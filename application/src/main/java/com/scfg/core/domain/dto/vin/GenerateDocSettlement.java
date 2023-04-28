@@ -15,11 +15,12 @@ import java.util.Date;
 @SuperBuilder
 public class GenerateDocSettlement {
 
+    private Date date;
     private String policyName;
     private String policyNumber;
     private Date policyFromDate;
     private Date policyToDate;
-    private Integer crediTermInYears;
+    private Integer creditTermInYears;
     private Date requestDate;
     private Integer daysPassed;
     private Integer yearsPassed;
@@ -30,8 +31,9 @@ public class GenerateDocSettlement {
     private Double currencyDollarValue;
     private Double premiumPaid;
     private Double premiumPaidAnnual;
+    private Double rescueValue;
     private Double adminExpenses;
-    private Double discountProrataDay;
+    private Double discountPerDay;
     private Double valueToReturn;
     private String assuranceName;
     private String assuranceIdentificationNumber;

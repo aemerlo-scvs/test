@@ -51,10 +51,10 @@ public class ProposalService implements ProposalUseCase {
             }
             if (filtersDto.getFromDate() != null || filtersDto.getToDate() != null) {
                 if(filtersDto.getToDate() == null || filtersDto.getToDate().isEmpty()) {
-                    throw new OperationException("El campo fecha de Inicio no debe estar vacio");
+                    throw new OperationException("El campo fecha final no debe estar vacio");
                 }
                 if(filtersDto.getFromDate() == null || filtersDto.getFromDate().isEmpty()) {
-                    throw new OperationException("El campo fecha de vencimiento no debe estar vacio");
+                    throw new OperationException("El campo fecha de inicio no debe estar vacio");
                 }
                 SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
                 Date initDate = date.parse(filtersDto.getFromDate());

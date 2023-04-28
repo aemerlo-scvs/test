@@ -19,9 +19,7 @@ import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.common.util.HelpersMethods;
 import com.scfg.core.common.util.*;
 import com.scfg.core.domain.*;
-import com.scfg.core.domain.common.Classifier;
-import com.scfg.core.domain.common.Direction;
-import com.scfg.core.domain.common.Pep;
+import com.scfg.core.domain.common.*;
 import com.scfg.core.domain.configuracionesSistemas.BrokerDTO;
 import com.scfg.core.domain.dto.*;
 import com.scfg.core.domain.dto.credicasas.FileDocumentByRequestDTO;
@@ -41,7 +39,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -77,8 +74,9 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
     private final VinPort vinPort;
     private final GenerateReportsService excelService;
     private final MessageResponsePort messageResponsePort;
-
     private final FileDocumentPort fileDocumentPort;
+    private final PolicyItemEconomicPort policyItemEconomicPort;
+    private final PolicyItemEconomicReinsurancePort policyItemEconomicReinsurancePort;
     private final Environment environment;
     private Gson gson;
     private final String[] urls = new String[]{"http://localhost:4201",
@@ -96,6 +94,9 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
     public void processRequest(Object request) {
 
         gson = new Gson();
+        double intermediaryCommissionPercentage = 0.0001;
+        List<CoveragePolicyItem> coveragePolicyItemList = new ArrayList<>();
+        List<PolicyItemEconomicReinsurance> policyItemEconomicReinsuranceList = new ArrayList<>();
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -123,6 +124,7 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
             } else {
                 personAux.setTelephone(processRequest.getSelectedCellphoneNumber());
                 NaturalPerson naturalPerson = processRequest.getPerson().getNaturalPerson();
+                naturalPerson.setId(personAux.getNaturalPerson().getId());
                 naturalPerson.setExtIdc(processRequest.getPerson().getNaturalPerson().getExtIdc());
                 naturalPerson.setMarriedLastName(processRequest.getPerson().getNaturalPerson().getMarriedLastName());
                 naturalPerson.setMaritalStatusIdc(processRequest.getPerson().getNaturalPerson().getMaritalStatusIdc());
@@ -180,28 +182,43 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
 
             Policy policy = new Policy(requestId,processRequest.getCurrencyTypeIdc(),processRequest.getTotalPremium(),0.0,0,productId,processRequest.getTermInDays()); //Validar el tipo de moneda a registrar en poliza, prima total, caital asegurado
             policy.setBrokerId(brokerDTO.getId());
-            policy.setIntermediaryCommissionPercentage(0.0001);
+            policy.setIntermediaryCommissionPercentage(intermediaryCommissionPercentage);
             Policy policyAux = policyPort.saveOrUpdate(policy);
-            PolicyItem policyItem = new PolicyItem(policyAux,personId,requestId,individualPremium);
-            PolicyItem policyItemAux = policyItemPort.saveOrUpdate(productCalculationsService.calculateVariablesWithYear(policyItem, processRequest.getTermInYears(),policy.getIntermediaryCommissionPercentage()));
+            PolicyItem policyItem = new PolicyItem(policyAux, personId, requestId, individualPremium, processRequest.getCoverages());
+            policyItem = policyItemPort.saveOrUpdate(policyItem);
 
-            double covInsured = 0;
+            PolicyItemEconomic policyItemEconomic = new PolicyItemEconomic(policyItem.getId(),
+                    PolicyMovementTypeClassifierEnum.PRODUCTION.getValue(), policy.getBrokerId(), individualPremium);
 
-            List<CoveragePolicyItem> coveragePolicyItemList = new ArrayList<>();
-            for (CoverageDTO coverage: processRequest.getCoverages()) {
-                CoveragePolicyItem coveragePolicyItem = new CoveragePolicyItem(coverage,policyItemAux.getId());
+            double totalPremiumCeded = productCalculationsService.calcPolicyItemEconomicReinsuranceTotalPremiumCededVIN(
+                    null, processRequest.getTermInYears(), policy.getFromDate(),
+                    policy.getToDate(), policy.getFromDate());
+
+            productCalculationsService.calcPolicyItemEconomicVIN(policyItemEconomic,null,
+                    totalPremiumCeded, processRequest.getTermInYears(), policy.getIntermediaryCommissionPercentage(),
+                    policy.getFromDate(), policy.getToDate(), policy.getFromDate());
+
+            policyItemEconomic = policyItemEconomicPort.saveOrUpdate(policyItemEconomic);
+
+
+            for (CoverageDTO coverage : processRequest.getCoverages()) {
+                CoveragePolicyItem coveragePolicyItem = new CoveragePolicyItem(coverage, policyItem.getId());
                 coveragePolicyItemList.add(coveragePolicyItem);
-                covInsured += coverage.getInsuredCapitalCoverage();
+
+                PolicyItemEconomicReinsurance policyItemEconomicReinsurance = new PolicyItemEconomicReinsurance(
+                        policyItemEconomic.getId(), coverage.getCoverageId());
+                productCalculationsService.calcPolicyItemEconomicReinsuranceVIN(policyItemEconomicReinsurance, null,
+                        policyItemEconomic.getMovementTypeIdc(), coverage, policyItemEconomic.getIndividualNetPremium(),
+                        processRequest.getTermInYears(), policy.getFromDate(), policy.getToDate(), policy.getFromDate());
+                policyItemEconomicReinsuranceList.add(policyItemEconomicReinsurance);
             }
 
-            policyItemAux.setIndividualInsuredCapital(covInsured);
-            policyItemAux = policyItemPort.saveOrUpdate(policyItemAux);
-
-            List<CoveragePolicyItem> coveragePolicyItemListAux = coveragePolicyItemPort.saveOrUpdateAll(coveragePolicyItemList);
+            coveragePolicyItemPort.saveOrUpdateAll(coveragePolicyItemList);
+            policyItemEconomicReinsurancePort.saveOrUpdateAll(policyItemEconomicReinsuranceList);
 
             for (Beneficiary beneficiary : processRequest.getBeneficiaries()) {
-                beneficiary.setPolicyItemId(policyItemAux.getId());
-                beneficiary.setPolicyId(policyItemAux.getPolicyId());
+                beneficiary.setPolicyItemId(policyItem.getId());
+                beneficiary.setPolicyId(policyItem.getPolicyId());
             }
 
             beneficiaryPort.saveAll(processRequest.getBeneficiaries());
@@ -443,8 +460,14 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {Exception.class, RuntimeException.class, OperationException.class})
     @Override
     public void cancelPolicy(RequestCancelOperationDTO requestCancelOperationDTO) {
-        this.validateCancelOperation(requestCancelOperationDTO);
-        List<Integer> operationNumbers = this.generalRequestPort.getIfExistOperationNumbers(requestCancelOperationDTO.getNro_operacion());
+
+        double factor = -1;
+        ZoneId zid = ZoneId.of("America/La_Paz");
+        LocalDateTime today = LocalDateTime.now(zid);
+
+        validateCancelOperation(requestCancelOperationDTO);
+
+        List<Integer> operationNumbers = generalRequestPort.getIfExistOperationNumbers(requestCancelOperationDTO.getNro_operacion());
 
         if(operationNumbers.isEmpty()){
             throw new OperationException("No se pudo realizar la operación, el número de operación no existe");
@@ -452,9 +475,8 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
             throw new OperationException("No se pudo realizar la operación, número de operación duplicado");
         }
 
-        Policy policy = this.policyPort.findByOperationNumber(requestCancelOperationDTO.getNro_operacion());
-        ZoneId zid = ZoneId.of("America/La_Paz");
-        LocalDateTime today = LocalDateTime.now(zid);
+        Policy policy = policyPort.findByOperationNumber(requestCancelOperationDTO.getNro_operacion());
+
         long t = ChronoUnit.HOURS.between(DateUtils.asDateToLocalDateTime(policy.getLastModifiedAt()), today);
         if(t > 24 ) {
             throw  new OperationException("No se pudo realizar la operación, han pasado más de 24 Horas desde que se generó el certificado de cobertura");
@@ -464,14 +486,45 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
             throw  new OperationException("No se pudo realizar la operación, la póliza ya se encuentra anulada");
         }
         policy.setPolicyStatusIdc(PolicyStatusEnum.CANCELED.getValue());
-        LocalDateTime dateNow = LocalDateTime.now();
-        Payment payment = this.paymentPort.findByGeneralRequest(policy.getGeneralRequestId());
-        PaymentPlan paymentPlan = mapToDomainPaymentPlan(policy.getTotalPremium() * (-1), payment.getId(), dateNow);
+
+        Payment payment = paymentPort.findByGeneralRequest(policy.getGeneralRequestId());
+        PaymentPlan paymentPlan = new PaymentPlan(policy.getTotalPremium() * factor, payment.getId(), today,
+                payment.getCreatedBy(), payment.getLastModifiedBy());
         long paymentPlanId = paymentPlanPort.saveOrUpdate(paymentPlan);
-        Transaction transaction = mapToDomainTransaction(requestCancelOperationDTO.getNro_comprobante(), policy.getTotalPremium() * (-1), policy.getCurrencyTypeIdc(), paymentPlanId, dateNow);
-        this.transactionPort.saveOrUpdate(transaction);
-        this.policyPort.saveOrUpdate(policy);
-        duplicateDataFromReversion(policy);
+        Transaction transaction = new Transaction(policy.getTotalPremium() * factor, today,
+                policy.getCurrencyTypeIdc(), paymentPlanId, requestCancelOperationDTO.getNro_comprobante().toString(),
+                payment.getCreatedBy(), payment.getLastModifiedBy());
+
+        GeneralRequest generalRequest = generalRequestPort.getGeneralRequest(policy.getGeneralRequestId());
+        PolicyItem policyItem = policyItemPort.findByPolicyIdAndPersonId(policy.getId(), generalRequest.getPersonId());
+        PolicyItem anulmmentPolicyItem = new PolicyItem(policyItem);
+        anulmmentPolicyItem.setTermValidity(DateUtils.asDate(today));
+        PolicyItemEconomic policyItemEconomic = policyItemEconomicPort.findLastByPolicyItemIdAndMovementTypeIdc(
+                policyItem.getId(), PolicyMovementTypeClassifierEnum.PRODUCTION.getValue(), PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        PolicyItemEconomic anulmmentPolicyItemEconomic = new PolicyItemEconomic(policyItemEconomic);
+
+        List<PolicyItemEconomicReinsurance> policyItemEconomicReinsuranceList = policyItemEconomicReinsurancePort
+                .findAllByPolicyItemEconomicId(policyItemEconomic.getId());
+        List<PolicyItemEconomicReinsurance> anulmmentPolicyItemEconomicReinsuranceList = new ArrayList(policyItemEconomicReinsuranceList);
+
+        anulmmentPolicyItemEconomic.setId(0L);
+        anulmmentPolicyItemEconomic.setMovementTypeIdc(PolicyMovementTypeClassifierEnum.ANNULMENT.getValue());
+        productCalculationsService.multiplyWithFactor(anulmmentPolicyItemEconomic, factor);
+
+        PolicyItemEconomic tempAnulmmentPolicyItemEconomic = policyItemEconomicPort.saveOrUpdate(anulmmentPolicyItemEconomic);
+        anulmmentPolicyItemEconomicReinsuranceList.forEach(o -> {
+            o.setId(0L);
+            o.setPremiumCeded(o.getPremiumCeded() * factor);
+            o.setPolicyItemEconomicId(tempAnulmmentPolicyItemEconomic.getId());
+        });
+
+        transactionPort.saveOrUpdate(transaction);
+        policyPort.saveOrUpdate(policy);
+        policyItemPort.saveOrUpdate(anulmmentPolicyItem);
+        policyItemEconomicReinsurancePort.saveOrUpdateAll(anulmmentPolicyItemEconomicReinsuranceList);
+
+        duplicateDataFromReversion(policy, generalRequest, policyItem, policyItemEconomic,
+                policyItemEconomicReinsuranceList);
     }
 
     @Override
@@ -582,6 +635,16 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
 
     @Override
     public FileDocumentDTO generateProductionReport(VinReportFilterDTO filterDTO) {
+        if (filterDTO.getFromDate() == null && filterDTO.getToDate() == null) {
+            throw new OperationException("Los campos fecha desde y fecha hasta son obligatorios");
+        }
+        if (filterDTO.getPolicyStatusIdc() == null || filterDTO.getPolicyStatusIdc() <= 0) {
+            filterDTO.setPolicyStatusIdc(-1);
+        }
+
+        filterDTO.setFromDate(DateUtils.formatToStartOrNull(filterDTO.getFromDate()));
+        filterDTO.setToDate(DateUtils.formatToEnd(filterDTO.getToDate()));
+
         List<Object> list = vinPort.getProductionReport(filterDTO);
         if (list.isEmpty()) {
             throw new OperationException("No se encontraron resultados");
@@ -592,6 +655,16 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
 
     @Override
     public FileDocumentDTO generateCommercialReport(VinReportFilterDTO filterDTO) {
+        if (filterDTO.getFromDate() == null && filterDTO.getToDate() == null) {
+            throw new OperationException("Los campos fecha desde y fecha hasta son obligatorios");
+        }
+        if (filterDTO.getPolicyStatusIdc() == null || filterDTO.getPolicyStatusIdc() <= 0) {
+            filterDTO.setPolicyStatusIdc(-1);
+        }
+
+        filterDTO.setFromDate(DateUtils.formatToStartOrNull(filterDTO.getFromDate()));
+        filterDTO.setToDate(DateUtils.formatToEnd(filterDTO.getToDate()));
+
         List<Object> list = vinPort.getCommercialReport(filterDTO);
         if (list.isEmpty()) {
             throw new OperationException("No se encontraron resultados");
@@ -723,45 +796,6 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
         return resp;
     }
 
-    //#region Mappers
-
-    private PaymentPlan mapToDomainPaymentPlan(double totalPayment, long paymentId, LocalDateTime dateNow) {
-
-        PaymentPlan paymentPlan = PaymentPlan.builder()
-                .id(0L)
-                .quoteNumber(1)
-                .amount(totalPayment)
-                .amountPaid(totalPayment)
-                .residue(0.00)
-                .percentage(100)
-                .expirationDate(dateNow)
-                .datePaid(dateNow)
-                .paymentId(paymentId)
-                .build();
-
-        return paymentPlan;
-    }
-
-    private Transaction mapToDomainTransaction(Long nroComprobante, double totalPayment, int currencyType,
-                                               long paymentPlanId, LocalDateTime dateNow) {
-
-        Transaction transaction = Transaction.builder()
-                .id(0L)
-                .amount(totalPayment)
-                .remainAmount(0.00)
-                .datePaid(dateNow)
-                .currencyTypeIdc(currencyType)
-                .paymentChannelIdc(PaymentChannelEnum.Cash.getValue())
-                .transactionType(TransactionTypeEnum.PremiumPayment.getValue())
-                .paymentPlanId(paymentPlanId)
-                .voucherNumber(nroComprobante.toString())
-                .build();
-
-        return transaction;
-    }
-
-    //#endregion
-
     //#region Auxiliary Methods
 
     private List<String> headersReport(int option) {
@@ -774,7 +808,9 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
             headers.add("Tipo de Movimiento");
             headers.add("SubTipo de Movimiento");
             headers.add("Moneda");
-            headers.add("Regional");
+            headers.add("Regional SCVS");
+            headers.add("Sucursal BFS");
+            headers.add("Agencia BFS");
             headers.add("Ramo");
             headers.add("Producto");
             headers.add("Plan");
@@ -799,6 +835,7 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
             headers.add("Gastos Medicos");
             headers.add("Capital Asegurado Total");
             headers.add("Prima Anual");
+            headers.add("Fecha de Anulación");
             headers.add("Prima Total (Vigencia Total)");
             headers.add("Prima Neta");
             headers.add("Prima Adicional");
@@ -826,7 +863,6 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
             headers.add("Capital Cedido Total");
             headers.add("Prima Cedida Total");
             headers.add("IRE Total");
-            headers.add("Prima Neta Retenida");
             headers.add("Edad Actuarial a la fecha de corte");
             headers.add("Edad actuarial Mancomunada a la fecha de corte");
             headers.add("Fumador");
@@ -840,6 +876,8 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
             headers.add("% De ahorro (si corresponde)");
             headers.add("Tasa de Interés Financiera (%)");
             headers.add("Reserva Matemática y Financiera Total");
+            headers.add("Fecha de Pago");
+            headers.add("No. de Comprobante");
         }
         if (option == 2) {
             headers.add("No. Propuesta");
@@ -1088,12 +1126,14 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
         senderService.sendMessage(messageDTO);
     }
 
-    private void duplicateDataFromReversion(Policy policy) {
+    private void duplicateDataFromReversion(Policy policy, GeneralRequest request, PolicyItem policyItem,
+                                            PolicyItemEconomic policyItemEconomic,
+                                            List<PolicyItemEconomicReinsurance> policyItemEconomicReinsuranceList) {
+        double factor = -1;
         Policy policyAux = policy;
-        GeneralRequest request = generalRequestPort.getGeneralRequest(policy.getGeneralRequestId());
-        PolicyItem policyItem = policyItemPort.getPolicyItemByGeneralRequestId(request.getId());
         AccountPolicy accountPolicy = accountPolicyPort.findByPolicyId(policyAux.getId());
         List<Beneficiary> beneficiaryList = beneficiaryPort.findAllByPolicyItemId(policyItem.getId());
+        List<CoveragePolicyItem> coveragePolicyItemList = coveragePolicyItemPort.findByPolicyItemId(policyItem.getId());
         MessageDTO messageSent = messageSentPort.findByReferenceIdAndTableReferenceIdc(request.getId(),
                 (int) ClassifierEnum.REFERENCE_TABLE_GENERALREQUEST.getReferenceCode());
         boolean messageSentControl = false;
@@ -1126,7 +1166,6 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
                 }
             }
         }
-        List<CoveragePolicyItem> coveragePolicyItemList = coveragePolicyItemPort.findByPolicyItemId(policyItem.getId());
 
         //#region Cambios de id para duplicar valores
 
@@ -1145,6 +1184,19 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
         policyItem.setGeneralRequestId(requestId);
         policyItem.setPolicyId(policyAux.getId());
         policyItem = policyItemPort.saveOrUpdate(policyItem);
+
+        policyItemEconomic.setId(0L);
+        policyItemEconomic.setMovementTypeIdc(PolicyMovementTypeClassifierEnum.PRODUCTION.getValue());
+        policyItemEconomic.setPolicyItemId(policyItem.getId());
+        policyItemEconomic = policyItemEconomicPort.saveOrUpdate(policyItemEconomic);
+
+        PolicyItemEconomic tempPolicyItemEconomic = policyItemEconomic;
+        policyItemEconomicReinsuranceList.forEach(o -> {
+            o.setId(0L);
+            o.setPremiumCeded(o.getPremiumCeded() * factor);
+            o.setPolicyItemEconomicId(tempPolicyItemEconomic.getId());
+        });
+        policyItemEconomicReinsurancePort.saveOrUpdateAll(policyItemEconomicReinsuranceList);
 
         accountPolicy.setId(0L);
         accountPolicy.setPolicyId(policyItem.getPolicyId());
@@ -1259,6 +1311,7 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
     //#endregion
 
     //#region Schedule
+
     @Scheduled(cron = "0 0 01 * * *", zone = "America/La_Paz")
     public void automaticCancelationProposal() {
         Calendar toDay = DateUtils.getDateNowByGregorianCalendar();
@@ -1268,6 +1321,7 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
         generalRequestList.forEach(x -> x.setRequestStatusIdc(RequestStatusEnum.CANCELLED.getValue()));
         generalRequestPort.saveOrUpdateAll(generalRequestList);
     }
+
     //#endregion
 
 }

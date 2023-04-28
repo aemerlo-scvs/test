@@ -18,5 +18,7 @@ public interface CoveragePolicyItemPort {
    List<CoveragePolicyItem> findAllByPersonId(Long personId);
 
    List<CoveragePolicyItem> findAllByPersonIdGEL(Long personId, List<Plan> planList);
+   Double getInsuredCapitalCededByPolicyItemId(Long policyItemId);
+   Double getIreByPolicyItemId(Long policyItemId);
 
 }

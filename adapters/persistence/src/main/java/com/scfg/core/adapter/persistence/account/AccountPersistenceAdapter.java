@@ -38,6 +38,13 @@ public class AccountPersistenceAdapter implements AccountPort {
     }
 
     @Override
+    public Account findByPolicyId(Long policyId) {
+        AccountJpaEntity account = accountRepository.findByPolicyId(policyId,
+                PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return mapToDomain(account);
+    }
+
+    @Override
     public Account findLastByPersonIdAndPolicyId(Long personId, Long policyId) {
         List<AccountJpaEntity> list = accountRepository.findAllByPersonIdAndPolicyId(personId, policyId,
                 PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());

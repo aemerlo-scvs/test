@@ -51,4 +51,7 @@ public class PaymentPlanJpaEntity extends BaseJpaEntity {
     @Column(name = "paymentId")
     private Long paymentId;
 
+    @Column(name = "annexeId")
+    private Long annexeId;
+
 }

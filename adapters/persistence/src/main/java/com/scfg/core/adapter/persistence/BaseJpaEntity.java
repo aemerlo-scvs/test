@@ -31,7 +31,6 @@ public abstract class BaseJpaEntity {
     @Column(name = "status", nullable = false)
     private Integer status;
 
-
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
 

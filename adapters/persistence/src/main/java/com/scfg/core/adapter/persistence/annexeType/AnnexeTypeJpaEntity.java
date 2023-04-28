@@ -23,7 +23,19 @@ public class AnnexeTypeJpaEntity extends BaseJpaEntity {
     private Long internalCode;
     @Column(name = "name")
     private String name;
-    @Column(name = "description")
-    private String description;
+    @Column(name = "initial", length = 15)
+    private String initial;
+
+    @Column(name = "apsCode", length = 100)
+    private String apsCode;
+
+    @Column(name = "apsResolutionNumber", length = 100)
+    private String apsResolutionNumber;
+
+    @Column(name = "apsName", length = 100)
+    private String apsName;
+
+    @Column(name = "productId")
+    private Long productId;
 
 }

@@ -8,4 +8,5 @@ public interface PolicyItemMathReservePort {
     PolicyItemMathReserve saveOrUpdate(PolicyItemMathReserve policyItemMathReserve);
     List<PolicyItemMathReserve> saveOrUpdateAll(List<PolicyItemMathReserve> policyItemMathReserveList);
     List<PolicyItemMathReserve> findByPolicyItemId(Long policyItemId);
+    PolicyItemMathReserve findByPolicyItemIdAndYear(Long policyItemId, Integer year);
 }

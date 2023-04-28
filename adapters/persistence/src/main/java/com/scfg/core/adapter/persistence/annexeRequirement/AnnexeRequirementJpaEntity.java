@@ -26,4 +26,6 @@ public class AnnexeRequirementJpaEntity extends BaseJpaEntity {
     private String description;
     @Column(name = "annexeTypeId")
     private Long annexeTypeId;
+    @Column(name = "required")
+    private Integer required;
 }

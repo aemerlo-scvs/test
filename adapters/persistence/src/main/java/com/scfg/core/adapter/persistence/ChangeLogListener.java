@@ -55,9 +55,11 @@ public class ChangeLogListener {
     @PrePersist
     public void prePersist(final BaseJpaEntity entity) throws JsonProcessingException {
 
-        entity.setStatus(PersistenceStatusEnum
-                .CREATED_OR_UPDATED
-                .getValue());
+        if (isNull(entity.getStatus())) {
+            entity.setStatus(PersistenceStatusEnum
+                    .CREATED_OR_UPDATED
+                    .getValue());
+        }
 
         ObjectMapper mapper = new ObjectMapper();
         if (entity != null) {

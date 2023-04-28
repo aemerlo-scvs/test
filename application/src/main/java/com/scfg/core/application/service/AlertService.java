@@ -31,6 +31,13 @@ public class AlertService {
         return alert;
     }
 
+    public Alert getAlertByEnumReplacingContent(AlertEnum alertEnum, List<String> valuesBodyToReplace, List<String> valuesSubjectToReplace) {
+        Alert alert = alertPort.findByAlert(alertEnum.getValue());
+        alert.setMail_body(getContent(alertEnum, alert.getMail_body(), valuesBodyToReplace));
+        alert.setMail_subject(getContentSubject(alertEnum, alert.getMail_subject(), valuesSubjectToReplace));
+        return alert;
+    }
+
     public String getContent(AlertEnum alertEnum, String content, List<String> valuesToReplace) {
 
         String contentReplaced = content;
@@ -77,9 +84,37 @@ public class AlertService {
             case VIN_ACTIVATION_CONFIRM_PROPOSAL_SMS:
                 contentReplaced = content.replace("{url}",valuesToReplace.get(0));
                 break;
+            case VIN_REQUESTANNEXE_ACEPTED:
+                contentReplaced = contentReplaced.replace("{name}",valuesToReplace.get(0));
+                contentReplaced = contentReplaced.replace("{observation}",valuesToReplace.get(1));
+            case VIN_REQUESTANNEXE_OBSERVED:
+                contentReplaced = contentReplaced.replace("{name}",valuesToReplace.get(0));
+            case VIN_REQUESTANNEXE_REJECTED:
+                contentReplaced = contentReplaced.replace("{name}",valuesToReplace.get(0));
+                contentReplaced = contentReplaced.replace("{observation}",valuesToReplace.get(1));
+            case VIN_ANNEXE_CONFIRM_PAYMENT_VOUCHER:
+                contentReplaced = contentReplaced.replace("{policyNumber}", valuesToReplace.get(0));
         }
         return contentReplaced;
     }
-
+    public String getContentSubject(AlertEnum alertEnum, String content, List<String> valuesSubjectToReplace) {
+        String contentReplaced = content;
+        if (valuesSubjectToReplace == null || valuesSubjectToReplace.isEmpty()) {
+            return content;
+        }
+        switch (alertEnum) {
+            case VIN_REQUESTANNEXE_ACEPTED:
+                contentReplaced = contentReplaced.replace("{nombreAsegurado}",valuesSubjectToReplace.get(0));
+            case VIN_REQUESTANNEXE_OBSERVED:
+                contentReplaced = contentReplaced.replace("{nombreAsegurado}",valuesSubjectToReplace.get(0));
+            case VIN_REQUESTANNEXE_REJECTED:
+                contentReplaced = contentReplaced.replace("{nombreAsegurado}",valuesSubjectToReplace.get(0));
+            case VIN_ANNEXE_CONFIRM_PAYMENT_VOUCHER:
+                contentReplaced = contentReplaced.replace("{nombreAsegurado}", valuesSubjectToReplace.get(0));
+            case VIN_REQUESTANNEXE_ACEPTED_ACCOUTING:
+                contentReplaced = contentReplaced.replace("{nombreAsegurado}",valuesSubjectToReplace.get(0));
+        }
+        return contentReplaced;
+    }
 
 }

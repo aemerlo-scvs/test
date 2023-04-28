@@ -23,4 +23,9 @@ public interface UserRepository extends JpaRepository<UserJpaEntity, Long> {
 
     Optional<UserJpaEntity> findByTokenEquals(String token);
 
+    @Query("SELECT u " +
+            "FROM UserJpaEntity u " +
+            "WHERE u.id =:id ")
+    Optional<UserJpaEntity> customFindById(@Param("id") Long id);
+
 }

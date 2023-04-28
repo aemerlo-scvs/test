@@ -59,4 +59,8 @@ public class TransactionJpaEntity extends BaseJpaEntity {
 
     @Column(name = "voucherNumber")
     private String voucherNumber;
+
+    @Column(name = "transactionFileDocumentId")
+    private Long transactionFileDocumentId;
+
 }

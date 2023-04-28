@@ -14,13 +14,13 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @ApiModel(description = "DTO para la lista de requerimientos para una solicitud de anexo")
-public class RequirementDTO {
+public class RequirementEditedDTO {
     private Long id;
     private String description;
     private String requestDate;
     private String receptionDate;
     private String comment;
-
     private Document fileDocument;
     private Long requirementId;
+    private Boolean isEdited;
 }

@@ -1,7 +1,6 @@
 package com.scfg.core.application.port.in;
 
 import com.scfg.core.domain.Policy;
-import com.scfg.core.domain.dto.PageableDTO;
 import com.scfg.core.domain.dto.PersonDTO;
 import com.scfg.core.domain.dto.credicasas.groupthefont.GELPolicyDTO;
 
@@ -14,5 +13,5 @@ public interface PolicyUseCase {
     Policy update(Policy o);
     Boolean delete(Policy o);
     List<GELPolicyDTO> getAllActualGELPolicies(Long businessGroupIdc);
-    PageableDTO getAllByPageAndPersonFilters(Integer Page, Integer Size, PersonDTO personDTO);
+    String getAllByPersonFilters(PersonDTO personDTO);
 }

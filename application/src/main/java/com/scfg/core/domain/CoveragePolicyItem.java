@@ -26,6 +26,12 @@ public class CoveragePolicyItem extends BaseDomain {
     private Double additionalPremiumPerThousand;
     private String comment;
     private Double rate;
+    private Long coverageId;
+    private Double insuredCapitalCededRate;
+    private Double insuredCapitalCeded;
+    private Double insuredCapitalRetained;
+    private Double IRE;
+    private Long reinsurerId;
 
 
     //#region Custom Constructor
@@ -64,10 +70,16 @@ public class CoveragePolicyItem extends BaseDomain {
 
     //VIN Constructor
     public CoveragePolicyItem(CoverageDTO coverageDTO, Long policyItemId) {
-        this.setPolicyItemId(policyItemId);
-        this.setCoverageProductPlanId(coverageDTO.getCoverageProductPlanId());
-        this.setInsuredCapital(coverageDTO.getInsuredCapitalCoverage());
-        this.setRate(coverageDTO.getRate());
+        this.policyItemId = policyItemId;
+        this.coverageProductPlanId = coverageDTO.getCoverageProductPlanId();
+        this.insuredCapital = coverageDTO.getInsuredCapitalCoverage();
+        this.rate = coverageDTO.getRate();
+        this.coverageId = coverageDTO.getCoverageId();
+        this.insuredCapitalCededRate = 0.5;
+        this.insuredCapitalCeded = this.insuredCapital * this.insuredCapitalCededRate;
+        this.insuredCapitalRetained = this.insuredCapital - this.insuredCapitalCeded;
+        this.IRE = 0.0;
+        this.reinsurerId = 1L;
     }
 
     //#endregion
