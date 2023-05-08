@@ -1,6 +1,7 @@
 package com.scfg.core.domain;
 
 import com.scfg.core.domain.common.BaseDomain;
+import com.scfg.core.domain.dto.CoverageDTO;
 import com.scfg.core.domain.dto.credicasas.groupthefont.requestDto.RequestFontDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,6 +13,7 @@ import javax.persistence.Column;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -72,8 +74,6 @@ public class PolicyItem extends BaseDomain {
         this.riskPositionIdc = 1;
     }
 
-    //#enregion
-
     // GEL Constructor
     public PolicyItem(RequestFontDTO requestFontDTO, Long personId, Long requestId, double individualPremiumRate) {
         this.personId = personId;
@@ -89,16 +89,43 @@ public class PolicyItem extends BaseDomain {
     }
 
     // VIN Constructor
-    public PolicyItem(Policy policy, Long personId, Long generalRequestId, Double individualPremium) {
+    public PolicyItem(Policy policy, Long personId, Long generalRequestId, Double individualPremium, List<CoverageDTO> coverages) {
         this.personId = personId;
         this.policyId = policy.getId();
         this.generalRequestId = generalRequestId;
         this.individualPremium = individualPremium;
-        this.individualInsuredCapital = policy.getInsuredCapital();
+        this.individualInsuredCapital = coverages.stream().mapToDouble(CoverageDTO::getInsuredCapitalCoverage).sum();
         this.validityStart = policy.getFromDate();
         this.termValidity = policy.getToDate();
-        this.riskPositionIdc = 1;
+        this.riskPositionIdc = 1; //TODO: Consultar sobre este valor
     }
-    //#enregion
+
+    public PolicyItem(PolicyItem policyItem) {
+        this.personId = policyItem.personId;
+        this.policyId = policyItem.policyId;
+        this.generalRequestId = policyItem.generalRequestId;
+        this.individualInsuredCapital = policyItem.individualInsuredCapital;
+        this.validityStart = policyItem.validityStart;
+        this.termValidity = policyItem.termValidity;
+        this.individualPremium = policyItem.individualPremium;
+        this.individualPremiumRate = policyItem.individualPremiumRate;
+        this.riskPositionIdc = policyItem.riskPositionIdc;
+        this.pronouncementDate = policyItem.pronouncementDate;
+        this.individualAdditionalPremium = policyItem.individualAdditionalPremium;
+        this.individualNetPremium = policyItem.individualNetPremium;
+        this.individualRiskPremium = policyItem.individualRiskPremium;
+        this.APS = policyItem.APS;
+        this.FPA = policyItem.FPA;
+        this.IVA = policyItem.IVA;
+        this.IT = policyItem.IT;
+        this.individualIntermediaryCommission = policyItem.individualIntermediaryCommission;
+        this.individualCollectionServiceCommission = policyItem.individualCollectionServiceCommission;
+        this.annexeId = policyItem.annexeId;
+        this.itemStatusIdc = policyItem.itemStatusIdc;
+        this.inclusionDate = policyItem.inclusionDate;
+        this.exclusionDate = policyItem.exclusionDate;
+    }
+
+    //#endregion
 
 }

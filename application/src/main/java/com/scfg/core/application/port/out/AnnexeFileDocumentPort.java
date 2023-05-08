@@ -10,5 +10,9 @@ public interface AnnexeFileDocumentPort {
 // TODO hacer consulta anidada con AnnexeRequirementControl para obtener
 //  el documento que tiene relacion con el campo fileDocument de AnnexeRequirementControl
 
+    Document getFileOptionalOrException(Long documentId);
+    Document getFileByRequestAnnexeIdAndTypeDocumentIdc(Long requestAnnexeId, Integer typeDocumentIdc);
+    Document findRequestAnnexeIdAndAnnexeTypeIdcAndSigned(Long requestAnnexeId, Integer typeDocumentIdc, Boolean signed);
 
 }
+

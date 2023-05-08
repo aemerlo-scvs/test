@@ -1,7 +1,9 @@
 package com.scfg.core.adapter.persistence.person;
 
 import com.scfg.core.adapter.persistence.juridicalPerson.JuridicalPersonJpaEntity;
+import com.scfg.core.adapter.persistence.juridicalPerson.JuridicalPersonRepository;
 import com.scfg.core.adapter.persistence.naturalPerson.NaturalPersonJpaEntity;
+import com.scfg.core.adapter.persistence.naturalPerson.NaturalPersonRepository;
 import com.scfg.core.application.port.out.PersonPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.PersistenceStatusEnum;
@@ -22,82 +24,137 @@ import java.util.stream.Collectors;
 public class PersonPersistenceAdapter implements PersonPort {
 
     private final PersonRepository personRepository;
+    private final NaturalPersonRepository naturalPersonRepository;
+    private final JuridicalPersonRepository juridicalPersonRepository;
 
     private final EntityManager em;
 
     @Override
     public List<Person> findAll() {
-        List<Person> list = new ArrayList<>();
-        List<PersonJpaEntity> listAux = personRepository.findAll(PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
-        listAux.forEach(item -> {
-            list.add(mapToDomain(item));
-        });
-        return list;
+        List<Person> personList = personRepository.findAll(PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return personList;
     }
 
     @Override
     public Person findById(long personId) {
-        PersonJpaEntity personJpaEntity = personRepository.customFindById(personId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
-        return (personJpaEntity != null) ? mapToDomain(personJpaEntity) : null;
+        Person person = personRepository.customFindById(personId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return person;
     }
 
     @Override
     public Person findByIdentificationNumberAndType(String identificationNumber, Integer documentType) {
-        PersonJpaEntity personJpaEntity = personRepository.findByNaturalPersonIdentificationNumberAndDocumentType(identificationNumber, documentType);
-        return (personJpaEntity != null) ? mapToDomain(personJpaEntity) : null;
+        Person person = personRepository.findByNaturalPersonIdentificationNumberAndDocumentType(identificationNumber, documentType);
+        return person;
     }
 
     @Override
     public List<Person> findAllByFilters(PersonDTO personDTO) {
         String query = personRepository.getFindAllByFiltersBaseQuery() + getPersonFilters(personDTO);
 
-        List<PersonJpaEntity> personJpaEntityList = em.createQuery(query).getResultList();
+        List<Person> personList = em.createQuery(query).getResultList();
 
         em.close();
-        return personJpaEntityList.stream().map(o -> new ModelMapper().map(o, Person.class)).collect(Collectors.toList());
+        return personList;
     }
 
     @Override
     public Boolean existsIdentificationNumber(String identificationNumber) {
-        PersonJpaEntity personJpaEntity = personRepository.findByNaturalPersonIdentificationNumber(identificationNumber);
-        return personJpaEntity != null;
+        Person person = personRepository.findByNaturalPersonIdentificationNumber(identificationNumber);
+        return person != null;
     }
     
     @Override
     public long saveOrUpdate(Person person) {
-        PersonJpaEntity personJpaEntity = mapToJpaEntity(person);
+        PersonJpaEntity personJpaEntity = mapToPersonJpaEntity(person);
         personJpaEntity = personRepository.save(personJpaEntity);
-        return personJpaEntity.getId();
+        person.setId(personJpaEntity.getId());
+        if (person.getNaturalPerson() != null) {
+            NaturalPersonJpaEntity naturalPersonJpaEntity = mapToNaturalPersonJpaEntity(person);
+            naturalPersonRepository.save(naturalPersonJpaEntity);
+            return naturalPersonJpaEntity.getPerson().getId();
+        }
+        JuridicalPersonJpaEntity juridicalPersonJpaEntity = mapToJuridicalPersonJpaEntity(person);
+        juridicalPersonJpaEntity = juridicalPersonRepository.save(juridicalPersonJpaEntity);
+        return juridicalPersonJpaEntity.getPerson().getId();
     }
 
     @Override
     public List<Person> findAllByAssignedGroup(Integer assignedGroup) {
-        List<PersonJpaEntity> personGroups = personRepository.findAllByAssignedGroupIdc(PersistenceStatusEnum.CREATED_OR_UPDATED.getValue(),assignedGroup);
-        List<Person> listAux = new ArrayList<>();
-        personGroups.forEach(item -> {
-            listAux.add(mapToDomain(item));
-        });
-        return listAux;
+        List<Person> personList = personRepository.findAllByAssignedGroupIdc(PersistenceStatusEnum.CREATED_OR_UPDATED.getValue(),assignedGroup);
+        return personList;
     }
 
     @Override
     public List<Person> findAllByListOfPersonId(List<Long> personIdList) {
-        List<PersonJpaEntity> personJpaEntityList = personRepository.findAllByListId(personIdList,PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
-        return personJpaEntityList.stream().map(o -> new ModelMapper().map(o, Person.class)).collect(Collectors.toList());
+        List<Person> personList = personRepository.findAllByListId(personIdList,PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return personList;
     }
 
     @Override
     public Person findByNitNumber(Long nitNumber) {
-        PersonJpaEntity person = personRepository.findByNitNumber(nitNumber,PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
-        return new ModelMapper().map(person, Person.class);
+        Person person = personRepository.findByNitNumber(nitNumber,PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return person;
+    }
+
+    @Override
+    public Person findByPolicyIdWhenPolicyAndPersonIsOneToOne(Long policyId) {
+        Person person = personRepository.findByPolicyId(policyId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return person;
     }
 
     //#region Mappers
+    public static NaturalPersonJpaEntity mapToNaturalPersonJpaEntity(Person person) {
+        NaturalPersonJpaEntity naturalPersonJpaEntity = NaturalPersonJpaEntity.builder()
+                .id(person.getNaturalPerson().getId())
+                .nit(person.getNit())
+                .clientCode(person.getNaturalPerson().getClientCode())
+                .clientEventual(person.getNaturalPerson().getClientEventual())
+                .clientType(person.getNaturalPerson().getClientType())
+                .name(person.getNaturalPerson().getName())
+                .lastName(person.getNaturalPerson().getLastName())
+                .motherLastName(person.getNaturalPerson().getMotherLastName())
+                .marriedLastName(person.getNaturalPerson().getMarriedLastName())
+                .maritalStatusIdc(person.getNaturalPerson().getMaritalStatusIdc())
+                .documentType(person.getNaturalPerson().getDocumentType())
+                .identificationNumber(person.getNaturalPerson().getIdentificationNumber())
+                .complement(person.getNaturalPerson().getComplement())
+                .extIdc(person.getNaturalPerson().getExtIdc())
+                .birthDate(person.getNaturalPerson().getBirthDate())
+                .genderIdc(person.getNaturalPerson().getGenderIdc())
+                .profession(person.getNaturalPerson().getProfession())
+                .workPlace(person.getNaturalPerson().getWorkPlace())
+                .workTypeIdc(person.getNaturalPerson().getWorkTypeIdc())
+                .position(person.getNaturalPerson().getPosition())
+                .entryDate(person.getNaturalPerson().getEntryDate())
+                .salary(person.getNaturalPerson().getSalary())
+                .createdAt(person.getNaturalPerson().getCreatedAt())
+                .lastModifiedAt(person.getNaturalPerson().getLastModifiedAt())
+                .internalClientCode(person.getNaturalPerson().getInternalClientCode())
+                .person(mapToPersonJpaEntity(person))
+                .build();
+        return naturalPersonJpaEntity;
+    }
 
-    public static PersonJpaEntity mapToJpaEntity(Person person) {
+    public static JuridicalPersonJpaEntity mapToJuridicalPersonJpaEntity(Person person) {
+        JuridicalPersonJpaEntity juridicalPersonJpaEntity = JuridicalPersonJpaEntity.builder()
+                .id(person.getJuridicalPerson().getId())
+                .nit(person.getNit())
+                .businessTypeIdc(person.getJuridicalPerson().getBusinessTypeIdc())
+                .name(person.getJuridicalPerson().getName())
+                .webSite(person.getJuridicalPerson().getWebSite())
+                .createdAt(person.getJuridicalPerson().getCreatedAt())
+                .createdBy(person.getJuridicalPerson().getCreatedBy())
+                .lastModifiedAt(person.getJuridicalPerson().getLastModifiedAt())
+                .lastModifiedBy(person.getJuridicalPerson().getLastModifiedBy())
+                .internalClientCode(person.getNaturalPerson().getInternalClientCode())
+                .person(mapToPersonJpaEntity(person))
+                .build();
+        return juridicalPersonJpaEntity;
+    }
+
+    public static PersonJpaEntity mapToPersonJpaEntity(Person person) {
         PersonJpaEntity personJpaEntity = PersonJpaEntity.builder()
                 .id(person.getId())
-                .nit(person.getNit())
                 .nationalityIdc(person.getNationalityIdc())
                 .residenceIdc(person.getResidenceIdc())
                 .activityIdc(person.getActivityIdc())
@@ -110,46 +167,9 @@ public class PersonPersistenceAdapter implements PersonPort {
                 .lastModifiedAt(person.getLastModifiedAt())
                 .build();
 
-        if (person.getNaturalPerson() != null) {
-            personJpaEntity.setNaturalPerson(mapToJpaEntity(person.getNaturalPerson()));
-        }
-
-        if (person.getJuridicalPerson() != null) {
-            personJpaEntity.setJuridicalPerson(mapToEntity(person.getJuridicalPerson()));
-        }
-
         return personJpaEntity;
     }
 
-    public static NaturalPersonJpaEntity mapToJpaEntity(NaturalPerson naturalPerson) {
-        return NaturalPersonJpaEntity.builder()
-                .id(naturalPerson.getId())
-                .clientCode(naturalPerson.getClientCode())
-                .clientEventual(naturalPerson.getClientEventual())
-                .clientType(naturalPerson.getClientType())
-                .name(naturalPerson.getName())
-                .lastName(naturalPerson.getLastName())
-                .motherLastName(naturalPerson.getMotherLastName())
-                .marriedLastName(naturalPerson.getMarriedLastName())
-                .maritalStatusIdc(naturalPerson.getMaritalStatusIdc())
-                .documentType(naturalPerson.getDocumentType())
-                .identificationNumber(naturalPerson.getIdentificationNumber())
-                .complement(naturalPerson.getComplement())
-                .extIdc(naturalPerson.getExtIdc())
-                .birthDate(naturalPerson.getBirthDate())
-                .genderIdc(naturalPerson.getGenderIdc())
-                .profession(naturalPerson.getProfession())
-                .workPlace(naturalPerson.getWorkPlace())
-                .workTypeIdc(naturalPerson.getWorkTypeIdc()) // TODO: Revisar que funcione para SEPELIO
-                .position(naturalPerson.getPosition())
-                .entryDate(naturalPerson.getEntryDate())
-                .salary(naturalPerson.getSalary())
-                .createdAt(naturalPerson.getCreatedAt())
-                .lastModifiedAt(naturalPerson.getLastModifiedAt())
-                .build();
-
-        // return naturalPersonJpaEntity;
-    }
 
     public static JuridicalPersonJpaEntity mapToEntity(JuridicalPerson juridicalPerson) {
         return JuridicalPersonJpaEntity.builder()
@@ -161,76 +181,6 @@ public class PersonPersistenceAdapter implements PersonPort {
                 .createdBy(juridicalPerson.getCreatedBy())
                 .lastModifiedAt(juridicalPerson.getLastModifiedAt())
                 .lastModifiedBy(juridicalPerson.getLastModifiedBy())
-                .build();
-    }
-
-    public static Person mapToDomain(PersonJpaEntity personJpaEntity) {
-        Person person = Person.builder()
-                .id(personJpaEntity.getId())
-                .nit(personJpaEntity.getNit())
-                .nationalityIdc(personJpaEntity.getNationalityIdc())
-                .residenceIdc(personJpaEntity.getResidenceIdc())
-                .activityIdc(personJpaEntity.getActivityIdc())
-                .reference(personJpaEntity.getReference())
-                .telephone(personJpaEntity.getTelephone())
-                .email(personJpaEntity.getEmail())
-                .holder(personJpaEntity.getHolder())
-                .insured(personJpaEntity.getInsured())
-                // .naturalPerson(new NaturalPerson())
-                // .juridicalPerson(new JuridicalPerson())
-                .createdAt(personJpaEntity.getCreatedAt())
-                .lastModifiedAt(personJpaEntity.getLastModifiedAt())
-                .build();
-
-        if (personJpaEntity.getNaturalPerson() != null) {
-            person.setNaturalPerson(mapToDomain(personJpaEntity.getNaturalPerson()));
-        }
-
-        if (personJpaEntity.getJuridicalPerson() != null) {
-            person.setJuridicalPerson(mapToDomain(personJpaEntity.getJuridicalPerson()));
-        }
-
-        return person;
-    }
-
-    public static NaturalPerson mapToDomain(NaturalPersonJpaEntity naturalPersonJpaEntity) {
-        return NaturalPerson.builder()
-                .id(naturalPersonJpaEntity.getId())
-                .clientCode(naturalPersonJpaEntity.getClientCode())
-                .clientEventual(naturalPersonJpaEntity.getClientEventual())
-                .clientType(naturalPersonJpaEntity.getClientType())
-                .name(naturalPersonJpaEntity.getName())
-                .lastName(naturalPersonJpaEntity.getLastName())
-                .motherLastName(naturalPersonJpaEntity.getMotherLastName())
-                .marriedLastName(naturalPersonJpaEntity.getMarriedLastName())
-                .maritalStatusIdc(naturalPersonJpaEntity.getMaritalStatusIdc())
-                .documentType(naturalPersonJpaEntity.getDocumentType())
-                .identificationNumber(naturalPersonJpaEntity.getIdentificationNumber())
-                .complement(naturalPersonJpaEntity.getComplement())
-                .extIdc(naturalPersonJpaEntity.getExtIdc())
-                .birthDate(naturalPersonJpaEntity.getBirthDate())
-                .genderIdc(naturalPersonJpaEntity.getGenderIdc())
-                .profession(naturalPersonJpaEntity.getProfession())
-                .workPlace(naturalPersonJpaEntity.getWorkPlace())
-                .workTypeIdc(naturalPersonJpaEntity.getWorkTypeIdc()) // TODO: Revisar que funcione para SEPELIO
-                .position(naturalPersonJpaEntity.getPosition())
-                .entryDate(naturalPersonJpaEntity.getEntryDate())
-                .salary(naturalPersonJpaEntity.getSalary())
-                .createdAt(naturalPersonJpaEntity.getCreatedAt())
-                .lastModifiedAt(naturalPersonJpaEntity.getLastModifiedAt())
-                .build();
-    }
-
-    public static JuridicalPerson mapToDomain(JuridicalPersonJpaEntity juridicalPersonJpaEntity) {
-        return JuridicalPerson.builder()
-                .id(juridicalPersonJpaEntity.getId())
-                .businessTypeIdc(juridicalPersonJpaEntity.getBusinessTypeIdc())
-                .name(juridicalPersonJpaEntity.getName())
-                .webSite(juridicalPersonJpaEntity.getWebSite())
-                .createdAt(juridicalPersonJpaEntity.getCreatedAt())
-                .createdBy(juridicalPersonJpaEntity.getCreatedBy())
-                .lastModifiedAt(juridicalPersonJpaEntity.getLastModifiedAt())
-                .lastModifiedBy(juridicalPersonJpaEntity.getLastModifiedBy())
                 .build();
     }
 

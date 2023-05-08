@@ -3,6 +3,7 @@ package com.scfg.core.adapter.persistence.policy;
 import com.scfg.core.application.port.out.PolicyPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.*;
+import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.common.util.HelpersMethods;
 import com.scfg.core.domain.Policy;
@@ -217,5 +218,13 @@ public class PolicyPersistenceAdapter implements PolicyPort {
             filters = "AND " + String.join(" AND ", filterList) + " \n";
         }
         return filters;
+    }
+
+
+    @Override
+    public Policy findByPolicyIdOrThrowExcepcion (Long policyId) {
+        PolicyJpaEntity policyJpaEntity = policyRepository.findOptionalByPolicyId(policyId,PersistenceStatusEnum.CREATED_OR_UPDATED.getValue())
+                .orElseThrow(() -> new NotDataFoundException("poliza no encontrada"));
+        return new ModelMapper().map(policyJpaEntity,Policy.class);
     }
 }

@@ -3,13 +3,14 @@ package com.scfg.core.adapter.persistence.coveragePolicyItem;
 import com.scfg.core.application.port.out.mortgageReliefValidations.CoveragePolicyItemPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.PersistenceStatusEnum;
+import com.scfg.core.common.util.ModelMapperConfig;
 import com.scfg.core.domain.CoveragePolicyItem;
-import com.scfg.core.domain.GeneralRequest;
 import com.scfg.core.domain.Plan;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @PersistenceAdapter
 @RequiredArgsConstructor
@@ -18,7 +19,7 @@ public class CoveragePolicyItemAdapter implements CoveragePolicyItemPort {
 
     @Override
     public CoveragePolicyItem save(CoveragePolicyItem coveragePolicyItem) {
-        CoveragePolicyItemJpaEntity coveragePolicyItemJpaEntity = mapToEntity(coveragePolicyItem);
+        CoveragePolicyItemJpaEntity coveragePolicyItemJpaEntity = mapToJpaEntity(coveragePolicyItem);
         coveragePolicyItemJpaEntity = coveragePolicyItemRepository.save(coveragePolicyItemJpaEntity);
 
         return coveragePolicyItemJpaEntity.getId() != null ? mapToDomain(coveragePolicyItemJpaEntity) : null;
@@ -26,10 +27,10 @@ public class CoveragePolicyItemAdapter implements CoveragePolicyItemPort {
 
     @Override
     public List<CoveragePolicyItem> saveOrUpdateAll(List<CoveragePolicyItem> coveragePolicyItemList) {
-        List<CoveragePolicyItemJpaEntity> coveragePolicyItemJpaEntities = mapListToEntity(coveragePolicyItemList);
-        coveragePolicyItemJpaEntities = coveragePolicyItemRepository.saveAll(coveragePolicyItemJpaEntities);
-        List<CoveragePolicyItem> coveragePolicyItemListNew = mapListToDomain(coveragePolicyItemJpaEntities);
-        return coveragePolicyItemListNew;
+        List<CoveragePolicyItemJpaEntity> jpaEntityList = mapListToJpaEntity(coveragePolicyItemList);
+        jpaEntityList = coveragePolicyItemRepository.saveAll(jpaEntityList);
+
+        return mapListToDomain(jpaEntityList);
     }
 
     @Override
@@ -58,6 +59,21 @@ public class CoveragePolicyItemAdapter implements CoveragePolicyItemPort {
         return coveragePolicyItemList;
     }
 
+    @Override
+    public Double getInsuredCapitalCededByPolicyItemId(Long policyItemId) {
+        Double insuredCapitalCeded = this.coveragePolicyItemRepository.getInsuredCapitalCededByPolicyItem(policyItemId);
+        if(insuredCapitalCeded == null) return (double) 0;
+        else return  insuredCapitalCeded;
+    }
+    @Override
+    public Double getIreByPolicyItemId(Long policyItemId) {
+        Double ire = this.coveragePolicyItemRepository.getIreByPolicyItem(policyItemId);
+        if(ire == null) return (double) 0;
+        else return ire;
+    }
+
+    //#region Mappers
+
     private CoveragePolicyItem mapToDomain(CoveragePolicyItemJpaEntity coveragePolicyItemJpaEntity) {
         CoveragePolicyItem coveragePolicyItem = CoveragePolicyItem.builder()
                 .id(coveragePolicyItemJpaEntity.getId())
@@ -75,7 +91,7 @@ public class CoveragePolicyItemAdapter implements CoveragePolicyItemPort {
 
     }
 
-    private CoveragePolicyItemJpaEntity mapToEntity(CoveragePolicyItem coveragePolicyItem) {
+    private CoveragePolicyItemJpaEntity mapToJpaEntity(CoveragePolicyItem coveragePolicyItem) {
         CoveragePolicyItemJpaEntity coveragePolicyItemJpaEntity = CoveragePolicyItemJpaEntity.builder()
                 .coverageProductPlanId(coveragePolicyItem.getCoverageProductPlanId())
                 .policyItemId(coveragePolicyItem.getPolicyItemId())
@@ -88,19 +104,18 @@ public class CoveragePolicyItemAdapter implements CoveragePolicyItemPort {
         return coveragePolicyItemJpaEntity;
     }
 
-    private List<CoveragePolicyItemJpaEntity> mapListToEntity(List<CoveragePolicyItem> policyItems) {
-        List<CoveragePolicyItemJpaEntity> coveragePolicyItemJpaEntities = new ArrayList<>();
-        policyItems.forEach(x -> {
-            coveragePolicyItemJpaEntities.add(mapToEntity(x));
-        });
-        return coveragePolicyItemJpaEntities;
+    private List<CoveragePolicyItemJpaEntity> mapListToJpaEntity(List<CoveragePolicyItem> list) {
+        return list.stream()
+                .map(o -> new ModelMapperConfig().getStrictModelMapper().map(o, CoveragePolicyItemJpaEntity.class))
+                .collect(Collectors.toList());
     }
 
-    private List<CoveragePolicyItem> mapListToDomain(List<CoveragePolicyItemJpaEntity> policyItems) {
-        List<CoveragePolicyItem> coveragePolicyItemList = new ArrayList<>();
-        policyItems.forEach(x -> {
-            coveragePolicyItemList.add(mapToDomain(x));
-        });
-        return coveragePolicyItemList;
+    private List<CoveragePolicyItem> mapListToDomain(List<CoveragePolicyItemJpaEntity> jpaEntityList) {
+        return jpaEntityList.stream()
+                .map(o -> new ModelMapperConfig().getStrictModelMapper().map(o, CoveragePolicyItem.class))
+                .collect(Collectors.toList());
     }
+
+    //#endregion
+
 }

@@ -9,7 +9,6 @@ import com.scfg.core.application.port.out.JksCertificatePort;
 import com.scfg.core.common.enums.JksAliasEnum;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.common.util.Crypt;
-import com.scfg.core.common.util.DateUtils;
 import com.scfg.core.common.util.Jks;
 import com.scfg.core.domain.JksCertificate;
 import com.scfg.core.domain.dto.JksCertificateDTO;
@@ -20,7 +19,6 @@ import java.io.*;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -49,7 +47,7 @@ public class JksCertificateService implements JksCertificateUseCase {
     }
 
     @Override
-    public String signDocumentWithP12Cert(String document, List<String> ownerSigns, LocalDateTime signatureDate) {
+    public String signDocumentWithP12Cert(String document, List<String> ownerSigns) {
         String signedDocument = "";
         String signedDocumentAux = "";
 
@@ -65,7 +63,7 @@ public class JksCertificateService implements JksCertificateUseCase {
                 signedDocumentAux = document;
             }
 
-            signedDocumentAux = signInBase64(signedDocumentAux, jksCertificateDTOList.get(i),signatureDate);
+            signedDocumentAux = signInBase64(signedDocumentAux, jksCertificateDTOList.get(i));
 
             signedDocument = signedDocumentAux;
         }
@@ -89,7 +87,7 @@ public class JksCertificateService implements JksCertificateUseCase {
                 signedDocumentAux = document;
             }
 
-            signedDocumentAux = signInByte(signedDocumentAux, jksCertificateDTOList.get(i), LocalDateTime.now());
+            signedDocumentAux = signInByte(signedDocumentAux, jksCertificateDTOList.get(i));
 
             signedDocument = signedDocumentAux;
         }
@@ -128,15 +126,15 @@ public class JksCertificateService implements JksCertificateUseCase {
         return jksCertificateDTOList;
     }
 
-    private String signInBase64(String documentToSign, JksCertificateDTO cert, LocalDateTime signatureDate) {
+    private String signInBase64(String documentToSign, JksCertificateDTO cert) {
 
         byte[] documentToSignAux = Base64.getDecoder().decode(documentToSign);
-        byte[] signedDocument = signInByte(documentToSignAux, cert, signatureDate);
+        byte[] signedDocument = signInByte(documentToSignAux, cert);
 
         return Base64.getEncoder().encodeToString(signedDocument);
     }
 
-    private byte[] signInByte(byte[] documentToSign, JksCertificateDTO cert, LocalDateTime signatureDate) {
+    private byte[] signInByte(byte[] documentToSign, JksCertificateDTO cert) {
 
         byte[] signedDocument = null;
         try {
@@ -163,7 +161,7 @@ public class JksCertificateService implements JksCertificateUseCase {
             sap.setCrypto(key, chain, null, PdfSignatureAppearance.SELF_SIGNED);
             sap.setReason("Firma PKCS12");
             sap.setLocation("Santa Cruz");
-            sap.setSignDate(DateUtils.asCalendarLocalDateTime(signatureDate));
+//
 //            // Añade la firma visible. Podemos comentarla para que no sea visible.
 //            sap.setVisibleSignature(new Rectangle(50, 50, 250, 80), 1, "sig");
 //            sap.setAcro6Layers(true);

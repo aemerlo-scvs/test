@@ -40,7 +40,7 @@ public interface PolicyRepository extends JpaRepository<PolicyJpaEntity,Long>{
     @Query(value = "SELECT P FROM PolicyJpaEntity P " +
             "WHERE P.generalRequestId IN (SELECT g.id FROM GeneralRequestJpaEntity g " +
             "WHERE g.personId IN (SELECT per.id FROM PersonJpaEntity per " +
-            "WHERE per.juridicalPerson.id IN (SELECT jp.id FROM JuridicalPersonJpaEntity jp " +
+            "WHERE per.id IN (SELECT jp.person.id FROM JuridicalPersonJpaEntity jp " +
             "WHERE jp.businessTypeIdc IN (SELECT cl.referenceId FROM ClassifierJpaEntity cl " +
             "WHERE cl.classifierType.id IN (SELECT clt.id FROM ClassifierTypeJpaEntity clt " +
             "WHERE clt.referenceId = :businessGroupIdc)))))")
@@ -173,5 +173,7 @@ public interface PolicyRepository extends JpaRepository<PolicyJpaEntity,Long>{
     @Query(value = "SELECT p FROM PolicyJpaEntity p \n" +
             "WHERE p.id = :policyId AND p.status = :status")
     PolicyJpaEntity findByPolicyId(@Param("policyId") Long policyId, @Param("status") Integer status);
-
+    @Query(value = "SELECT p FROM PolicyJpaEntity p \n" +
+            "WHERE p.id = :policyId AND p.status = :status")
+    Optional<PolicyJpaEntity> findOptionalByPolicyId(@Param("policyId") Long policyId, @Param("status") Integer status);
 }

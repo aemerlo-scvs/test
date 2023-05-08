@@ -4,4 +4,5 @@ import com.scfg.core.domain.PaymentPlan;
 
 public interface PaymentPlanPort {
     long saveOrUpdate(PaymentPlan paymentPlan);
+    PaymentPlan findByAnnexeIdOrExcepcion(Long annexeId);
 }

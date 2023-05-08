@@ -43,4 +43,23 @@ public class CoveragePolicyItemJpaEntity extends BaseJpaEntity {
 
     @Column(name = "rate")
     private Double rate;
+
+    @Column(name = "coverageId")
+    private Long coverageId;
+
+    @Column(name = "insuredCapitalCededRate")
+    private Double insuredCapitalCededRate;
+
+    @Column(name = "insuredCapitalCeded")
+    private Double insuredCapitalCeded;
+
+    @Column(name = "insuredCapitalRetained")
+    private Double insuredCapitalRetained;
+
+    @Column(name = "IRE")
+    private Double IRE;
+
+    @Column(name = "reinsurerId")
+    private Long reinsurerId;
+
 }

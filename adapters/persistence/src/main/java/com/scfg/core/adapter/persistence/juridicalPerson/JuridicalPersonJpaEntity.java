@@ -1,6 +1,8 @@
 package com.scfg.core.adapter.persistence.juridicalPerson;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.scfg.core.adapter.persistence.BaseJpaEntity;
+import com.scfg.core.adapter.persistence.person.PersonJpaEntity;
 import com.scfg.core.common.util.HelpersConstants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,9 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "JuridicalPerson")
@@ -29,4 +29,15 @@ public class JuridicalPersonJpaEntity extends BaseJpaEntity {
 
     @Column(name = "webSite")
     private String webSite;
+
+    @Column(name = "nit")
+    private Long nit;
+
+    @Column(name = "internalClientCode", insertable = false)
+    private Long internalClientCode;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "personId")
+    @JsonBackReference
+    private PersonJpaEntity person;
 }

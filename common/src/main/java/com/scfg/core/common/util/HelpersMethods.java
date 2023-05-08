@@ -737,4 +737,30 @@ public class HelpersMethods {
         }
     }
 
+    public static void throwExceptionIfInvalidNumber(String name, Long value, boolean required, Long greaterThan) throws OperationException {
+        throwExceptionIfInvalidNumber(name, value, required, greaterThan, null);
+    }
+    public static void throwExceptionIfInvalidNumber(String name, Long value, boolean required, Long greaterThan, Long lessThan) throws OperationException {
+        if (!required && value == null)
+            return;
+
+        if (required && value == null)
+            throw new OperationException("El campo '" + name + "' es requerido");
+
+        if (value.compareTo(greaterThan) <= 0) { // value es menor o igual
+            throw new OperationException("El campo '" + name + "' debe ser mayor que " + greaterThan);
+        }
+
+        if (lessThan != null && value.compareTo(lessThan) >= 0) { // value es mayor o igual
+            throw new OperationException("El campo '" + name + "' debe ser menor que " + lessThan);
+        }
+    }
+
+    public static void throwExceptionRequiredIfNull(String name, Object value) throws OperationException {
+        if (value == null) {
+            throw new OperationException("El campo '" + name + "' es requerido");
+        }
+    }
+
+
 }

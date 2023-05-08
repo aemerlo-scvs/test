@@ -33,4 +33,5 @@ public interface PolicyPort {
 
     String getNextSequencyPolNumber(String productInitial);
     Policy findByPolicyId(Long policyId);
+    Policy findByPolicyIdOrThrowExcepcion (Long policyId);
 }

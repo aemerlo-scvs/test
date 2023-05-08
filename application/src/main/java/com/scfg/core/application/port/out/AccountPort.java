@@ -8,6 +8,7 @@ public interface AccountPort {
 
     List<Account> findAllByPersonId(Long personId);
     Account findLastByPersonId(Long personId);
+    Account findByPolicyId(Long policyId);
     Account findLastByPersonIdAndPolicyId(Long personId, Long policyId);
     Account saveOrUpdate(Account account);
 

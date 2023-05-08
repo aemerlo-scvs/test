@@ -1,14 +1,14 @@
 package com.scfg.core.adapter.persistence.naturalPerson;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.scfg.core.adapter.persistence.BaseJpaEntity;
+import com.scfg.core.adapter.persistence.person.PersonJpaEntity;
 import com.scfg.core.common.util.HelpersConstants;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -79,4 +79,15 @@ public class NaturalPersonJpaEntity extends BaseJpaEntity {
 
     @Column(name = "salary")
     private Double salary;
+
+    @Column(name = "nit")
+    private Long nit;
+
+    @Column(name = "internalClientCode", insertable = false)
+    private Long internalClientCode;
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "personId")
+    @JsonBackReference
+    private PersonJpaEntity person;
 }

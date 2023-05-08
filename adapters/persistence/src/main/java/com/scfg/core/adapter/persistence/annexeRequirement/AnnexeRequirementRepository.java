@@ -1,7 +1,5 @@
 package com.scfg.core.adapter.persistence.annexeRequirement;
 
-import com.scfg.core.adapter.persistence.requestAnnexe.RequestAnnexeJpaEntity;
-import com.scfg.core.domain.common.AnnexeRequirement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

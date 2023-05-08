@@ -141,7 +141,7 @@ public interface CLFReportRepository extends JpaRepository<NaturalPersonJpaEntit
             "(select top 1 tft.tipoFirma from #tempFirmType tft \n" +
             "where tft.policyItemId = poi.id) as tipoFirma \n" +
             "from NaturalPerson ntp   \n" +
-            "join Person p on p.naturalPersonId = ntp.id   \n" +
+            "join Person p on p.id = ntp.personId   \n" +
             "join GeneralRequest gr on gr.personId = p.id   \n" +
             "join PolicyItem poi on poi.generalRequestId = gr.id  \n" +
             "left join #tempCobertAsig cobert on cobert.requestId = gr.id and cobert.policyItemId = poi.id \n" +
@@ -312,7 +312,7 @@ public interface CLFReportRepository extends JpaRepository<NaturalPersonJpaEntit
                 "(select top 1 tft.tipoFirma from #tempFirmType tft \n" +
                 "where tft.policyItemId = poi.id) as tipoFirma \n" +
                 "from NaturalPerson ntp   \n" +
-                "join Person p on p.naturalPersonId = ntp.id   \n" +
+                "join Person p on p.id = ntp.personId   \n" +
                 "join GeneralRequest gr on gr.personId = p.id   \n" +
                 "join PolicyItem poi on poi.generalRequestId = gr.id  \n" +
                 "left join #tempCobertAsig cobert on cobert.requestId = gr.id and cobert.policyItemId = poi.id \n" +

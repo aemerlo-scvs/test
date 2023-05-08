@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
-public class AnnexeType extends BaseDomain{
+public class AnnexeType extends BaseDomain {
     private Long internalCode;
     private String name;
     private String description;

@@ -19,7 +19,7 @@ public interface RequestDetailRepository extends JpaRepository<GeneralRequestJpa
             "gr.createdBy, gr.createdAt, gr.lastModifiedAt, '') \n" +
             "FROM GeneralRequestJpaEntity gr\n" +
             "INNER JOIN PersonJpaEntity p ON p.id = gr.personId\n" +
-            "INNER JOIN NaturalPersonJpaEntity np ON np.id = p.naturalPerson.id\n" +
+            "INNER JOIN NaturalPersonJpaEntity np ON np.person.id = p.id\n" +
             "INNER JOIN PolicyItemJpaEntity pt ON pt.generalRequestId = gr.id\n" +
             "WHERE gr.id = :requestId AND gr.status = :status AND pt.status = :status AND p.status = :status AND np.status = :status")
     RequestDetailDTO findRequestDetailById(@Param("requestId") Long requestId, @Param("status") Integer status);
@@ -30,11 +30,12 @@ public interface RequestDetailRepository extends JpaRepository<GeneralRequestJpa
             "where gr.id = :requestId ")
     String findPlanNameByRequestId(@Param("requestId") Long requestId);
 
-    @Query("select pr.juridicalPerson.name as oganization " +
+    @Query("select jp.name as oganization " +
             "from GeneralRequestJpaEntity gr " +
             "inner join PolicyJpaEntity p on p.generalRequestId = gr.id " +
             "join PolicyItemJpaEntity pl on pl.policyId = p.id " +
             "join PersonJpaEntity pr on pr.id = gr.personId " +
+            "join JuridicalPersonJpaEntity jp on jp.person.id = pr.id " +
             "where pl.id = :policyItemId ")
     String findJuridicalNameByPolicyItemId(@Param("policyItemId") Long policyItemId);
 

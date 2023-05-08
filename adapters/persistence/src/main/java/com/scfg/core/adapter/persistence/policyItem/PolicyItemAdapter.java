@@ -32,6 +32,12 @@ public class PolicyItemAdapter implements PolicyItemPort {
         return mapToDomain(policyItemJpaEntity.get());
     }
 
+    @Override
+    public PolicyItem findByPolicyIdAndPersonId(Long policyId, Long personId) {
+        PolicyItemJpaEntity policyItemJpaEntity = policyItemRepository.findByPolicyIdAndPersonId(policyId, personId);
+        return mapToDomain(policyItemJpaEntity);
+    }
+
     //#region Mappers
 
     private PolicyItem mapToDomain(PolicyItemJpaEntity policyItemJpaEntity) {

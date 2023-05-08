@@ -23,14 +23,14 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
     @Query("SELECT p " +
             "FROM GeneralRequestJpaEntity gr " +
             "INNER JOIN PersonJpaEntity p ON p.id = gr.personId " +
-            "INNER JOIN FETCH NaturalPersonJpaEntity np ON np.id = p.naturalPerson.id " +
+            "INNER JOIN FETCH NaturalPersonJpaEntity np ON np.person.id = p.id " +
             "WHERE gr.activationCode = :activationCode AND np.identificationNumber = :identificationNumber")
     PersonJpaEntity findByActivationCodeAndIdentificationNumberDeprecated(@Param("activationCode") String activationCode, @Param("identificationNumber") String identificationNumber);
 
     @Query("SELECT new com.scfg.core.domain.smvs.VerifyActivationCodeDTO(gr.id, p.id, gr.requestStatusIdc)" +
             "FROM GeneralRequestJpaEntity gr " +
             "INNER JOIN PersonJpaEntity p ON p.id = gr.personId " +
-            "INNER JOIN FETCH NaturalPersonJpaEntity np ON np.id = p.naturalPerson.id " +
+            "INNER JOIN FETCH NaturalPersonJpaEntity np ON np.person.id = p.id " +
             "WHERE gr.activationCode = :activationCode AND np.identificationNumber = :identificationNumber AND gr.status = :status")
     VerifyActivationCodeDTO findByActivationCodeAndIdentificationNumber(@Param("activationCode") String activationCode, @Param("identificationNumber") String identificationNumber, @Param("status") Integer status);
 
@@ -63,7 +63,7 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
             "INNER JOIN CoverageProductJpaEntity cp ON cp.id = cpp.coverageProductId " +
             "INNER JOIN ProductJpaEntity pr ON pr.id = cp.productId " +
             "INNER JOIN PersonJpaEntity p ON p.id = gr.personId " +
-            "INNER JOIN FETCH NaturalPersonJpaEntity np ON np.id = p.naturalPerson.id " +
+            "INNER JOIN FETCH NaturalPersonJpaEntity np ON np.person.id = p.id " +
             "INNER JOIN DirectionJpaEntity d on d.personId = p.id " +
             "INNER JOIN PaymentJpaEntity py ON py.generalRequestId = gr.id " +
             "INNER JOIN PaymentPlanJpaEntity pp ON pp.paymentId = py.id " +
@@ -100,7 +100,7 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
     default String getFindAllByFiltersBaseQuery(String additionalJoins) {
         return "FROM GeneralRequestJpaEntity gr\n" +
                 "INNER JOIN PersonJpaEntity p ON p.id = gr.personId\n" +
-                "INNER JOIN NaturalPersonJpaEntity np ON np.id = p.naturalPerson.id\n" +
+                "INNER JOIN NaturalPersonJpaEntity np ON np.person.id = p.id\n" +
                 "LEFT JOIN PolicyItemJpaEntity pt ON pt.generalRequestId = gr.id\n" +
                 "LEFT JOIN ClassifierJpaEntity c1 on c1.referenceId = gr.requestStatusIdc\n" +
                 "LEFT JOIN CoverageProductPlanJpaEntity cpp ON cpp.planId = gr.planId\n" +
@@ -130,7 +130,7 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
     default String getFindAllSMVSRequestBaseQuery(String additionalWhere) {
         return "FROM GeneralRequestJpaEntity gr\n" +
                 "INNER JOIN PersonJpaEntity p ON p.id = gr.personId\n" +
-                "INNER JOIN NaturalPersonJpaEntity np ON np.id = p.naturalPerson.id\n" +
+                "INNER JOIN NaturalPersonJpaEntity np ON np.person.id = p.id\n" +
                 "WHERE gr.planId =\n" +
                 "(\n" +
                 "SELECT pl.id\n" +
@@ -166,7 +166,7 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
                 "gr.acceptanceReasonIdc, gr.rejectedReasonIdc, gr.pendingReason, gr.requestedAmount, gr.currentAmount, gr.accumulatedAmount, pt.pronouncementDate) \n" +
                 "FROM GeneralRequestJpaEntity gr \n" +
                 "INNER JOIN PersonJpaEntity p ON p.id = gr.personId \n" +
-                "INNER JOIN NaturalPersonJpaEntity np ON np.id = p.naturalPerson.id \n" +
+                "INNER JOIN NaturalPersonJpaEntity np ON np.person.id = p.id \n" +
                 "INNER JOIN PolicyItemJpaEntity pt ON pt.generalRequestId = gr.id \n" +
                 "WHERE ";
     }
@@ -244,7 +244,7 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
             "INNER JOIN PlanJpaEntity pl ON pl.id = gr.planId " +
             "INNER JOIN ProductJpaEntity pr ON pr.id = p.productId " +
             "INNER JOIN PersonJpaEntity  pe ON pe.id = gr.personId " +
-            "INNER JOIN NaturalPersonJpaEntity np ON np.id = pe.naturalPerson.id " +
+            "INNER JOIN NaturalPersonJpaEntity np ON np.person.id = p.id " +
             "INNER JOIN PolicyItemJpaEntity pit ON pit.generalRequestId = gr.id " +
             "WHERE gr.creditNumber =:operationNumber " +
             "AND np.identificationNumber =:identificationNumber " +
@@ -313,7 +313,7 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
     default String getFindAllByIdPlanFiltersBaseQuery(Long planId) {
         return "FROM GeneralRequest gr\n" +
                 "INNER JOIN Person p ON p.id = gr.personId\n" +
-                "INNER JOIN NaturalPerson np ON np.id = p.naturalPersonId\n" +
+                "INNER JOIN NaturalPerson np ON np.personId = p.id\n" +
                 "INNER JOIN Policy po ON po.generalRequestId = gr.id \n" +
                 "WHERE " +
                 "gr.typeIdc = " + ClassifierEnum.TYPE_REQUEST_PROPOSAL.getReferenceCode() + " AND\n" +

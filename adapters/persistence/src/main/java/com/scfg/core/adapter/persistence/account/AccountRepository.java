@@ -22,4 +22,11 @@ public interface AccountRepository extends JpaRepository<AccountJpaEntity, Long>
     List<AccountJpaEntity> findAllByPersonIdAndPolicyId(@Param("personId") Long personId, @Param("policyId") Long policyId,
                                                         @Param("status") Integer status);
 
+    @Query("SELECT a " +
+            "FROM AccountJpaEntity a " +
+            "LEFT JOIN AccountPolicyJpaEntity ap ON ap.accountId = a.id " +
+            "WHERE ap.policyId = :policyId AND a.status = :status AND ap.status = :status")
+    AccountJpaEntity findByPolicyId(@Param("policyId") Long policyId,
+                                    @Param("status") Integer status);
+
 }
