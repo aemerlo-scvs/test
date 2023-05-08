@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface AnnexeRepository extends JpaRepository<AnnexeJpaEntity, Long>{
 
     @Query("SELECT MAX(a.annexeNumber) FROM AnnexeJpaEntity a " +
-            "WHERE a.policyId =:policyId ")
+            "WHERE a.policyId = :policyId")
     Long getAnnexeNumber(@Param("policyId") Long policyId);
 
     @Query("SELECT p FROM AnnexeJpaEntity p " +

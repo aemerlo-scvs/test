@@ -15,5 +15,6 @@ public interface RequestAnnexePort {
     PageableDTO findAllPageByFilters(RequestAnnexeSearchFiltersDto filtersDto, Integer page, Integer size) throws ParseException;
 
     RequestAnnexe findRequestAnnexeIdOrThrowExcepcion (Long requestAnnexeId);
+    List<RequestAnnexe> getRequestByPolicyIdAndAnnexeTypeId(Long policyId, Long annexeTypeId);
     Long saveOrUpdate(RequestAnnexe requestAnnexe);
 }

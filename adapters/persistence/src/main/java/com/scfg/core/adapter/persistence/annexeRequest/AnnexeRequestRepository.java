@@ -16,15 +16,15 @@ public interface AnnexeRequestRepository extends JpaRepository<AnnexeRequestJpaE
             "INNER JOIN PolicyJpaEntity p on r.policyId = p.id " +
             "WHERE p.id =:policyId " +
             "AND r.annexeTypeId =:annexeTypeId " +
-            "AND r.statusIdc IN (:requestAnnexeStatusList) " +
+            "AND r.statusIdc IN (:requuestAnnexeStatusList) " +
             "AND r.status =:status " +
             "AND p.status =:status " +
-            "ORDER BY r.id DESC ")
-    List<AnnexeRequestJpaEntity> findAllByPolicyIdAndAnnexeTypeIdAndRequestStatus(
+            "ORDER BY r.id desc ")
+    List<AnnexeRequestJpaEntity> findAllByPolicyIdAndAnnexe(
             @Param("policyId")Long policyId,
             @Param("annexeTypeId") Long annexeTypeId,
             @Param("status") Integer status,
-            @Param("requestAnnexeStatusList") List<Integer> requestAnnexeStatusList);
+            @Param("requuestAnnexeStatusList") List<Integer> requuestAnnexeStatusList);
 
     default String getFindAllPageByFiltersSelectQuery() {
         return "SELECT new com.scfg.core.domain.dto.vin.ResponseAnnexeRequestDto(ra.id, np.identificationNumber, np.complement, \n" +

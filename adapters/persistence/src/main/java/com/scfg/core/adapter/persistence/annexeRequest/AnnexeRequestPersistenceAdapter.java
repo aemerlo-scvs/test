@@ -13,6 +13,7 @@ import com.scfg.core.domain.dto.RequestAnnexeSearchFiltersDto;
 import com.scfg.core.domain.common.RequestAnnexe;
 import com.scfg.core.domain.dto.vin.ResponseAnnexeRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 import javax.persistence.EntityManager;
 
@@ -29,11 +30,20 @@ public class AnnexeRequestPersistenceAdapter implements RequestAnnexePort {
 
     private final AnnexeRequestRepository annexeRequestRepository;
     private final EntityManager em;
+    @Override
+    public Long saveOrUpdate(RequestAnnexe o) {
+        AnnexeRequestJpaEntity annexeRequestJpaEntity = mapToJpaEntity(o);
+        annexeRequestJpaEntity = annexeRequestRepository.save(annexeRequestJpaEntity);
+        return annexeRequestJpaEntity.getId();
+    }
 
     @Override
-    public List<RequestAnnexe> findAllRequestByPolicyIdAndAnnexeTypeIdAndRequestStatus(Long policyId, Long annexeTypeId,
-                                                                                       List<Integer> requestAnnexeStatusList) {
-        List<AnnexeRequestJpaEntity> list = annexeRequestRepository.findAllByPolicyIdAndAnnexeTypeIdAndRequestStatus(
+    public List<RequestAnnexe> getRequestByPolicyIdAndAnnexeTypeId(Long policyId, Long annexeTypeId) {
+        List<Integer> requestAnnexeStatusList = new ArrayList<>();
+        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.PENDING.getValue());
+        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.OBSERVED.getValue());
+        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.REQUESTED.getValue());
+        List<AnnexeRequestJpaEntity> list = annexeRequestRepository.findAllByPolicyIdAndAnnexe(
                 policyId,
                 annexeTypeId,
                 PersistenceStatusEnum.CREATED_OR_UPDATED.getValue(),
@@ -41,6 +51,11 @@ public class AnnexeRequestPersistenceAdapter implements RequestAnnexePort {
         );
         return list.stream().map(o -> new ModelMapperConfig().getStrictModelMapper()
                 .map(o, RequestAnnexe.class)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<RequestAnnexe> findAllRequestByPolicyIdAndAnnexeTypeIdAndRequestStatus(Long policyId, Long annexeTypeId, List<Integer> requestAnnexeStatusList) {
+        return null;
     }
 
     @Override
@@ -71,24 +86,7 @@ public class AnnexeRequestPersistenceAdapter implements RequestAnnexePort {
         return new ModelMapperConfig().getStrictModelMapper().map(annexeRequestJpaEntity, RequestAnnexe.class);
     }
 
-    @Override
-    public Long saveOrUpdate(RequestAnnexe o) {
-        AnnexeRequestJpaEntity annexeRequestJpaEntity = mapToJpaEntity(o);
-        annexeRequestJpaEntity = annexeRequestRepository.save(annexeRequestJpaEntity);
-        return annexeRequestJpaEntity.getId();
-    }
-
-    //#region Mappers
-
-    private AnnexeRequestJpaEntity mapToJpaEntity(RequestAnnexe requestAnnexe) {
-        return new ModelMapperConfig().getStrictModelMapper().map(requestAnnexe, AnnexeRequestJpaEntity.class);
-    }
-
-    //#endregion
-
-    //#region Auxiliary Methods
-
-    private String getFindAnnexeFilters(RequestAnnexeSearchFiltersDto searchRequestDTO) throws ParseException {
+    public String getFindAnnexeFilters(RequestAnnexeSearchFiltersDto searchRequestDTO) throws ParseException {
         String filters = "";
         List<String> filterList = new ArrayList<>();
         if (!searchRequestDTO.getIdentificationNumber().isEmpty()) {
@@ -118,7 +116,7 @@ public class AnnexeRequestPersistenceAdapter implements RequestAnnexePort {
         }
         return filters;
     }
-    private String getFirstStatus() {
+    public String getFirstStatus() {
         String filters = "";
         List<String> filterList = new ArrayList<>();
         int  status = RequestAnnexeStatusEnum.PENDING.getValue();
@@ -130,10 +128,15 @@ public class AnnexeRequestPersistenceAdapter implements RequestAnnexePort {
     }
 
 
-    private String getOrderByDateAnnexe(){
+    public String getOrderByDateAnnexe(){
         return  "ORDER BY ra.createdAt asc ";
     }
 
-    //#endregion
+    //#region Mappers
 
+    private AnnexeRequestJpaEntity mapToJpaEntity(RequestAnnexe requestAnnexe) {
+        return new ModelMapperConfig().getStrictModelMapper().map(requestAnnexe, AnnexeRequestJpaEntity.class);
+    }
+
+    //#endregion
 }

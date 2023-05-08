@@ -31,6 +31,18 @@ public class CoverageJpaEntity extends BaseJpaEntity {
     @Column(name = "coverageTypeIdc")
     private Integer coverageTypeIdc;
 
-    @Column(name = "branchId")
-    private Long branchId;
+    @Column(name = "apsCode")
+    private String apsCode;
+
+    @Column(name = "resolution")
+    private String resolution;
+
+    @Column(name = "minimumAge")
+    private Integer minimumAge;
+    @Column(name = "maximumAge")
+    private Integer maximumAge;
+    @Column(name = "limitAge")
+    private  Integer limitAge;
+    @Column(name = "productId")
+    private Long productId;
 }

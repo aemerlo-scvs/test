@@ -17,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 public class PolicyItemEconomicReinsurance extends BaseDomain {
     private Long policyItemEconomicId;
     private Double premiumCeded;
+    private Double premiumRetained;
     private Long coverageId;
     private Long reinsurerId;
 

@@ -1,6 +1,10 @@
 package com.scfg.core.adapter.persistence.coverage;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 
 public interface CoverageRepository extends JpaRepository<CoverageJpaEntity, Long> {
@@ -16,5 +20,7 @@ public interface CoverageRepository extends JpaRepository<CoverageJpaEntity, Lon
                 "cp.status = " + status + " AND cv.status = " + status + " AND pi2.status = " + status + " \n" +
                 "GROUP BY pi2.id";
     }
-
+    @Query("select v from CoverageJpaEntity v " +
+            "where v.productId= :productId")
+    List<CoverageJpaEntity> findAllCoverageByProductId(@Param("productId")Long productId);
 }

@@ -534,9 +534,9 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
                     .documentNumber(this.paymentFileDocumentPort.getMaxNumberTransactionFileDocument().toString())
                     .documentTypeIdc(AnnulmentRequestAnnexeDocumentTypeClassifierEnum.PROOF_OF_PAYMENT.getValue())
                     .build();
-             transaction = new Transaction(
+            transaction = new Transaction(
                     paymentPlan.getAmount(),
-                     requestSaveVoucherPaymentDto.getPayDate(),
+                    requestSaveVoucherPaymentDto.getPayDate(),
                     policy.getCurrencyTypeIdc(),
                     paymentPlan.getId(),
                     requestSaveVoucherPaymentDto.getVoucherNumber().toString()

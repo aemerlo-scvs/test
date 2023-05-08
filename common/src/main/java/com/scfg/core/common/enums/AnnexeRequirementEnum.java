@@ -4,8 +4,7 @@ public enum AnnexeRequirementEnum {
 
     RESCUE_REQUEST("Solicitud de Rescate"), // SOLICITUD DE RESCATE
     SETTLEMENT("Finiquito"), // FINIQUITO
-    REVERSE_AND_FRONT_CI("Cédula de Identidad"), // CI ANVERSO/REVERSO
-    CERTIFICATE_COVERAGE("Certificado de Cobertura"); // CERTIFICADO DE COBERTURA
+    REVERSE_AND_FRONT_CI("Cédula de Identidad"); // CI ANVERSO/REVERSO
 
     private String value;
 

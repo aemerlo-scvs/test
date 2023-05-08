@@ -51,7 +51,14 @@ public class AnnexePersistenceAdapter implements AnnexePort {
     }
 
     @Override
-    public AnnexeDTO findAnnexeById(Long annexeId) {
+    public AnnexeDTO findAnnexeByIdOrThrowExcepcion(Long annexeId) {
+        AnnexeJpaEntity annexeJpaEntity = annexeRepository.findOptionalById(annexeId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue())
+                .orElseThrow(() -> new NotDataFoundException("Anexo no encontrado"));
+        return new ModelMapper().map(annexeJpaEntity, AnnexeDTO.class);
+    }
+
+    @Override
+    public AnnexeDTO findAnnexeById(Long annexeId)  {
         AnnexeJpaEntity annexeJpaEntity = annexeRepository.findOptionalById(annexeId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue())
                 .orElseThrow(() -> new NotDataFoundException("Anexo no encontrado"));
         return new ModelMapper().map(annexeJpaEntity, AnnexeDTO.class);

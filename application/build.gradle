@@ -46,7 +46,12 @@ dependencies {
 
     implementation group: 'org.w3c.jigsaw', name: 'jigsaw', version: '2.2.6'
 
+    implementation group: 'com.github.librepdf', name: 'openpdf', version: '1.3.29'
+    // https://mvnrepository.com/artifact/com.itextpdf/html2pdf
+    implementation group: 'com.itextpdf', name: 'html2pdf', version: '4.0.0'
 
+    implementation group: 'org.xhtmlrenderer', name: 'flying-saucer-pdf-openpdf', version: '9.1.22'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'junit' // excluding junit 4
