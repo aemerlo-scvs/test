@@ -20,20 +20,20 @@ import static org.springframework.http.ResponseEntity.ok;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/clause")
+@RequestMapping(path = ClauseEndPoint.BASE)
 @Api(tags = "API REST Clausulas")
 public class ClauseController {
     private  final ClauseUseCase clauseUseCase;
-    @GetMapping(value = "/all")
+    @GetMapping(value = ClauseEndPoint.GETALL)
     @ApiOperation(value = "Listado de las clausulas")
     public ResponseEntity findAll() {
         List<Clause> clauseList = clauseUseCase.getAllClause();
         return ok(clauseList);
     }
 
-    @PostMapping(value = "/save")
+    @PostMapping(value = ClauseEndPoint.SAVE)
     @ApiOperation(value = "Guardar las clausulas")
-    public ResponseEntity guardar(@RequestBody Clause clause) {
+    public ResponseEntity save(@RequestBody Clause clause) {
         try {
             PersistenceResponse response = clauseUseCase.saveOrUpdate(clause);
             return ok(response);
@@ -44,7 +44,7 @@ public class ClauseController {
         }
 
     }
-    @PostMapping(value = "/update")
+    @PostMapping(value = ClauseEndPoint.UPDATE)
     @ApiOperation(value = "Actualizar las Clausulas")
     public ResponseEntity update(@RequestBody Clause clause) {
         try {
@@ -56,7 +56,7 @@ public class ClauseController {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
-    @DeleteMapping(value = "/delete/{id}")
+    @DeleteMapping(value = ClauseEndPoint.DELETE)
     @ApiOperation(value = "Dar de baja la clasulas")
     public ResponseEntity delete(@PathVariable Long id) {
         try {
@@ -68,8 +68,8 @@ public class ClauseController {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
-    @GetMapping(value = "/findClauseById/{id}")
-    @ApiOperation(value = "Clausula por ID")
+    @GetMapping(value = ClauseEndPoint.GETBYID)
+    @ApiOperation(value = "Obtener clausula por ID")
     public ResponseEntity findById(@PathVariable Long id) {
         try {
             Clause response = clauseUseCase.getById(id);
@@ -81,7 +81,7 @@ public class ClauseController {
         }
     }
 
-    @GetMapping(value = "/findClauseByProductId/{productId}")
+    @GetMapping(value = ClauseEndPoint.GETALLBYPRODUCT)
     @ApiOperation(value = "Listado de clausulas por productos id")
     public ResponseEntity findClauseByProductId(@PathVariable Long productId) {
         try {

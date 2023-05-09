@@ -24,10 +24,4 @@ public interface AnnexeFileDocumentRepository extends JpaRepository<AnnexeFileDo
     AnnexeFileDocumentJpaEntity findRequestAnnexeIdAndAnnexeTypeIdcAndSigned(@Param("requestAnnexeId")Long requestAnnexeId,
                                                                           @Param("annexeTypeIdc")Integer annexeTypeIdc,
                                                                           @Param("signed")Boolean signed);
-
-    @Query("SELECT MAX(a.documentNumber) " +
-            "FROM AnnexeFileDocumentJpaEntity a " +
-            "WHERE a.documentTypeIdc =:documentTypeIdc ")
-    Long getMaxNumber(@Param("documentTypeIdc") Integer documentTypeIdc);
-
 }

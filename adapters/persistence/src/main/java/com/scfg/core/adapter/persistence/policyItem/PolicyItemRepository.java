@@ -6,8 +6,6 @@ public interface PolicyItemRepository extends JpaRepository<PolicyItemJpaEntity,
 
     PolicyItemJpaEntity findByGeneralRequestId(Long generalRequestId);
 
-    PolicyItemJpaEntity findByPolicyIdAndPersonIdAndStatus(Long policyId, Long personId, Integer status);
-
-    PolicyItemJpaEntity findByPolicyIdAndStatus(Long policyId, Integer status);
+    PolicyItemJpaEntity findByPolicyIdAndPersonId(Long policyId, Long personId);
 }
 

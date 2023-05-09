@@ -22,11 +22,6 @@ public class BranchPersistenceAdapter implements BranchPort {
     private ModelMapper modelMapper;
 
     @Override
-    public List<Branch> getAllBranh() {
-        return null;
-    }
-
-    @Override
     public PersistenceResponse save(Branch branch, boolean returnEntity) {
         BranchJpaEntity branchJpaEntity = mapperDtoToEntity(branch);
         branchJpaEntity = branchRepository.save(branchJpaEntity);
@@ -46,6 +41,7 @@ public class BranchPersistenceAdapter implements BranchPort {
         branchJpaEntity1.setDescription(branch.getDescription());
         branchJpaEntity1.setLastModifiedAt(new Date());
         branchJpaEntity1.setStatus(branch.getStatus());
+        branchJpaEntity1.setModalityIdc(branch.getModalityIdc());
         branchRepository.save(branchJpaEntity1);
         return new PersistenceResponse(
                 Branch.class.getSimpleName(),

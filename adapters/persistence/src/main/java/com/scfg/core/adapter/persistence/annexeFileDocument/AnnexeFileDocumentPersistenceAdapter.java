@@ -1,5 +1,6 @@
 package com.scfg.core.adapter.persistence.annexeFileDocument;
 
+import com.scfg.core.adapter.persistence.document.DocumentRepository;
 import com.scfg.core.application.port.out.AnnexeFileDocumentPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.exception.NotDataFoundException;
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AnnexeFileDocumentPersistenceAdapter implements AnnexeFileDocumentPort {
     private final AnnexeFileDocumentRepository annexeFileDocumentRepository;
+    private final DocumentRepository documentRepository;
 
 
     @Override
@@ -45,12 +47,6 @@ public class AnnexeFileDocumentPersistenceAdapter implements AnnexeFileDocumentP
     public Document findRequestAnnexeIdAndAnnexeTypeIdcAndSigned(Long requestAnnexeId, Integer typeDocumentIdc, Boolean signed) {
         AnnexeFileDocumentJpaEntity document = annexeFileDocumentRepository.findRequestAnnexeIdAndAnnexeTypeIdcAndSigned(requestAnnexeId, typeDocumentIdc, signed);
         return new ModelMapper().map(document, Document.class);
-    }
-
-    @Override
-    public Long getNextNumber(Integer documentTypeIdc) {
-        Long maxNumber = this.annexeFileDocumentRepository.getMaxNumber(documentTypeIdc);
-        return maxNumber == null ? 1L : maxNumber + 1;
     }
 
     private AnnexeFileDocumentJpaEntity mapToJpaEntity(Document annexeFileDocument) {

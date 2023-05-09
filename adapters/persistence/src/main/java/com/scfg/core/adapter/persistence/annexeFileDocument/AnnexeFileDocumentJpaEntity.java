@@ -27,6 +27,5 @@ public class AnnexeFileDocumentJpaEntity extends BaseJpaEntity {
     private String content;
     @Column(name = "mimeType")
     private String mimeType;
-    @Column(name = "documentNumber")
-    private Long documentNumber;
+
 }

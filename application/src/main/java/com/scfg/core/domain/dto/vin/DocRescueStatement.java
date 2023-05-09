@@ -27,7 +27,6 @@ public class DocRescueStatement {
     private String policyNumber;
     private String identificationNumber;
     private String extension;
-    private Long     documentNumber;
     //todo REFACTORIZAR NOMBRES.
     private BigDecimal capitalAseguradoTotal;
     private BigDecimal valorRescateADevolver;

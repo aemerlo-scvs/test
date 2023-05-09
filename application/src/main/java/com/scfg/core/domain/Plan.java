@@ -16,8 +16,6 @@ import java.io.Serializable;
 @SuperBuilder
 public class Plan extends BaseDomain implements Serializable {
 
-    private Long id;
-
     private String name;
 
     private String description;
@@ -26,16 +24,12 @@ public class Plan extends BaseDomain implements Serializable {
 
     private Integer rate;
 
-    private Double totalInsuredCapital;
-
     private Integer applyDiscount;
 
-    private Double creditPremiumSurcharge;
-
     private Integer currencyTypeIdc;
+    private Integer status;
 
     private Long productId;
-
-    private Integer agreementCode;
+    private  Integer bfsAgreementCode;
 
 }

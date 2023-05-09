@@ -29,23 +29,23 @@ public class AnswerQuestionnaireRequestPersistenceAdapter implements AnswerQuest
 
     //#region Mappers
 
-    private Plan mapToDomain(PlanJpaEntity planJpaEntity) {
-        Plan plan = Plan.builder()
-                .id(planJpaEntity.getId())
-                .name(planJpaEntity.getName())
-                .description(planJpaEntity.getDescription())
-                .totalPremium(planJpaEntity.getTotalPremium())
-                .rate(planJpaEntity.getRate())
-                .totalInsuredCapital(planJpaEntity.getTotalInsuredCapital())
-                .applyDiscount(planJpaEntity.getApplyDiscount())
-                .creditPremiumSurcharge(planJpaEntity.getCreditPremiumSurcharge())
-                .currencyTypeIdc(planJpaEntity.getCurrencyTypeIdc())
-                .createdAt(planJpaEntity.getCreatedAt())
-                .lastModifiedAt(planJpaEntity.getLastModifiedAt())
-                .build();
-
-        return plan;
-    }
+//    private Plan mapToDomain(PlanJpaEntity planJpaEntity) {
+//        Plan plan = Plan.builder()
+//                .id(planJpaEntity.getId())
+//                .name(planJpaEntity.getName())
+//                .description(planJpaEntity.getDescription())
+//                .totalPremium(planJpaEntity.getTotalPremium())
+//                .rate(planJpaEntity.getRate())
+//                .totalInsuredCapital(planJpaEntity.getTotalInsuredCapital())
+//                .applyDiscount(planJpaEntity.getApplyDiscount())
+//                .creditPremiumSurcharge(planJpaEntity.getCreditPremiumSurcharge())
+//                .currencyTypeIdc(planJpaEntity.getCurrencyTypeIdc())
+//                .createdAt(planJpaEntity.getCreatedAt())
+//                .lastModifiedAt(planJpaEntity.getLastModifiedAt())
+//                .build();
+//
+//        return plan;
+//    }
 
     private AnswerQuestionnaireRequestJpaEntity mapToJpaEntity(AnswerDTO answerDTO){
         AnswerQuestionnaireRequestJpaEntity answerJpa = AnswerQuestionnaireRequestJpaEntity.builder()

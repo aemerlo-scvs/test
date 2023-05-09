@@ -7,16 +7,12 @@ import com.scfg.core.domain.configuracionesSistemas.FilterParamenter;
 import java.util.List;
 
 public interface CoveragePort {
-
-    List<Coverage> getAllCoverage();
-
-    String getAllCoverageNamesByGeneralRequestId(Long requestId);
     PersistenceResponse save(Coverage coverage, boolean returnEntity);
     PersistenceResponse update(Coverage coverage);
     PersistenceResponse delete(Long  id);
+    List<Coverage> getAllCoverage();
 
-
-
+    String getAllCoverageNamesByGeneralRequestId(Long requestId);
     List<Coverage> getfilterParamenters(FilterParamenter paramenter);
     List<Coverage> findAllCoverageByProductId(Long productId);
 }

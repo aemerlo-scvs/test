@@ -8,7 +8,6 @@ import com.scfg.core.common.util.ObjectMapperUtils;
 import com.scfg.core.common.util.PersistenceResponse;
 import com.scfg.core.domain.Coverage;
 import com.scfg.core.domain.configuracionesSistemas.FilterParamenter;
-import com.scfg.core.domain.dto.credicasas.RequestDetailDTO;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.EntityManager;
@@ -20,7 +19,6 @@ import java.util.Optional;
 @PersistenceAdapter
 @RequiredArgsConstructor
 public class CoveragePersistenceAdapter implements CoveragePort {
-
 
     private final CoverageRepository coverageRepository;
     private EntityManager em;
@@ -93,4 +91,20 @@ public class CoveragePersistenceAdapter implements CoveragePort {
         em.close();
         return (coverageNames.size() > 0) ? coverageNames.get(0).toString() : "";
     }
+
+//    private List<Coverage> mapListToDomain(List<CoverageJpaEntity> coverageJpaEntities) {
+////        List<Coverage> coverages = new ArrayList<>();
+////        coverageJpaEntities.forEach(o -> {
+////            coverages.add(mapEntityToDomain(o));
+////        });
+//        //return coverages;
+//
+//        List<Coverage> coverageList = ObjectMapperUtils.mapAll(coverageJpaEntities, Coverage.class);
+//        return coverageList;
+//    }
+
+//    private Coverage mapEntityToDomain(CoverageJpaEntity p) {
+//        Coverage coverage = modelMapper.map(p, Coverage.class);
+//        return coverage;
+//    }
 }

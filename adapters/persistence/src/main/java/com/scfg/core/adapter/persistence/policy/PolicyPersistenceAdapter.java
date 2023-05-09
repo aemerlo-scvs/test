@@ -129,24 +129,29 @@ public class PolicyPersistenceAdapter implements PolicyPort {
     }
 
     @Override
-    public String findAllByPersonFilters(PersonDTO personDTO) {
-
-        String response = null;
+    public PageableDTO findAllByPageAndPersonFilters(PersonDTO personDTO, Integer page, Integer size) {
         String filters = this.getFindPolicyFilters(personDTO);
+
+        int initRange = HelpersMethods.getPageInitRange(page, size);
+
         String query = this.policyRepository.getFindAllByFiltersSelectQuery(
-                PersistenceStatusEnum.CREATED_OR_UPDATED.getValue()) + filters +
-                "FOR JSON PATH";
+                                            PersistenceStatusEnum.CREATED_OR_UPDATED.getValue()) + filters;
 
-        List<Object> list = em.createNativeQuery(query).getResultList();
+        String countQuery = this.policyRepository.getFindAllByFiltersCountQuery(
+                                            PersistenceStatusEnum.CREATED_OR_UPDATED.getValue()) + filters;
 
+        List<RequestPolicyDetailDto> requestPolicyDetailDTOList = em.createQuery(query)
+                                                                    .setFirstResult(initRange)
+                                                                    .setMaxResults(size).getResultList();
         em.close();
 
+        Long count = (Long) em.createQuery(countQuery).getSingleResult();
+        em.close();
 
-        if (list.size() > 0) {
-            response = (String) list.get(0);
-        }
-
-        return response;
+        return PageableDTO.builder()
+                .content(requestPolicyDetailDTOList)
+                .totalElements(count.intValue())
+                .build();
     }
 
     @Override

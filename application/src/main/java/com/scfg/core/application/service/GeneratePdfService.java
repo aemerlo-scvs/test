@@ -7,8 +7,12 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import com.lowagie.text.pdf.draw.VerticalPositionMark;
+import com.lowagie.text.pdf.parser.PdfTextExtractor;
 import com.scfg.core.application.port.in.GeneratePdfUseCase;
 import com.scfg.core.application.port.out.ClassifierPort;
+import com.scfg.core.application.port.out.GeneralRequestPort;
+import com.scfg.core.application.port.out.PersonPort;
+import com.scfg.core.application.port.out.PolicyPort;
 import com.scfg.core.common.enums.*;
 import com.scfg.core.common.templates.pdf.GenericHeaderPdfTemplate;
 import com.scfg.core.common.templates.pdf.HeaderFooterPdfTemplate;
@@ -16,12 +20,15 @@ import com.scfg.core.common.util.DateUtils;
 import com.scfg.core.common.util.HelpersMethods;
 import com.scfg.core.common.util.MyProperties;
 import com.scfg.core.domain.Beneficiary;
+import com.scfg.core.domain.GeneralRequest;
+import com.scfg.core.domain.Policy;
 import com.scfg.core.domain.common.Classifier;
 import com.scfg.core.domain.common.Direction;
 import com.scfg.core.domain.dto.CoverageDTO;
 import com.scfg.core.domain.dto.credicasas.QuestionDTO;
 import com.scfg.core.domain.dto.credicasas.groupthefont.*;
 import com.scfg.core.domain.dto.vin.*;
+import com.scfg.core.domain.person.Person;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.slf4j.Logger;
@@ -29,12 +36,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import sun.misc.BASE64Decoder;
 
+import javax.validation.constraints.Null;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
-import java.time.LocalDateTime;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -2741,8 +2748,8 @@ public class GeneratePdfService implements GeneratePdfUseCase {
 
             String fromDate = HelpersMethods.formatStringOnlyDate(generateCertificateVin.getPolicy().getFromDate());
             String toDate = HelpersMethods.formatStringOnlyDate(generateCertificateVin.getPolicy().getToDate());
-            String fullCommentDate = "Desde el " + fromDate + " a hrs. 12:01 pm (medio día) hasta el " + toDate +
-                    " a hrs. 12:00 pm (medio día).";
+            String fullCommentDate = "Desde el " + fromDate + " a hrs. 12:00 am (medio día) hasta el " + toDate +
+                    " 12:00 am (medio día).";
             primCertTable.addCell(getCellVinSize8("VIGENCIA:", 5, Element.ALIGN_LEFT, true, false));//5
             primCertTable.addCell(getCellVinSize8(fullCommentDate, 43, Element.ALIGN_LEFT, false, false));//43
 
@@ -3303,10 +3310,10 @@ public class GeneratePdfService implements GeneratePdfUseCase {
                 String mfranco = "LUIS MAURICIO FRANCO MELAZZINI";
                 String maguirre = "MARIO EDMUNDO AGUIRRE DURAN";
 
+                Date nowDate = new Date();
 
-
-                String mfrancoFirm = "Firmado digitalmente por " + mfranco + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(generateCertificateVin.getPolicy().getIssuanceDate());
-                String maguirreFirm = "Firmado digitalmente por " + maguirre + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(generateCertificateVin.getPolicy().getIssuanceDate());
+                String mfrancoFirm = "Firmado digitalmente por " + mfranco + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(nowDate);
+                String maguirreFirm = "Firmado digitalmente por " + maguirre + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(nowDate);
                 PdfPTable firmTable = new PdfPTable(6);
                 firmTable.setHorizontalAlignment(Element.ALIGN_CENTER);
                 firmTable.setLockedWidth(true);
@@ -3320,9 +3327,9 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             } else {
                 String rfmolina = "RAFAEL FERNANDO MOLINA LIZARAZU";
 
+                Date nowDate = new Date();
 
-
-                String rfmolinaFirm = "Firmado digitalmente por " + rfmolina + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(generateCertificateVin.getPolicy().getIssuanceDate());
+                String rfmolinaFirm = "Firmado digitalmente por " + rfmolina + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(nowDate);
                 PdfPTable firmTable = new PdfPTable(2);
                 firmTable.setHorizontalAlignment(Element.ALIGN_CENTER);
                 firmTable.setLockedWidth(true);
@@ -3449,18 +3456,18 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             String paymentDollarExchangeRate = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getCurrencyDollarValue(), paymentCurrencyAbbreviation);
 
-            String detailRescueValue = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
-                    obj.getRescueValue(), "");
+            String detailTotalPaid = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
+                    obj.getPremiumPaid(), "");
             String detailAdministrativeExpenses = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getAdminExpenses(), "");
-            String detailDiscountPerDay = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
-                    obj.getDiscountPerDay(), "");
-            String detailValueToReturn = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
+            String detailProrate = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
+                    obj.getDiscountProrataDay(), "");
+            String detailRePayment = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getValueToReturn(), "");
             String detailCurrencyDetail = paymentCurrencyAbbreviation.toUpperCase();
 
-            LocalDateTime date = DateUtils.asDateToLocalDateTime(obj.getDate());
-            Calendar acceptanceDate = DateUtils.asCalendarLocalDateTime(date);
+            Calendar acceptanceDate = Calendar.getInstance();
+            Calendar c2 = new GregorianCalendar();
             String acceptanceDateDay = Integer.toString(acceptanceDate.get(Calendar.DATE));
             String acceptanceDateMonth = "enero";
 
@@ -3606,7 +3613,7 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 9, Element.ALIGN_LEFT, cellFontSize, false, null));
             detailPaymentTable.addCell(getCellVinFiniquito("Valor del rescate(a):", 14, Element.ALIGN_LEFT, cellFontSize, true, null));
             detailPaymentTable.addCell(getCellVinFiniquito("", 6, Element.ALIGN_LEFT, cellFontSize, false, null));
-            detailPaymentTable.addCell(getCellVinFiniquito(detailRescueValue, 5, Element.ALIGN_RIGHT, cellFontSize, true, null));
+            detailPaymentTable.addCell(getCellVinFiniquito(detailTotalPaid, 5, Element.ALIGN_RIGHT, cellFontSize, true, null));
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 14, Element.ALIGN_LEFT, cellFontSize, false, null));
 
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 9, Element.ALIGN_LEFT, cellFontSize, false, null));
@@ -3619,13 +3626,13 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 9, Element.ALIGN_LEFT, cellFontSize, false, null));
             detailPaymentTable.addCell(getCellVinFiniquitoBorder("Descuento del rescate a prórrata día (c):", 14, Element.ALIGN_LEFT, cellFontSize, true, null, Rectangle.BOTTOM));
             detailPaymentTable.addCell(getCellVinFiniquito("", 6, Element.ALIGN_LEFT, cellFontSize, false, null));
-            detailPaymentTable.addCell(getCellVinFiniquitoBorder(detailDiscountPerDay, 5, Element.ALIGN_RIGHT, cellFontSize, true, null, Rectangle.BOTTOM));
+            detailPaymentTable.addCell(getCellVinFiniquitoBorder(detailProrate, 5, Element.ALIGN_RIGHT, cellFontSize, true, null, Rectangle.BOTTOM));
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 14, Element.ALIGN_LEFT, cellFontSize, false, null));
 
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 9, Element.ALIGN_LEFT, cellFontSize, false, null));
             detailPaymentTable.addCell(getCellVinFiniquito("Valor del rescate a Devolver (e = a-b-c):", 14, Element.ALIGN_LEFT, cellFontSize, true, null));
             detailPaymentTable.addCell(getCellVinFiniquito("", 6, Element.ALIGN_LEFT, cellFontSize, false, null));
-            detailPaymentTable.addCell(getCellVinFiniquitoBorder(detailValueToReturn, 5, Element.ALIGN_RIGHT, cellFontSize, true, null, Rectangle.BOTTOM));
+            detailPaymentTable.addCell(getCellVinFiniquitoBorder(detailRePayment, 5, Element.ALIGN_RIGHT, cellFontSize, true, null, Rectangle.BOTTOM));
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 14, Element.ALIGN_LEFT, cellFontSize, false, null));
 
             detailPaymentTable.addCell(rowBlank);
@@ -3729,24 +3736,24 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             arialFontItalicSize8.setSize(8);
 
             String city = obj.getCity();
-            String date = HelpersMethods.formatStringOnlyDate(obj.getDate());
+            String date = HelpersMethods.formatStringOnlyDate(new Date());
             String policyName = obj.getPolicyName().toUpperCase();
             String policyNumber = obj.getPolicyNumber().toUpperCase();
-            String insuredCapital = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(obj.getInsuredCapital(), "Bs");
+            String capitalInsured = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(obj.getInsuredCapital(), "Bs");
             String premiumPaid = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getPremiumPaid(), "Bs");
             String from = HelpersMethods.formatStringOnlyDate(obj.getPolicyFromDate());
             String toDate = HelpersMethods.formatStringOnlyDate(obj.getPolicyToDate());
-            String yearsQuantity = obj.getCreditTermInYears().toString();
+            String yearsQuantity = obj.getCrediTermInYears().toString();
             String rescueRequestDate = HelpersMethods.formatStringOnlyDate(obj.getRequestDate());
             String yearlyPremium = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(obj.getPremiumPaidAnnual(), "Bs");
             String years = obj.getYearsPassed().toString();
             String days = obj.getDaysPassed().toString();
-            String rescueValue = HelpersMethods.convertNumberToCompanyFormatNumber(obj.getRescueValue());
+            String rescueValue = HelpersMethods.convertNumberToCompanyFormatNumber(obj.getPremiumPaid());
             String expenseManagement = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getAdminExpenses(), "");
             String rescueDiscount = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
-                    obj.getDiscountPerDay(), "");
+                    obj.getDiscountProrataDay(), "");
             String rescueValueToReturn = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getValueToReturn(), "");
             String nameClient = obj.getAssuranceName().toUpperCase();
@@ -3818,7 +3825,7 @@ public class GeneratePdfService implements GeneratePdfUseCase {
 
             bodyTable.addCell(getCellVinFiniquito("", 3, Element.ALIGN_LEFT, cellFontSize, false, null));
             bodyTable.addCell(getCellVinFiniquito("Capital asegurado:", 7, Element.ALIGN_LEFT, cellFontSize, false, null));
-            bodyTable.addCell(getCellVinFiniquito(insuredCapital, 10, Element.ALIGN_CENTER, cellFontSize, false, bgGray));
+            bodyTable.addCell(getCellVinFiniquito(capitalInsured, 10, Element.ALIGN_CENTER, cellFontSize, false, bgGray));
             bodyTable.addCell(getCellVinFiniquito("", 9, Element.ALIGN_LEFT, cellFontSize, false, null));
             bodyTable.addCell(getCellVinFiniquito("Prima pagada: ", 6, Element.ALIGN_LEFT, cellFontSize, false, null));
             bodyTable.addCell(getCellVinFiniquito(premiumPaid, 9, Element.ALIGN_CENTER, cellFontSize, false, bgGray));
@@ -3882,12 +3889,6 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             bodyTable.addCell(rowBlank);
             bodyTable.addCell(rowBlank);
 
-            bodyTable.addCell(getCellVinFiniquito("", 3, Element.ALIGN_LEFT, cellFontSize, false, null));
-            bodyTable.addCell(getCellVinRescission("Aclaración: Si la solicitud de terminación es posterior a los primeros treinta (30) días continuos de vigencia, se devolverá considerando el valor de rescate (entendiéndose por valor de rescate a la suma de dinero provisionada por la Entidad Aseguradora en caso que la póliza termine antes del plazo establecido para la entrega al asegurado).",
-                    32, Element.ALIGN_JUSTIFIED, cellFontSize, false, null, Rectangle.NO_BORDER, false));
-            bodyTable.addCell(getCellVinFiniquito("", 13, Element.ALIGN_LEFT, cellFontSize, false, null));
-            bodyTable.addCell(rowBlank);
-
             bodyTable.addCell(getCellVinFiniquito("Firma:", 10, Element.ALIGN_LEFT, cellFontSize, false, null));
             bodyTable.addCell(getCellVinFiniquitoBorder("", 25, Element.ALIGN_LEFT, cellFontSize, false, null, Rectangle.BOTTOM));
             bodyTable.addCell(getCellVinFiniquito("", 13, Element.ALIGN_LEFT, cellFontSize, false, null));
@@ -3949,7 +3950,6 @@ public class GeneratePdfService implements GeneratePdfUseCase {
 
     @Override
     public byte[] generateVINRamsonSettlement(DocRescueStatement obj) {
-        DecimalFormat format = new DecimalFormat("#,##0.00");
         Document document = new Document(PageSize.LETTER);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         FontFactory.register(properties.getPathFonts() + "Arial.ttf", "ARIAL");
@@ -3986,12 +3986,8 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             } catch (Exception x) {
                 x.printStackTrace();
             }
-            //            Title
-            document.add(jumpLine);
-            document.add(jumpLine);
-            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-            Paragraph title = new Paragraph("COMUNICADO DE DEVOLUCIÓN DE RESCATE SCS-GTE/"
-                    + String.format("%03d", obj.getDocumentNumber())+"-" +currentYear,arialBoldSize12);
+//            Title
+            Paragraph title = new Paragraph("COMUNICADO DE DEVOLUCIÓN DE RESCATE SCS-GTE/" + "XXX-2023", arialBoldSize12);
             title.setAlignment(Element.ALIGN_RIGHT);
             document.add(title);
             document.add(jumpLine);
@@ -4049,23 +4045,23 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             part2.setLockedWidth(true);
             part2.setHorizontalAlignment(Element.ALIGN_LEFT);
 
-            part2.addCell(getCellVinFiniquito("Capital Asegurado Total", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part2.addCell(getCellVinFiniquito("Capital Aseg Total", 6, Element.ALIGN_CENTER, 8, true, bgGray));
             part2.addCell(getCellVinFiniquito("Valor del Rescate a Devolver", 6, Element.ALIGN_CENTER, 8, true, bgGray));
             part2.addCell(getCellVinFiniquito("Prima Neta Rescatada", 6, Element.ALIGN_CENTER, 8, true, bgGray));
             part2.addCell(getCellVinFiniquito("Prima Adicional Rescatada", 6, Element.ALIGN_CENTER, 8, true, bgGray));
             part2.addCell(getCellVinFiniquito("APS", 6, Element.ALIGN_CENTER, 8, true, bgGray));
-            part2.addCell(getCellVinFiniquito("FPA", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part2.addCell(getCellVinFiniquito("FRA", 6, Element.ALIGN_CENTER, 8, true, bgGray));
             part2.addCell(getCellVinFiniquito("Prima de Riesgo", 6, Element.ALIGN_CENTER, 8, true, bgGray));
             part2.addCell(getCellVinFiniquito("Servicio de Cobranza Rescatado", 6, Element.ALIGN_CENTER, 8, true, bgGray));
 
-            part2.addCell(getCellVinFiniquito(format.format(obj.getCapitalAseguradoTotal()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part2.addCell(getCellVinFiniquito(format.format(obj.getValorRescateADevolver()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part2.addCell(getCellVinFiniquito(format.format(obj.getPrimaNetaRescatada()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part2.addCell(getCellVinFiniquito(format.format(obj.getPrimaAdicionalRescatada()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part2.addCell(getCellVinFiniquito(format.format(obj.getAps()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part2.addCell(getCellVinFiniquito(format.format(obj.getFpa()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part2.addCell(getCellVinFiniquito(format.format(obj.getPrimaRiesgo()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part2.addCell(getCellVinFiniquito(format.format(obj.getServicioCobranzaRescatado()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(obj.getCapitalAseguradoTotal().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(obj.getValorRescateADevolver().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(obj.getPrimaNetaRescatada().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(obj.getPrimaAdicionalRescatada().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(obj.getAps().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(obj.getFpa().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(obj.getPrimaRiesgo().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(obj.getServicioCobranzaRescatado().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
 
             part2.addCell(rowBlank);
             document.add(part2);
@@ -4082,11 +4078,11 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             part3.addCell(getCellVinFiniquito("Comisión Broker Rescatada", 6, Element.ALIGN_CENTER, 8, true, bgGray));
             part3.addCell(getCellVinFiniquito("", 18, Element.ALIGN_CENTER, 8, false, null));
 
-            part3.addCell(getCellVinFiniquito(format.format(obj.getPrimaCedidaRescatada()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part3.addCell(getCellVinFiniquito(format.format(obj.getCapitalCedidoRescatado()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part3.addCell(getCellVinFiniquito(format.format(obj.getReservaMatematica()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part3.addCell(getCellVinFiniquito(format.format(obj.getImpuestosRemesas()), 6, Element.ALIGN_RIGHT, 8, false, null));
-            part3.addCell(getCellVinFiniquito(format.format(obj.getComisionBrokerRescata()), 6, Element.ALIGN_RIGHT, 8,false, null));
+            part3.addCell(getCellVinFiniquito(obj.getPrimaCedidaRescatada().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part3.addCell(getCellVinFiniquito(obj.getCapitalCedidoRescatado().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part3.addCell(getCellVinFiniquito(obj.getReservaMatematica().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part3.addCell(getCellVinFiniquito(obj.getImpuestosRemesas().toString(), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part3.addCell(getCellVinFiniquito(obj.getComisionBrokerRescata().toString(), 6, Element.ALIGN_RIGHT, 8,false, null));
             part3.addCell(getCellVinFiniquito("", 18, Element.ALIGN_RIGHT, 8, false, null));
 
             part3.addCell(rowBlank);
