@@ -8,13 +8,11 @@ import java.util.List;
 
 public interface FileDocumentPort {
     List<FileDocument> findAll();
-    List<FileDocumentByRequestDTO> findAllDocumentsByRequestId(Long requestId);
-    List<FileDocumentByRequestDTO> findAllSignedDocumentsByRequestId(Long requestId);
-    FileDocument findLastByPolicyItemIdAndDocumentTypeIdc(Long policyItemId, Integer documentTypeIdc);
     FileDocument findById(Long fileId);
-    List<FileDocumentByRequestDTO> getCertificateCoverageDocumentByPolicyItemId(Long policyItemId);
     FileDocument SaveOrUpdate(FileDocument fileDocument);
     List<FileDocumentDTO> SaveOrUpdateAll(List<FileDocumentDTO> fileDocument);
+    List<FileDocumentByRequestDTO> findAllDocumentsByRequestId(Long requestId);
+    List<FileDocumentByRequestDTO> findAllSignedDocumentsByRequestId(Long requestId);
     long deleteFileDocument(Long fileDocumentId);
-
+    List<FileDocumentByRequestDTO> getCertificateCoverageDocumentByPolicyItemId(Long policyItemId);
 }

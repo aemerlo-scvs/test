@@ -1,7 +1,9 @@
 package com.scfg.core.adapter.web;
 
 public interface BranchEndPoint {
-    String BASE = "branch";
-    String SEARCHONE = "/search-one";
-    String GETBRANCHALL = "/branchall";
+    String BASE = "/branch";
+    String GETALL = "/all";
+    String SAVE = "/save";
+    String UPDATE = "/update";
+    String DELETE = "/delete/{branchId}";
 }

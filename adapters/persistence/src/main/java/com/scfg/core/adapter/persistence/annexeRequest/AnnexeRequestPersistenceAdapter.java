@@ -54,11 +54,6 @@ public class AnnexeRequestPersistenceAdapter implements RequestAnnexePort {
     }
 
     @Override
-    public List<RequestAnnexe> findAllRequestByPolicyIdAndAnnexeTypeIdAndRequestStatus(Long policyId, Long annexeTypeId, List<Integer> requestAnnexeStatusList) {
-        return null;
-    }
-
-    @Override
     public PageableDTO findAllPageByFilters(RequestAnnexeSearchFiltersDto filtersDto, Integer page, Integer size) throws ParseException {
         String filters = filtersDto != null ? this.getFindAnnexeFilters(filtersDto) : this.getFirstStatus();
         int initRange = HelpersMethods.getPageInitRange(page, size);

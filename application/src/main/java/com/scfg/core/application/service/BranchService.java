@@ -19,7 +19,7 @@ public class BranchService implements BranchUseCase {
     private final BranchPort branchPort;
     @Override
     public List<Branch> getAllBranchs() {
-        return branchPort.getAllBranh();
+        return branchPort.getAllBranch();
     }
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
     @Override
@@ -41,7 +41,6 @@ public class BranchService implements BranchUseCase {
         return branchPort.delete(id);
 
     }
-
     @Override
     public List<Branch> getfilterParamenter(FilterParamenter paramenter) {
         List<Branch> list1 = branchPort.getfilterParamenters(paramenter);

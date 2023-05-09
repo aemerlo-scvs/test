@@ -47,7 +47,7 @@ public interface PlanRepository extends JpaRepository<PlanJpaEntity, Long> {
     @Query(value = "SELECT pl FROM PlanJpaEntity pl \n" +
             "INNER JOIN ProductJpaEntity po \n" +
             "ON po.id = pl.productId \n" +
-            "WHERE po.agreementCode = :agreementCodeProduct AND pl.agreementCode = :agreementCodePlan \n" +
+            "WHERE po.agreementCode = :agreementCodeProduct AND pl.bfsAgreementCode = :agreementCodePlan \n" +
             "AND pl.status = :status AND po.status = :status")
     PlanJpaEntity findByAgreementCodePlanAndAgreementCodeProduct(@Param("agreementCodePlan") Integer agreementCodePlan,
                                                                  @Param("agreementCodeProduct") Integer agreementCodeProduct,
@@ -55,6 +55,6 @@ public interface PlanRepository extends JpaRepository<PlanJpaEntity, Long> {
 
 
     @Query("SELECT pl FROM PlanJpaEntity pl \n" +
-            "WHERE pl.agreementCode = :agreementCode AND pl.status = :status")
-    PlanJpaEntity findByAgreementCode(@Param("agreementCode") Integer agreementCode, @Param("status") Integer status);
+            "WHERE pl.bfsAgreementCode = :bfsAgreementCode AND pl.status = :status")
+    PlanJpaEntity findByAgreementCode(@Param("bfsAgreementCode") Integer bfsAgreementCode, @Param("status") Integer status);
 }

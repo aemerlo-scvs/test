@@ -10,5 +10,5 @@ public interface MathReservePort {
 
     MathReserve getById(Long Id);
 
-    List<MathReserve> getAllByVersionInsurerYearAndTotalYear(String version, Integer insurerYear, Integer totalYear);
+    List<MathReserve> getAllByInsurerYearAndTotalYear(Integer insurerYear, Integer totalYear);
 }

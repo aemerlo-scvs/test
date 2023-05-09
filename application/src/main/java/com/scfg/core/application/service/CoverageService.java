@@ -38,19 +38,19 @@ public class CoverageService implements CoverageUseCase {
 
     @Override
     public List<Coverage> getfilterParamenter(FilterParamenter parameters) {
-//        List<Coverage> list1 = coveragePort.getfilterParamenters(parameters);
-//
-//        if (parameters.getName() != null && !parameters.getName().isEmpty()) {
-//            list1 = list1.stream().filter((s) -> (s.getName().toUpperCase().contains(parameters.getName().toUpperCase()))).collect(Collectors.toList());
-//        }
-//        if (list1.size() > 0 && parameters.getDateto() != null && parameters.getDatefrom() != null) {
-//            list1 = list1.stream().filter(re -> re.getCreatedAt().after(parameters.getDatefrom()) && re.getCreatedAt().before(parameters.getDateto())).collect(Collectors.toList());
-//        }
-//        if (list1.size() > 0 && parameters.getStatus() != null) {
-//            list1 = list1.stream().filter(re -> re.getStatus() == parameters.getStatus()).collect(Collectors.toList());
-//        }
-//
-        return null;
+        List<Coverage> list1 = coveragePort.getfilterParamenters(parameters);
+
+        if (parameters.getName() != null && !parameters.getName().isEmpty()) {
+            list1 = list1.stream().filter((s) -> (s.getName().toUpperCase().contains(parameters.getName().toUpperCase()))).collect(Collectors.toList());
+        }
+        if (list1.size() > 0 && parameters.getDateto() != null && parameters.getDatefrom() != null) {
+            list1 = list1.stream().filter(re -> re.getCreatedAt().after(parameters.getDatefrom()) && re.getCreatedAt().before(parameters.getDateto())).collect(Collectors.toList());
+        }
+        if (list1.size() > 0 && parameters.getStatus() != null) {
+            list1 = list1.stream().filter(re -> re.getStatus() == parameters.getStatus()).collect(Collectors.toList());
+        }
+
+        return list1;
     }
 
     @Override

@@ -19,7 +19,6 @@ import javax.persistence.Table;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Where(clause = HelpersConstants.FILTER_ACTIVE_RECORDS_FOR_PERSIST)
 @SuperBuilder
 public class CoverageJpaEntity extends BaseJpaEntity {
     @Column(name = "name", length = 100, nullable = false)

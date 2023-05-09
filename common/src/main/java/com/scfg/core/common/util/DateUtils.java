@@ -101,42 +101,14 @@ public class DateUtils {
         }
     }
 
+
     public static Long daysBetween(Date fromDate, Date toDate){
         LocalDateTime fromDateAux = asDateToLocalDateTime(fromDate);
         LocalDateTime toDateAux = asDateToLocalDateTime(toDate);
         return ChronoUnit.DAYS.between(fromDateAux, toDateAux);
     }
-
     public static Long daysBetween(LocalDateTime fromDate, LocalDateTime toDate){
         return ChronoUnit.DAYS.between(fromDate, toDate);
     }
 
-    public  static Date getFirstDayOfNextMonth(LocalDateTime date) {
-        ZoneId zid = ZoneId.of("America/La_Paz");
-       date= date.plusMonths(1);
-       date= date.minusDays(date.getDayOfMonth()-1);
-        return Date.from(date.atZone(zid).toInstant());
-    }
-
-    public static Date getDateFromLocalDateTime(LocalDateTime date) {
-        ZoneId zid = ZoneId.of("America/La_Paz");
-        return Date.from(date.atZone(zid).toInstant());
-    }
-
-    public static LocalDateTime getSummaryPeriodTo(LocalDateTime date, int years) {
-        return date.plusYears(years);
-    }
-
-    public  static Date addHoursAndMinutes(LocalDateTime date, int hours, int minutes) {
-        LocalDate localDate=date.toLocalDate();
-        ZoneId zid = ZoneId.of("America/La_Paz");
-        return Date.from(localDate.atTime(hours,minutes).atZone(zid).toInstant());
-    }
-
-    public static Calendar asCalendarLocalDateTime(LocalDateTime date) {
-        Calendar calendar=Calendar.getInstance();
-        ZoneId zid = ZoneId.of("America/La_Paz");
-        calendar.setTime(Date.from(date.atZone(zid).toInstant()));
-        return calendar;
-    }
 }

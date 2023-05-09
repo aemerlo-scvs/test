@@ -22,58 +22,29 @@ import javax.persistence.Table;
 @Where(clause = HelpersConstants.FILTER_ACTIVE_RECORDS_FOR_PERSIST)
 @SuperBuilder
 public class ProductJpaEntity extends BaseJpaEntity {
-
     @Column(name = "renewalIdc")
     private Integer renewalIdc;
-
     @Column(name = "businessLineIdc")
     private Integer businessLineIdc;
-
     @Column(name = "agreementCode")
     private Integer agreementCode;
-
     @Column(name = "apsCode")
     private String apsCode;
-
     @Column(name = "name", length = 100)
     private String name;
-
     @Column(name = "description", length = 200)
     private String description;
-
-    @Column(name = "minimumEntryAge")
-    private Integer minimumEntryAge;
-
-    @Column(name = "entryAgeLimit")
-    private Integer entryAgeLimit;
-
-    @Column(name = "ageLimitStay")
-    private Integer ageLimitStay;
-
     @Column(name = "nomenclature", length = 50)
     private String nomenclature;
-
-    @Column(name = "claimNotificationLimit")
-    private Integer claimNotificationLimit;
-
-    @Column(name = "settlementLimit")
-    private Integer settlementLimit;
-
     @Column(name = "resolution", length = 200)
     private String resolution;
-
-    @Column(name = "numberDayPastDue")
-    private Integer numberDayPastDue;
-
     @Column(name = "branchId")
     private Long branchId;
-
-    @Column(name = "initials")
+    @Column(name = "initials", length = 10)
     private String initials;
-
     @Column(name = "correlativeNumber")
     private Long correlativeNumber;
-
     @Column(name = "billable")
     private Integer billable;
 }
+

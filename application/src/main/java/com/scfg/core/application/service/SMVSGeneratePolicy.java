@@ -106,7 +106,7 @@ public class SMVSGeneratePolicy implements SMVSUseGeneratePolicy {
         //#endregion
 
         //#region 3.- Add new policy plan1.get().getAmount()
-        Policy oPolicy = new Policy(o.getRequestId(), 1, numberPolicyNext, numberPolicyNew, plan1.getTotalPremium(), plan1.getTotalInsuredCapital(),
+        Policy oPolicy = new Policy(o.getRequestId(), 1, numberPolicyNext, numberPolicyNew, plan1.getTotalPremium(), 12000.0,
                 PolicyStatusEnum.ACTIVE.getValue(), product.getId());
         Policy policy = policyPort.saveOrUpdate(oPolicy);
 
@@ -116,7 +116,7 @@ public class SMVSGeneratePolicy implements SMVSUseGeneratePolicy {
 
         // 3.2 add CoveragePolicyItem, primero tenemos que sacar el CoverageProductPlan
         CoverageProductPlan coverageProductPlan = coverageProductPlanPort.findCoverageProductPlanByPlanIdAndProductId(product.getId(), plan1.getId());
-        CoveragePolicyItem coveragePolicyItem = new CoveragePolicyItem(coverageProductPlan.getId(), policyItem.getId(), plan1.getTotalInsuredCapital());
+        CoveragePolicyItem coveragePolicyItem = new CoveragePolicyItem(coverageProductPlan.getId(), policyItem.getId(), 12000.0);
         coveragePolicyItemPort.save(coveragePolicyItem);
 
         //#endregion

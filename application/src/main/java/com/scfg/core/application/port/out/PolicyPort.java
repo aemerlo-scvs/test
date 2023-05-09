@@ -1,6 +1,7 @@
 package com.scfg.core.application.port.out;
 
 import com.scfg.core.domain.Policy;
+import com.scfg.core.domain.dto.PageableDTO;
 import com.scfg.core.domain.dto.PersonDTO;
 import com.scfg.core.domain.dto.credicasas.groupthefont.GELPolicyDTO;
 
@@ -26,7 +27,7 @@ public interface PolicyPort {
 
     List<Object> getAllSMVSSubscriptionReport(Date startDate, Date toDate, Integer statusRequest);
 
-    String findAllByPersonFilters(PersonDTO personDTO);
+    PageableDTO findAllByPageAndPersonFilters(PersonDTO personDTO, Integer page, Integer size);
 
     Policy findByOperationNumber(String operationNumber);
 
