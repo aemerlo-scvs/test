@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -139,38 +138,20 @@ public class GenerateCertificateCoverageService implements GenerateCertificateCo
             //#region Inserción de datos
             byte[] json = objectMapper.writeValueAsBytes(object);
             BfsPaymentDTO paymentDTO = objectMapper.readValue(json, BfsPaymentDTO.class);
-
-            LocalDateTime today;
-            ZoneId zid = ZoneId.of("America/La_Paz");
-
-            if(paymentDTO.getFecha_aceptacion()!=null) {
-                int hour=  LocalDateTime.now(zid).getHour();
-                int minute= LocalDateTime.now(zid).getMinute();
-                today = paymentDTO.getFecha_aceptacion().withHour(hour).withMinute(minute).atZone(zid).toLocalDateTime();
-            }
-            else {
-                today = LocalDateTime.now(zid);
-            }
-
+            LocalDateTime dateNow = LocalDateTime.now();
             Payment payment = mapToDomainPayment(policy.getTotalPremium(), policy.getCurrencyTypeIdc(), requestId);
             long paymentId = paymentPort.saveOrUpdate(payment);
-            PaymentPlan paymentPlan = mapToDomainPaymentPlan(policy.getTotalPremium(), paymentId, today);
+            PaymentPlan paymentPlan = mapToDomainPaymentPlan(policy.getTotalPremium(), paymentId, dateNow);
             long paymentPlanId = paymentPlanPort.saveOrUpdate(paymentPlan);
-            Transaction transaction = mapToDomainTransaction(paymentDTO, policy.getTotalPremium(), policy.getCurrencyTypeIdc(), paymentPlanId, today);
+            Transaction transaction = mapToDomainTransaction(paymentDTO, policy.getTotalPremium(), policy.getCurrencyTypeIdc(), paymentPlanId, dateNow);
             long transactionId = transactionPort.saveOrUpdate(transaction);
             boolean changePolId = false;
 
-            if(today.getDayOfMonth()>25)
-            {
-                policy.setIssuanceDate(DateUtils.getFirstDayOfNextMonth(today));
-            }
-            else
-            {
-                policy.setIssuanceDate(DateUtils.getDateFromLocalDateTime(today));
-            }
-
-            policy.setFromDate(DateUtils.addHoursAndMinutes(today,12,1));
-            policy.setToDate(DateUtils.addHoursAndMinutes( DateUtils.getSummaryPeriodTo(today,generalRequest.getCreditTermInYears()),12,0));
+            Date validateFrom = DateUtils.asDate(LocalDate.now());
+            Date validated = DateUtils.asSummaryRestartDays(validateFrom, Calendar.DAY_OF_YEAR, generalRequest.getCreditTermInDays());
+            policy.setIssuanceDate(new Date());
+            policy.setFromDate(validateFrom);
+            policy.setToDate(validated);
             if (policy.getPolicyStatusIdc() == PolicyStatusEnum.CANCELED.getValue()) {
                 policy.setId(0L);
                 changePolId = true;
@@ -182,8 +163,6 @@ public class GenerateCertificateCoverageService implements GenerateCertificateCo
             policy = policyPort.saveOrUpdate(policy);
             if (changePolId) {
                 policyItem.setPolicyId(policy.getId());
-                policyItem.setValidityStart(policy.getFromDate());
-                policyItem.setTermValidity(policy.getToDate());
                 policyItem = policyItemPort.saveOrUpdate(policyItem);
                 List<PolicyItemMathReserve> changeStatusList = policyItemMathReservePort.findByPolicyItemId(policyItem.getId());
                 if (changeStatusList != null || !changeStatusList.isEmpty()) {
@@ -249,7 +228,7 @@ public class GenerateCertificateCoverageService implements GenerateCertificateCo
             } else {
                 signList.add(CertificateOwnerEnum.RFMOLINA.getValue());
             }
-            String signedB64 = jksCertificateService.signDocumentWithP12Cert(base64, signList, DateUtils.asDateToLocalDateTime(policy.getIssuanceDate()));
+            String signedB64 = jksCertificateService.signDocumentWithP12Cert(base64, signList);
 
             String fileName = policy.getNumberPolicy();
             FileDocument fileDocument = FileDocument.builder()

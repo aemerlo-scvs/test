@@ -2751,8 +2751,8 @@ public class GeneratePdfService implements GeneratePdfUseCase {
 
             String fromDate = HelpersMethods.formatStringOnlyDate(generateCertificateVin.getPolicy().getFromDate());
             String toDate = HelpersMethods.formatStringOnlyDate(generateCertificateVin.getPolicy().getToDate());
-            String fullCommentDate = "Desde el " + fromDate + " a hrs. 12:01 pm (medio día) hasta el " + toDate +
-                    " a hrs. 12:00 pm (medio día).";
+            String fullCommentDate = "Desde el " + fromDate + " a hrs. 12:00 am (medio día) hasta el " + toDate +
+                    " 12:00 am (medio día).";
             primCertTable.addCell(getCellVinSize8("VIGENCIA:", 5, Element.ALIGN_LEFT, true, false));//5
             primCertTable.addCell(getCellVinSize8(fullCommentDate, 43, Element.ALIGN_LEFT, false, false));//43
 
@@ -3313,10 +3313,10 @@ public class GeneratePdfService implements GeneratePdfUseCase {
                 String mfranco = "LUIS MAURICIO FRANCO MELAZZINI";
                 String maguirre = "MARIO EDMUNDO AGUIRRE DURAN";
 
+                Date nowDate = new Date();
 
-
-                String mfrancoFirm = "Firmado digitalmente por " + mfranco + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(generateCertificateVin.getPolicy().getIssuanceDate());
-                String maguirreFirm = "Firmado digitalmente por " + maguirre + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(generateCertificateVin.getPolicy().getIssuanceDate());
+                String mfrancoFirm = "Firmado digitalmente por " + mfranco + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(nowDate);
+                String maguirreFirm = "Firmado digitalmente por " + maguirre + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(nowDate);
                 PdfPTable firmTable = new PdfPTable(6);
                 firmTable.setHorizontalAlignment(Element.ALIGN_CENTER);
                 firmTable.setLockedWidth(true);
@@ -3330,9 +3330,9 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             } else {
                 String rfmolina = "RAFAEL FERNANDO MOLINA LIZARAZU";
 
+                Date nowDate = new Date();
 
-
-                String rfmolinaFirm = "Firmado digitalmente por " + rfmolina + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(generateCertificateVin.getPolicy().getIssuanceDate());
+                String rfmolinaFirm = "Firmado digitalmente por " + rfmolina + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(nowDate);
                 PdfPTable firmTable = new PdfPTable(2);
                 firmTable.setHorizontalAlignment(Element.ALIGN_CENTER);
                 firmTable.setLockedWidth(true);

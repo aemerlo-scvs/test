@@ -153,6 +153,8 @@ public class SMVSIntegrationService implements SMVSIntegrationUseCase {
                 directionPort.saveOrUpdate(direction);
             }
         } else {
+            personAux.getNaturalPerson().setClientCode(paymentDTO.getCod_cliente());
+            personPort.saveOrUpdate(personAux);
             personId = personAux.getId();
         }
 

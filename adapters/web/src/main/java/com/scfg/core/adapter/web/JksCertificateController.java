@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
@@ -77,7 +76,7 @@ public class JksCertificateController {
     ResponseEntity signWithP12Cert(@RequestBody SignDocumentDTO signDocumentDTO) {
         try {
             String response = jksCertificateUseCase.signDocumentWithP12Cert(signDocumentDTO.getBase64Document(),
-                    signDocumentDTO.getOwnerSigns(), LocalDateTime.now());
+                    signDocumentDTO.getOwnerSigns());
             return ok(response);
         } catch (OperationException e) {
             return CustomErrorType.badRequest("Bad Request", e.getMessage());

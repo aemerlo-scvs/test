@@ -14,7 +14,6 @@ import com.scfg.core.domain.smvs.SendMessageDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -41,18 +40,16 @@ public class SMVSSendingScheduledMessagesService {
     private final EmailService emailService;
     private final AlertPort alertPort;
 
-    private final Environment environment;
-
     // Tiempos expresados en Dias
     private final int dayAfterPurchase = 1;
     private final int minTime = 4;
     private final int maxTime = 10;
     private final Integer productAgreementCode = 746;
 
+    @Profile(value="prod")
     @Scheduled(cron = "0 0 6 * * *", zone = "America/La_Paz")
     public void sendMessages() {
 
-        if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
         ZoneId zid = ZoneId.of("America/La_Paz");
         LocalDateTime today = LocalDateTime.now(zid);
         today.with(LocalTime.MIN);
@@ -105,10 +102,8 @@ public class SMVSSendingScheduledMessagesService {
                 smvsCommonService.sendContactCenterMessage(messageDTOAux);
             }
         }
-            //#endregion
-        }
 
-
+        //#endregion
 
     }
 
