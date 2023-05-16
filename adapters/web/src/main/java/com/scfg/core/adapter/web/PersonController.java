@@ -124,5 +124,19 @@ public class PersonController {
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
+    @GetMapping(value = "/searchPerson/{docType}/{documentNumber}/{name}")
+    @ApiOperation(value = "Retorna un listado de personas")
+    ResponseEntity searchPerson(@PathVariable Long docType, @PathVariable(required = false) String documentNumber, @PathVariable(required = false) String name) {
+        try {
+            List<Object> person = personUseCase.searchPerson(docType,documentNumber, name);
+            return ok(person);
+        } catch (NotDataFoundException e) {
+            // log.error("Ocurrio un error al obtener el rol: [{}]", roleId, e);
+            return CustomErrorType.badRequest("Bad Request", e.getMessage());
+        } catch (Exception e) {
+            // log.error("Ocurrio un error al obtener el rol: [{}]", roleId, e);
+            return CustomErrorType.serverError("Server Error", e.getMessage());
+        }
+    }
 
 }

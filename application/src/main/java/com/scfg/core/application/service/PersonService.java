@@ -158,4 +158,9 @@ public class PersonService implements PersonUseCase {
         person.setTelephones(telephoneList);
         return person;
     }
+
+    @Override
+    public List<Object> searchPerson(Long docType, String documentNumber, String name) {
+        return personPort.searchPerson(docType,documentNumber, name);
+    }
 }

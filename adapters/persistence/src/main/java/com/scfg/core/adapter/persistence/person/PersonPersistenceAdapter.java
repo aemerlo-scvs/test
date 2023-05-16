@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ public class PersonPersistenceAdapter implements PersonPort {
     private final PersonRepository personRepository;
 
     private final EntityManager em;
+    private static String GET_REQUEST_ALL_BY_FILTER = "exec proc_search_persons :docType,:documentNumber,:name";
 
     @Override
     public List<Person> findAll() {
@@ -90,6 +92,19 @@ public class PersonPersistenceAdapter implements PersonPort {
     public Person findByNitNumber(Long nitNumber) {
         PersonJpaEntity person = personRepository.findByNitNumber(nitNumber,PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
         return new ModelMapper().map(person, Person.class);
+    }
+
+    @Override
+    public List<Object> searchPerson(Long docType, String documentNumber, String name) {
+        Query query = em.createNativeQuery(GET_REQUEST_ALL_BY_FILTER);
+        query.setParameter("docType", docType);
+        query.setParameter("documentNumber", documentNumber);
+        query.setParameter("name", name);
+
+        List<Object> list = query.getResultList();
+        em.close();
+
+        return list;
     }
 
     //#region Mappers
