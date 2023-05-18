@@ -124,9 +124,9 @@ public class PersonController {
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
-    @GetMapping(value = "/searchPerson/{docType}/{documentNumber}/{name}")
+    @GetMapping(value = "/searchPerson")
     @ApiOperation(value = "Retorna un listado de personas")
-    ResponseEntity searchPerson(@PathVariable Long docType, @PathVariable(required = false) String documentNumber, @PathVariable(required = false) String name) {
+    ResponseEntity searchPerson(@RequestParam Long docType, @RequestParam(required = false) String documentNumber, @RequestParam(required = false) String name) {
         try {
             List<Object> person = personUseCase.searchPerson(docType,documentNumber, name);
             return ok(person);
