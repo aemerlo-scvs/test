@@ -12,13 +12,14 @@ import java.util.List;
 
 public interface JuridicalPersonRepository extends JpaRepository<JuridicalPersonJpaEntity,Long> {
     @Query("SELECT p FROM PersonJpaEntity p " +
-            "JOIN FETCH p.juridicalPerson jp " +
+            "JOIN FETCH JuridicalPersonJpaEntity jp " +
+            "ON jp.person.id = p.id " +
             "WHERE p.assignedGroupIdc = :assignedGroup AND p.status = :status")
     List<PersonJpaEntity> findAllJuridicalPerson(@Param("assignedGroup") int assignedGroup,@Param("status") int status);
 
     @Query("SELECT new com.scfg.core.domain.dto.JuridicalPersonWithPersonIdDTO(jp.id, jp.name, jp.businessTypeIdc, p.id) \n" +
             "FROM JuridicalPersonJpaEntity jp \n" +
-            "INNER JOIN PersonJpaEntity p ON p.juridicalPerson.id  = jp.id \n" +
+            "INNER JOIN PersonJpaEntity p ON p.id  = jp.person.id \n" +
             "WHERE p.assignedGroupIdc = :assignedGroup AND p.status = :status")
     List<JuridicalPersonWithPersonIdDTO> findAllJuridicalPersonByAssignedGroup(@Param("assignedGroup") int assignedGroup, @Param("status") int status);
 

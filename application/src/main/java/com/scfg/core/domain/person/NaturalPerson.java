@@ -59,10 +59,38 @@ public class NaturalPerson extends BaseDomain {
 
     private Double salary;
 
+    private Long internalClientCode;
+
     public NaturalPerson() {
     }
 
     //#region Constructors
+
+    public NaturalPerson(NaturalPersonDomain naturalPersonDomain) {
+        this.setId(naturalPersonDomain.getId());
+        this.setClientCode(naturalPersonDomain.getClientCode());
+        this.setClientEventual(naturalPersonDomain.getClientEventual());
+        this.setClientType(naturalPersonDomain.getClientType());
+        this.setName(naturalPersonDomain.getName());
+        this.setLastName(naturalPersonDomain.getLastName());
+        this.setMotherLastName(naturalPersonDomain.getMotherLastName());
+        this.setMarriedLastName(naturalPersonDomain.getMarriedLastName());
+        this.setMaritalStatusIdc(naturalPersonDomain.getMaritalStatusIdc());
+        this.setDocumentType(naturalPersonDomain.getDocumentType());
+        this.setIdentificationNumber(naturalPersonDomain.getIdentificationNumber());
+        this.setComplement(naturalPersonDomain.getComplement());
+        this.setExtIdc(naturalPersonDomain.getExtIdc());
+        this.setBirthDate(naturalPersonDomain.getBirthDate());
+        this.setGenderIdc(naturalPersonDomain.getGenderIdc());
+        this.setProfession(naturalPersonDomain.getProfession());
+        this.setWorkPlace(naturalPersonDomain.getWorkPlace());
+        this.setWorkTypeIdc(naturalPersonDomain.getWorkTypeIdc());
+        this.setCreatedAt(naturalPersonDomain.getCreatedAt());
+        this.setLastModifiedAt(naturalPersonDomain.getLastModifiedAt());
+        this.setCreatedBy(naturalPersonDomain.getCreatedBy());
+        this.setLastModifiedBy(naturalPersonDomain.getLastModifiedBy());
+        this.setInternalClientCode(naturalPersonDomain.getInternalClientCode());
+    }
 
     //SMVS
     public NaturalPerson(MakePaymentDTO paymentDTO, Integer extIdc) {

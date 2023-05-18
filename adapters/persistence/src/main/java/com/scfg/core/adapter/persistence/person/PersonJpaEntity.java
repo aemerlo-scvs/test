@@ -20,9 +20,6 @@ import javax.persistence.*;
 @SuperBuilder
 public class PersonJpaEntity extends BaseJpaEntity {
 
-    @Column(name = "nit")
-    private Long nit;
-
     @Column(name = "nationalityIdc")
     private Integer nationalityIdc;
 
@@ -49,15 +46,5 @@ public class PersonJpaEntity extends BaseJpaEntity {
 
     @Column(name = "assignedGroupIdc")
     private Integer assignedGroupIdc;
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "naturalPersonId")
-    @JsonBackReference
-    private NaturalPersonJpaEntity naturalPerson;
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "juridicalPersonId")
-    @JsonBackReference
-    private JuridicalPersonJpaEntity juridicalPerson;
 
 }
