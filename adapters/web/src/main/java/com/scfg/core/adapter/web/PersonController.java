@@ -128,7 +128,7 @@ public class PersonController {
     @ApiOperation(value = "Retorna un listado de personas")
     ResponseEntity searchPerson(@RequestParam Long docType, @RequestParam(required = false) String documentNumber, @RequestParam(required = false) String name) {
         try {
-            List<Object> person = personUseCase.searchPerson(docType,documentNumber, name);
+            Object person = personUseCase.searchPerson(docType,documentNumber, name);
             return ok(person);
         } catch (NotDataFoundException e) {
             // log.error("Ocurrio un error al obtener el rol: [{}]", roleId, e);

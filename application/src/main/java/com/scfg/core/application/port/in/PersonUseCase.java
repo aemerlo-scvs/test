@@ -30,5 +30,5 @@ public interface PersonUseCase {
     Boolean delete(Person person);
 
     Person getJuridicalPersonByNitNumber(Long nitNumber);
-    List<Object> searchPerson(Long docType, String documentNumber, String name);
+    Object searchPerson(Long docType, String documentNumber, String name);
 }
