@@ -2,6 +2,7 @@ package com.scfg.core.adapter.persistence.policyItem;
 
 import com.scfg.core.application.port.out.mortgageReliefValidations.PolicyItemPort;
 import com.scfg.core.common.PersistenceAdapter;
+import com.scfg.core.common.enums.PersistenceStatusEnum;
 import com.scfg.core.domain.PolicyItem;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -30,6 +31,20 @@ public class PolicyItemAdapter implements PolicyItemPort {
     public PolicyItem findById(Long policyItemId) {
         Optional<PolicyItemJpaEntity> policyItemJpaEntity = policyItemRepository.findById(policyItemId);
         return mapToDomain(policyItemJpaEntity.get());
+    }
+
+    @Override
+    public PolicyItem findByPolicyId(Long policyId) {
+        PolicyItemJpaEntity policyItemJpaEntity = policyItemRepository.findByPolicyIdAndStatus(policyId,
+                PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return mapToDomain(policyItemJpaEntity);
+    }
+
+    @Override
+    public PolicyItem findByPolicyIdAndPersonId(Long policyId, Long personId) {
+        PolicyItemJpaEntity policyItemJpaEntity = policyItemRepository.findByPolicyIdAndPersonIdAndStatus(policyId,
+                personId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return mapToDomain(policyItemJpaEntity);
     }
 
     //#region Mappers

@@ -1,4 +1,4 @@
-package com.scfg.core.adapter.persistence.requestAnnexe;
+package com.scfg.core.adapter.persistence.annexeRequest;
 
 import com.scfg.core.adapter.persistence.BaseJpaEntity;
 import lombok.AllArgsConstructor;
@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "RequestAnnexe")
@@ -18,15 +19,17 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class RequestAnnexeJpaEntity  extends BaseJpaEntity {
-    @Column(name = "description")
-    private String description;
-   @Column(name = "annulmentReason")
-    private String annulmentReason;
-   @Column(name = "statusIdc")
+public class AnnexeRequestJpaEntity extends BaseJpaEntity {
+    @Column(name = "reasonIdc")
+    private Integer reasonIdc;
+    @Column(name = "statusIdc")
     private Integer statusIdc;
-   @Column(name = "annexeTypeId")
+    @Column(name = "comment")
+    private String comment;
+    @Column(name = "annexeTypeId")
     private Long annexeTypeId;
-   @Column(name = "policyId")
+    @Column(name = "policyId")
     private Long policyId;
+    @Column(name = "requestDate")
+    private LocalDateTime requestDate;
 }

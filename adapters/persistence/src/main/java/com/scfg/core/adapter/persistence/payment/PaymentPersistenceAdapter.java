@@ -7,6 +7,7 @@ import com.scfg.core.common.enums.PeriodicityEnum;
 import com.scfg.core.common.enums.PersistenceStatusEnum;
 import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.domain.Payment;
+import config.ModelMapperConfig;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -26,14 +27,14 @@ public class PaymentPersistenceAdapter implements PaymentPort {
 
     @Override
     public Payment findByGeneralRequest(Long generalRequestId) {
-        List<PaymentJpaEntity> list = this.paymentRepository.findAllByGeneralRequestId(
-                generalRequestId,
+        List<PaymentJpaEntity> list = this.paymentRepository.findAllByGeneralRequestId(generalRequestId,
                 PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+
         if (list.isEmpty()) {
             throw new NotDataFoundException("Pago: de la solicitud : " + generalRequestId.toString() + " No encontrado");
         }
         PaymentJpaEntity paymentJpaEntity = list.get(0);
-        return mapToPayment(paymentJpaEntity.getTotal(), paymentJpaEntity.getCurrencyTypeIdc(), paymentJpaEntity.getGeneralRequestId(), paymentJpaEntity.getId());
+        return new ModelMapperConfig().getStrictModelMapper().map(paymentJpaEntity, Payment.class);
     }
 
     //#region Mappers
@@ -54,24 +55,11 @@ public class PaymentPersistenceAdapter implements PaymentPort {
                 .generalRequestId(payment.getGeneralRequestId())
                 .createdAt(payment.getCreatedAt())
                 .lastModifiedAt(payment.getLastModifiedAt())
+                .annexeId(payment.getAnnexeId())
+                .paymentFileDocumentId(payment.getPaymentFileDocumentId())
                 .build();
 
         return  paymentJpaEntity;
-    }
-
-    private static Payment mapToPayment(double totalPayment, int currencyType, long requestId, Long idPlan) {
-        Payment payment = Payment.builder()
-                .id(idPlan)
-                .paymentTypeIdc(PaymentTypeEnum.Cash.getValue())
-                .paymentPeriod(PeriodicityEnum.None.getValue())
-                .total(totalPayment)
-                .surcharge(0.00)
-                .totalSurcharge(0.00)
-                .totalPaid(totalPayment)
-                .currencyTypeIdc(currencyType)
-                .generalRequestId(requestId)
-                .build();
-        return payment;
     }
 
     //#endregion

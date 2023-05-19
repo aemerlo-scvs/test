@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @AllArgsConstructor
@@ -26,10 +27,13 @@ public class RequestPolicyDetailDto {
     private Integer statePolicy;
     private String toDate;
     private String fromDate;
+    private String annulmentPaid;
+    private LocalDateTime annexeRequestDate;
 
     public RequestPolicyDetailDto(Long id, String identificationNumber, String names, String lastName,
                                   String motherLastName, String product, String plan, String numberPolicy,
-                                  Integer statePolicy, Date toDate, Date fromDate) {
+                                  Integer statePolicy, Date toDate, Date fromDate, String annulmentPaid,
+                                  LocalDateTime annexeRequestDate) {
         this.id = id;
         this.identificationNumber = identificationNumber;
         this.names = names;
@@ -41,5 +45,7 @@ public class RequestPolicyDetailDto {
         this.statePolicy = statePolicy;
         this.toDate = toDate.toString();
         this.fromDate = fromDate.toString();
+        this.annulmentPaid = annulmentPaid;
+        this.annexeRequestDate = annexeRequestDate;
     }
 }

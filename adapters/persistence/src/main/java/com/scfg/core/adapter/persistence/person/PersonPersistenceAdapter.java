@@ -92,6 +92,12 @@ public class PersonPersistenceAdapter implements PersonPort {
         return new ModelMapper().map(person, Person.class);
     }
 
+    @Override
+    public Person findByPolicyIdWhenPolicyAndPersonIsOneToOne(Long policyId) {
+        PersonJpaEntity person = personRepository.findByPolicyId(policyId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return mapToDomain(person);
+    }
+
     //#region Mappers
 
     public static PersonJpaEntity mapToJpaEntity(Person person) {

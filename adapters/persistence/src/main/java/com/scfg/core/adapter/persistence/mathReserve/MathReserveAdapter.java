@@ -3,6 +3,7 @@ package com.scfg.core.adapter.persistence.mathReserve;
 import com.scfg.core.application.port.out.MathReservePort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.PersistenceStatusEnum;
+import com.scfg.core.common.util.ModelMapperConfig;
 import com.scfg.core.domain.MathReserve;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -34,9 +35,9 @@ public class MathReserveAdapter implements MathReservePort {
     }
 
     @Override
-    public List<MathReserve> getAllByInsurerYearAndTotalYear(Integer insurerYear, Integer totalYear) {
+    public List<MathReserve> getAllByVersionInsurerYearAndTotalYear(String version, Integer insurerYear, Integer totalYear) {
         List<MathReserveJpaEntity> mathReserveJpaEntityList = mathReserveRepository.
-                findAllByAgeAndTotalYear(insurerYear, totalYear, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+                findAllByVersionAgeAndTotalYear(version, insurerYear, totalYear, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
 
         List<MathReserve> mathReserveList = new ArrayList<>();
 
@@ -45,7 +46,7 @@ public class MathReserveAdapter implements MathReservePort {
         }
 
         mathReserveJpaEntityList.forEach(e -> {
-            MathReserve mathReserve = new ModelMapper().map(e, MathReserve.class);
+            MathReserve mathReserve = new ModelMapperConfig().getStrictModelMapper().map(e, MathReserve.class);
             mathReserveList.add(mathReserve);
         });
 

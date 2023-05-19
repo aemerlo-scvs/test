@@ -53,4 +53,10 @@ public class PaymentJpaEntity extends BaseJpaEntity {
     @Column(name = "generalRequestId")
     private Long generalRequestId;
 
+    @Column(name = "annexeId")
+    private Long annexeId;
+
+    @Column(name = "paymentFileDocumentId")
+    private Long paymentFileDocumentId;
+
 }

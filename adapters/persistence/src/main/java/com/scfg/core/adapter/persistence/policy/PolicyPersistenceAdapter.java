@@ -3,6 +3,7 @@ package com.scfg.core.adapter.persistence.policy;
 import com.scfg.core.application.port.out.PolicyPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.*;
+import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.common.util.HelpersMethods;
 import com.scfg.core.domain.Policy;
@@ -128,29 +129,24 @@ public class PolicyPersistenceAdapter implements PolicyPort {
     }
 
     @Override
-    public PageableDTO findAllByPageAndPersonFilters(PersonDTO personDTO, Integer page, Integer size) {
+    public String findAllByPersonFilters(PersonDTO personDTO) {
+
+        String response = null;
         String filters = this.getFindPolicyFilters(personDTO);
-
-        int initRange = HelpersMethods.getPageInitRange(page, size);
-
         String query = this.policyRepository.getFindAllByFiltersSelectQuery(
-                                            PersistenceStatusEnum.CREATED_OR_UPDATED.getValue()) + filters;
+                PersistenceStatusEnum.CREATED_OR_UPDATED.getValue()) + filters +
+                "FOR JSON PATH";
 
-        String countQuery = this.policyRepository.getFindAllByFiltersCountQuery(
-                                            PersistenceStatusEnum.CREATED_OR_UPDATED.getValue()) + filters;
+        List<Object> list = em.createNativeQuery(query).getResultList();
 
-        List<RequestPolicyDetailDto> requestPolicyDetailDTOList = em.createQuery(query)
-                                                                    .setFirstResult(initRange)
-                                                                    .setMaxResults(size).getResultList();
         em.close();
 
-        Long count = (Long) em.createQuery(countQuery).getSingleResult();
-        em.close();
 
-        return PageableDTO.builder()
-                .content(requestPolicyDetailDTOList)
-                .totalElements(count.intValue())
-                .build();
+        if (list.size() > 0) {
+            response = (String) list.get(0);
+        }
+
+        return response;
     }
 
     @Override
@@ -217,5 +213,13 @@ public class PolicyPersistenceAdapter implements PolicyPort {
             filters = "AND " + String.join(" AND ", filterList) + " \n";
         }
         return filters;
+    }
+
+
+    @Override
+    public Policy findByPolicyIdOrThrowExcepcion (Long policyId) {
+        PolicyJpaEntity policyJpaEntity = policyRepository.findOptionalByPolicyId(policyId,PersistenceStatusEnum.CREATED_OR_UPDATED.getValue())
+                .orElseThrow(() -> new NotDataFoundException("poliza no encontrada"));
+        return new ModelMapper().map(policyJpaEntity,Policy.class);
     }
 }

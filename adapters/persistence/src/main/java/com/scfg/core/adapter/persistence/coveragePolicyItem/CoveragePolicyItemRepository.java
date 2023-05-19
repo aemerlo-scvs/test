@@ -31,4 +31,12 @@ public interface CoveragePolicyItemRepository extends JpaRepository<CoveragePoli
             "where g.personId = :personId AND g.planId = :planId AND g.status = :status")
     List<CoveragePolicyItemJpaEntity> findAllByPersonIdGEL(@Param("personId") Long personId, @Param("planId") Long planId, @Param("status") Integer status);
 
+
+    @Query("SELECT SUM(cvp.IRE) FROM CoveragePolicyItemJpaEntity cvp " +
+            "WHERE cvp.policyItemId = :policyItemId ")
+    Double getIreByPolicyItem(@Param("policyItemId") Long policyItemId);
+
+    @Query("SELECT SUM(cvp.insuredCapitalCeded) FROM CoveragePolicyItemJpaEntity cvp " +
+            "WHERE cvp.policyItemId = :policyItemId ")
+    Double getInsuredCapitalCededByPolicyItem(@Param("policyItemId") Long policyItemId);
 }
