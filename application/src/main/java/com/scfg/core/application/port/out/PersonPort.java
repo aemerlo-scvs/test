@@ -24,6 +24,6 @@ public interface PersonPort {
     List<Person> findAllByListOfPersonId(List<Long> personIdList);
 
     Person findByNitNumber(Long nitNumber);
-    List<Object> searchPerson(Long docType, String documentNumber, String name);
+    Object searchPerson(Long docType, String documentNumber, String name);
 
 }

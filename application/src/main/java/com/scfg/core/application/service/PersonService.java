@@ -160,7 +160,7 @@ public class PersonService implements PersonUseCase {
     }
 
     @Override
-    public List<Object> searchPerson(Long docType, String documentNumber, String name) {
+    public Object searchPerson(Long docType, String documentNumber, String name) {
         return personPort.searchPerson(docType,documentNumber, name);
     }
 }

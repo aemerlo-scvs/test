@@ -12,10 +12,13 @@ import com.scfg.core.domain.person.JuridicalPerson;
 import com.scfg.core.domain.person.NaturalPerson;
 import com.scfg.core.domain.person.Person;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.type.NTextType;
 import org.modelmapper.ModelMapper;
 
 import javax.persistence.EntityManager;
+import javax.persistence.ParameterMode;
 import javax.persistence.Query;
+import javax.persistence.StoredProcedureQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +32,7 @@ public class PersonPersistenceAdapter implements PersonPort {
     private final JuridicalPersonRepository juridicalPersonRepository;
 
     private final EntityManager em;
-    private static String GET_REQUEST_ALL_BY_FILTER = "exec proc_search_persons :docType,:documentNumber,:name";
+//    private static String GET_REQUEST_ALL_BY_FILTER = "exec proc_search_persons :documentType,:documentNumber,:personName";
 
     @Override
     public List<Person> findAll() {
@@ -99,13 +102,34 @@ public class PersonPersistenceAdapter implements PersonPort {
     }
 
     @Override
-    public List<Object> searchPerson(Long docType, String documentNumber, String name) {
-        Query query = em.createNativeQuery(GET_REQUEST_ALL_BY_FILTER);
-        query.setParameter("docType", docType);
-        query.setParameter("documentNumber", documentNumber);
-        query.setParameter("name", name);
+    public Object searchPerson(Long documentType, String documentNumber, String personName) {
+        StoredProcedureQuery query = em.createStoredProcedureQuery("proc_search_persons")
+                .registerStoredProcedureParameter(
+                        "documentType",
+                        Integer.class,
+                        ParameterMode.IN
+                )
+                .registerStoredProcedureParameter(
+                        "documentNumber",
+                        String.class,
+                        ParameterMode.IN
+                )
+                .registerStoredProcedureParameter(
+                        "personName",
+                        String.class,
+                        ParameterMode.IN
+                )
+                .registerStoredProcedureParameter(
+                        "result",
+                        NTextType.class,
+                        ParameterMode.OUT
+                )
+                .setParameter("documentType", documentType.intValue())
+                .setParameter("documentNumber", documentNumber)
+                .setParameter("personName", personName);
+        query.execute();
 
-        List<Object> list = query.getResultList();
+        Object list = (Object) query.getOutputParameterValue("result");
         em.close();
 
         return list;
