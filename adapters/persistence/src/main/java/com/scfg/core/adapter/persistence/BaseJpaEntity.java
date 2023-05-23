@@ -1,6 +1,5 @@
 package com.scfg.core.adapter.persistence;
 
-import com.scfg.core.common.enums.PersistenceStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import java.util.Date;
 
-import static com.scfg.core.common.util.HelpersMethods.*;
 
 @MappedSuperclass
 @Data
@@ -31,21 +29,16 @@ public abstract class BaseJpaEntity {
     @Column(name = "status", nullable = false)
     private Integer status;
 
-
     @Temporal(TemporalType.TIMESTAMP)
     @CreatedDate
-
-    //@CreationTimestamp
     @Column(name = "createdAt", nullable = false, updatable = false)
     private Date createdAt;
 
 
     @Temporal(TemporalType.TIMESTAMP)
     @LastModifiedDate
-//    @UpdateTimestamp
     @Column(name = "lastModifiedAt")
     private Date lastModifiedAt;
-
 
     @CreatedBy
     @Column(name = "createdBy", updatable = false)

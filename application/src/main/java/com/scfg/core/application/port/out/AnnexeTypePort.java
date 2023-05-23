@@ -7,5 +7,7 @@ import java.util.List;
 public interface AnnexeTypePort {
 
     List<AnnexeType> findAll();
+    AnnexeType findByIdOrExcepcion(Long annexeTypeId);
+    AnnexeType findByProductIdAndInternalCode(Long productId, Long internalCode);
 
 }

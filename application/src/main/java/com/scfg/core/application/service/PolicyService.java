@@ -6,7 +6,6 @@ import com.scfg.core.application.port.out.PlanPort;
 import com.scfg.core.application.port.out.PolicyPort;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.domain.Policy;
-import com.scfg.core.domain.dto.PageableDTO;
 import com.scfg.core.domain.dto.PersonDTO;
 import com.scfg.core.domain.dto.credicasas.groupthefont.GELPolicyDTO;
 import lombok.RequiredArgsConstructor;
@@ -66,10 +65,10 @@ public class PolicyService implements PolicyUseCase {
     }
 
     @Override
-    public PageableDTO getAllByPageAndPersonFilters(Integer page, Integer size, PersonDTO personDTO) {
+    public String getAllByPersonFilters(PersonDTO personDTO) {
         if (personDTO.getIdentificationNumber().isEmpty()) {
             throw new OperationException("El campo cédula de identidad no puede estar vacio");
         }
-        return this.policyPort.findAllByPageAndPersonFilters(personDTO, page, size);
+        return this.policyPort.findAllByPersonFilters(personDTO);
     }
 }

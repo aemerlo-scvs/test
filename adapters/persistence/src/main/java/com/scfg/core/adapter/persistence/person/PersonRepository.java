@@ -73,4 +73,12 @@ public interface PersonRepository extends JpaRepository<PersonJpaEntity, Long> {
             "WHERE p.nit = :nit AND p.status = :status")
     PersonJpaEntity findByNitNumber(@Param("nit") Long nit, @Param("status") Integer status);
 
+    @Query("SELECT p " +
+            "FROM PersonJpaEntity p " +
+            "LEFT JOIN FETCH p.naturalPerson np " +
+            "LEFT JOIN FETCH p.juridicalPerson jp " +
+            "INNER JOIN PolicyItemJpaEntity pi on pi.personId = p.id " +
+            "INNER JOIN PolicyJpaEntity po on po.id = pi.policyId " +
+            "WHERE po.id = :policyId AND p.status = :status")
+    PersonJpaEntity findByPolicyId(@Param("policyId") Long policyId, @Param("status") Integer status);
 }

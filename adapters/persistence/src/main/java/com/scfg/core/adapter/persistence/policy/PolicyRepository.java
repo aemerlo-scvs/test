@@ -127,24 +127,44 @@ public interface PolicyRepository extends JpaRepository<PolicyJpaEntity,Long>{
 
 
     default String getFindAllByFiltersSelectQuery(Integer status) {
-        return  "SELECT new com.scfg.core.domain.dto.RequestPolicyDetailDto( \n" +
-                "p.id, np.identificationNumber, np.name, np.lastName, np.motherLastName, \n" +
-                "pr.name, pl.name, p.numberPolicy, p.policyStatusIdc ,p.toDate ,p.fromDate) \n" +
-                this.getFindAllByFiltersBaseQuery(status);
-    }
-
-    default String getFindAllByFiltersCountQuery(Integer status) {
-        return "SELECT COUNT (p) \n" +
+        return "SELECT\n" +
+                "p.id AS [id], \n" +
+                "np.identificationNumber AS [identificationNumber], \n" +
+                "np.name AS [names], \n" +
+                "np.lastName AS [lastName], \n" +
+                "np.motherLastName AS [motherLastName], \n" +
+                "pr.name AS [product], \n" +
+                "pl.name AS [plan], \n" +
+                "p.numberPolicy AS [numberPolicy], \n" +
+                "p.policyStatusIdc AS [statePolicy],\n" +
+                "p.fromDate AS [fromDate],\n" +
+                "p.toDate AS [toDate],\n" +
+                "(\n" +
+                "SELECT COUNT(ra.id)\n" +
+                "FROM RequestAnnexe ra\n" +
+                "WHERE ra.policyId = p.id\n" +
+                ") AS [requestAnnexeNumber], \n" +
+                "(\n" +
+                "SELECT STRING_AGG(b.name, ' | ')\n" +
+                "FROM\n" +
+                "(\n" +
+                "SELECT ra.annexeTypeId, at2.name\n" +
+                "FROM RequestAnnexe ra\n" +
+                "INNER JOIN AnnexeType at2 ON at2.id = ra.annexeTypeId\n" +
+                "WHERE ra.policyId = p.id\n" +
+                "GROUP BY ra.annexeTypeId, at2.name\n" +
+                ") AS b\n" +
+                ")  AS [requestAnnexeTypes]\n" +
                 this.getFindAllByFiltersBaseQuery(status);
     }
 
     default String getFindAllByFiltersBaseQuery(Integer status) {
-        return "FROM PolicyJpaEntity p \n" +
-                "INNER JOIN GeneralRequestJpaEntity gr on p.generalRequestId = gr.id \n" +
-                "INNER JOIN PlanJpaEntity  pl on gr.planId = pl.id \n" +
-                "INNER JOIN ProductJpaEntity pr on p.productId = pr.id \n" +
-                "INNER JOIN PersonJpaEntity pe on gr.personId = pe.id  \n" +
-                "INNER JOIN NaturalPersonJpaEntity np on np.id = pe.naturalPerson.id \n" +
+        return "FROM Policy p \n" +
+                "INNER JOIN GeneralRequest gr on p.generalRequestId = gr.id \n" +
+                "INNER JOIN [Plan]  pl on gr.planId = pl.id \n" +
+                "INNER JOIN Product pr on p.productId = pr.id \n" +
+                "INNER JOIN Person pe on gr.personId = pe.id  \n" +
+                "INNER JOIN NaturalPerson np on np.id = pe.naturalPersonId \n" +
                 "WHERE p.status = " + status + " AND p.policyStatusIdc <> 0 AND gr.status = " + status +
                 " AND pl.status = " + status + " \n" +
                 "AND pr.status = " + status + " AND pe.status = " + status + " AND np.status = " + status + " \n";
@@ -173,5 +193,7 @@ public interface PolicyRepository extends JpaRepository<PolicyJpaEntity,Long>{
     @Query(value = "SELECT p FROM PolicyJpaEntity p \n" +
             "WHERE p.id = :policyId AND p.status = :status")
     PolicyJpaEntity findByPolicyId(@Param("policyId") Long policyId, @Param("status") Integer status);
-
+    @Query(value = "SELECT p FROM PolicyJpaEntity p \n" +
+            "WHERE p.id = :policyId AND p.status = :status")
+    Optional<PolicyJpaEntity> findOptionalByPolicyId(@Param("policyId") Long policyId, @Param("status") Integer status);
 }

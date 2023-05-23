@@ -9,4 +9,6 @@ public interface PolicyItemPort {
     PolicyItem getPolicyItemByGeneralRequestId(Long generalRequestId);
 
     PolicyItem findById(Long policyItemId);
+    PolicyItem findByPolicyId(Long policyId);
+    PolicyItem findByPolicyIdAndPersonId(Long policyId, Long personId);
 }

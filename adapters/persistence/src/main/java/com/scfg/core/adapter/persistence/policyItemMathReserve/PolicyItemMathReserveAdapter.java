@@ -56,6 +56,13 @@ public class PolicyItemMathReserveAdapter implements PolicyItemMathReservePort {
         return policyItemMathReserves;
     }
 
+    @Override
+    public PolicyItemMathReserve findByPolicyItemIdAndYear(Long policyItemId, Integer year) {
+        PolicyItemMathReserveJpaEntity policyItemMathReserveJpaEntity = this.policyItemMathReserveRepository.findByPolicyItemIdAndYear(
+                policyItemId, year, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return mapToDomain(policyItemMathReserveJpaEntity);
+    }
+
     //#region Mappers
 
     private PolicyItemMathReserve mapToDomain(PolicyItemMathReserveJpaEntity policyItemMathReserveJpaEntity) {

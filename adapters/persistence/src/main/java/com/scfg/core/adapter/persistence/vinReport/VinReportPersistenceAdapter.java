@@ -8,6 +8,7 @@ import com.scfg.core.domain.dto.vin.VinReportFilterDTO;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.List;
 
 @PersistenceAdapter
@@ -18,17 +19,27 @@ public class VinReportPersistenceAdapter implements VinPort {
     private final EntityManager em;
     @Override
     public List<Object> getProductionReport(VinReportFilterDTO filterDTO) {
-        String query = vinReportRepository.getProductionReport(filterDTO);
-        List objDt = em.createNativeQuery(query).getResultList();
+        Query query = em.createNativeQuery(vinReportRepository.getProductionReport());
+        query.setParameter("fromDate", filterDTO.getFromDate());
+        query.setParameter("toDate", filterDTO.getToDate());
+        query.setParameter("policyStatusIdc", filterDTO.getPolicyStatusIdc());
+
+        List list = query.getResultList();
         em.close();
-        return objDt;
+
+        return list;
     }
 
     @Override
     public List<Object> getCommercialReport(VinReportFilterDTO filterDTO) {
-        String query = vinReportRepository.getCommercialReport(filterDTO);
-        List objDt = em.createNativeQuery(query).getResultList();
+        Query query = em.createNativeQuery(vinReportRepository.getCommercialReport());
+        query.setParameter("fromDate", filterDTO.getFromDate());
+        query.setParameter("toDate", filterDTO.getToDate());
+        query.setParameter("policyStatusIdc", filterDTO.getPolicyStatusIdc());
+
+        List list = query.getResultList();
         em.close();
-        return objDt;
+
+        return list;
     }
 }

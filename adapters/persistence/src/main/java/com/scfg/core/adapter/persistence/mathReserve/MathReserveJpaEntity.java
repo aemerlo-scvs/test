@@ -37,4 +37,7 @@ public class MathReserveJpaEntity extends BaseJpaEntity {
 
     @Column(name = "[percentageRate]")
     private Float percentageRate;
+
+    @Column(name = "[version]")
+    private String version;
 }

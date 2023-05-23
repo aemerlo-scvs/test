@@ -7,12 +7,8 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
 import com.lowagie.text.pdf.draw.VerticalPositionMark;
-import com.lowagie.text.pdf.parser.PdfTextExtractor;
 import com.scfg.core.application.port.in.GeneratePdfUseCase;
 import com.scfg.core.application.port.out.ClassifierPort;
-import com.scfg.core.application.port.out.GeneralRequestPort;
-import com.scfg.core.application.port.out.PersonPort;
-import com.scfg.core.application.port.out.PolicyPort;
 import com.scfg.core.common.enums.*;
 import com.scfg.core.common.templates.pdf.GenericHeaderPdfTemplate;
 import com.scfg.core.common.templates.pdf.HeaderFooterPdfTemplate;
@@ -20,18 +16,12 @@ import com.scfg.core.common.util.DateUtils;
 import com.scfg.core.common.util.HelpersMethods;
 import com.scfg.core.common.util.MyProperties;
 import com.scfg.core.domain.Beneficiary;
-import com.scfg.core.domain.GeneralRequest;
-import com.scfg.core.domain.Policy;
 import com.scfg.core.domain.common.Classifier;
 import com.scfg.core.domain.common.Direction;
 import com.scfg.core.domain.dto.CoverageDTO;
 import com.scfg.core.domain.dto.credicasas.QuestionDTO;
 import com.scfg.core.domain.dto.credicasas.groupthefont.*;
-import com.scfg.core.domain.dto.vin.GenerateCertificateVin;
-import com.scfg.core.domain.dto.vin.GenerateDocSettlement;
-import com.scfg.core.domain.dto.vin.RequestAnnexeDTO;
-import com.scfg.core.domain.dto.vin.RequirementDTO;
-import com.scfg.core.domain.person.Person;
+import com.scfg.core.domain.dto.vin.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;
 import org.slf4j.Logger;
@@ -39,12 +29,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import sun.misc.BASE64Decoder;
 
-import javax.validation.constraints.Null;
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDateTime;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -3451,7 +3441,6 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             String policyAmountAssured = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(obj.getInsuredCapital(), "Bs");
             String policyDateRequest = HelpersMethods.formatStringOnlyDate(obj.getRequestDate());
 
-            String paymentMethod = "ABONO EN CUENTA BCO. FASSIL NO.:";
             String paymentAccount = obj.getAccountNumber();
             String paymentCurrency = obj.getCurrencyDesc().toUpperCase();
             String paymentCurrencyAbbreviation = obj.getCurrencyAbbreviation();
@@ -3460,18 +3449,18 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             String paymentDollarExchangeRate = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getCurrencyDollarValue(), paymentCurrencyAbbreviation);
 
-            String detailTotalPaid = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
-                    obj.getPremiumPaid(), "");
+            String detailRescueValue = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
+                    obj.getRescueValue(), "");
             String detailAdministrativeExpenses = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getAdminExpenses(), "");
-            String detailProrate = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
-                    obj.getDiscountProrataDay(), "");
-            String detailRePayment = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
+            String detailDiscountPerDay = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
+                    obj.getDiscountPerDay(), "");
+            String detailValueToReturn = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getValueToReturn(), "");
             String detailCurrencyDetail = paymentCurrencyAbbreviation.toUpperCase();
 
-            Calendar acceptanceDate = Calendar.getInstance();
-            Calendar c2 = new GregorianCalendar();
+            LocalDateTime date = DateUtils.asDateToLocalDateTime(obj.getDate());
+            Calendar acceptanceDate = DateUtils.asCalendarLocalDateTime(date);
             String acceptanceDateDay = Integer.toString(acceptanceDate.get(Calendar.DATE));
             String acceptanceDateMonth = "enero";
 
@@ -3562,7 +3551,7 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             policyTable.addCell(getCellVinFiniquito(policyDateEnd, 6, Element.ALIGN_RIGHT, cellFontSize, false, bgLightGray));
             policyTable.addCell(rowBlank);
 
-            policyTable.addCell(getCellVinFiniquito("Suma Asegurada:", 11, Element.ALIGN_LEFT, cellFontSize, true, null));
+            policyTable.addCell(getCellVinFiniquito("Capital Asegurado:", 11, Element.ALIGN_LEFT, cellFontSize, true, null));
             policyTable.addCell(getCellVinFiniquito("", 4, Element.ALIGN_LEFT, cellFontSize, false, null));
             policyTable.addCell(getCellVinFiniquito(policyAmountAssured, 10, Element.ALIGN_LEFT, cellFontSize, false, bgLightGray));
             policyTable.addCell(getCellVinFiniquito("", 4, Element.ALIGN_LEFT, cellFontSize, false, null));
@@ -3582,7 +3571,7 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             paymentTable.addCell(rowBlank);
 
             paymentTable.addCell(getCellVinFiniquito("Forma de Pago:", 9, Element.ALIGN_LEFT, cellFontSize, true, null));
-            paymentTable.addCell(getCellVinFiniquito(paymentMethod + paymentAccount, 20, Element.ALIGN_LEFT, cellFontSize, false, bgLightGray));
+            paymentTable.addCell(getCellVinFiniquito("ABONO EN CUENTA BCO. FASSIL NO.:" + paymentAccount, 20, Element.ALIGN_LEFT, cellFontSize, false, bgLightGray));
             paymentTable.addCell(getCellVinFiniquito("Monto Aceptado: ", 7, Element.ALIGN_LEFT, cellFontSize, true, null));
             paymentTable.addCell(getCellVinFiniquito(paymentAmountAccepted, 6, Element.ALIGN_LEFT, cellFontSize, false, bgLightGray));
             paymentTable.addCell(getCellVinFiniquito("", 6, Element.ALIGN_LEFT, cellFontSize, false, null));
@@ -3615,9 +3604,9 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 14, Element.ALIGN_LEFT, cellFontSize, false, null));
 
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 9, Element.ALIGN_LEFT, cellFontSize, false, null));
-            detailPaymentTable.addCell(getCellVinFiniquito("Prima Total pagada (a):", 14, Element.ALIGN_LEFT, cellFontSize, true, null));
+            detailPaymentTable.addCell(getCellVinFiniquito("Valor del rescate(a):", 14, Element.ALIGN_LEFT, cellFontSize, true, null));
             detailPaymentTable.addCell(getCellVinFiniquito("", 6, Element.ALIGN_LEFT, cellFontSize, false, null));
-            detailPaymentTable.addCell(getCellVinFiniquito(detailTotalPaid, 5, Element.ALIGN_RIGHT, cellFontSize, true, null));
+            detailPaymentTable.addCell(getCellVinFiniquito(detailRescueValue, 5, Element.ALIGN_RIGHT, cellFontSize, true, null));
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 14, Element.ALIGN_LEFT, cellFontSize, false, null));
 
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 9, Element.ALIGN_LEFT, cellFontSize, false, null));
@@ -3630,13 +3619,13 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 9, Element.ALIGN_LEFT, cellFontSize, false, null));
             detailPaymentTable.addCell(getCellVinFiniquitoBorder("Descuento del rescate a prórrata día (c):", 14, Element.ALIGN_LEFT, cellFontSize, true, null, Rectangle.BOTTOM));
             detailPaymentTable.addCell(getCellVinFiniquito("", 6, Element.ALIGN_LEFT, cellFontSize, false, null));
-            detailPaymentTable.addCell(getCellVinFiniquitoBorder(detailProrate, 5, Element.ALIGN_RIGHT, cellFontSize, true, null, Rectangle.BOTTOM));
+            detailPaymentTable.addCell(getCellVinFiniquitoBorder(detailDiscountPerDay, 5, Element.ALIGN_RIGHT, cellFontSize, true, null, Rectangle.BOTTOM));
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 14, Element.ALIGN_LEFT, cellFontSize, false, null));
 
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 9, Element.ALIGN_LEFT, cellFontSize, false, null));
             detailPaymentTable.addCell(getCellVinFiniquito("Valor del rescate a Devolver (e = a-b-c):", 14, Element.ALIGN_LEFT, cellFontSize, true, null));
             detailPaymentTable.addCell(getCellVinFiniquito("", 6, Element.ALIGN_LEFT, cellFontSize, false, null));
-            detailPaymentTable.addCell(getCellVinFiniquitoBorder(detailRePayment, 5, Element.ALIGN_RIGHT, cellFontSize, true, null, Rectangle.BOTTOM));
+            detailPaymentTable.addCell(getCellVinFiniquitoBorder(detailValueToReturn, 5, Element.ALIGN_RIGHT, cellFontSize, true, null, Rectangle.BOTTOM));
             detailPaymentTable.addCell(getCellVinFiniquito(" ", 14, Element.ALIGN_LEFT, cellFontSize, false, null));
 
             detailPaymentTable.addCell(rowBlank);
@@ -3740,24 +3729,24 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             arialFontItalicSize8.setSize(8);
 
             String city = obj.getCity();
-            String date = HelpersMethods.formatStringOnlyDate(new Date());
+            String date = HelpersMethods.formatStringOnlyDate(obj.getDate());
             String policyName = obj.getPolicyName().toUpperCase();
             String policyNumber = obj.getPolicyNumber().toUpperCase();
-            String capitalInsured = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(obj.getInsuredCapital(), "Bs");
+            String insuredCapital = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(obj.getInsuredCapital(), "Bs");
             String premiumPaid = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getPremiumPaid(), "Bs");
             String from = HelpersMethods.formatStringOnlyDate(obj.getPolicyFromDate());
             String toDate = HelpersMethods.formatStringOnlyDate(obj.getPolicyToDate());
-            String yearsQuantity = obj.getCrediTermInYears().toString();
+            String yearsQuantity = obj.getCreditTermInYears().toString();
             String rescueRequestDate = HelpersMethods.formatStringOnlyDate(obj.getRequestDate());
             String yearlyPremium = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(obj.getPremiumPaidAnnual(), "Bs");
             String years = obj.getYearsPassed().toString();
             String days = obj.getDaysPassed().toString();
-            String rescueValue = HelpersMethods.convertNumberToCompanyFormatNumber(obj.getPremiumPaid());
+            String rescueValue = HelpersMethods.convertNumberToCompanyFormatNumber(obj.getRescueValue());
             String expenseManagement = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getAdminExpenses(), "");
             String rescueDiscount = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
-                    obj.getDiscountProrataDay(), "");
+                    obj.getDiscountPerDay(), "");
             String rescueValueToReturn = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getValueToReturn(), "");
             String nameClient = obj.getAssuranceName().toUpperCase();
@@ -3829,7 +3818,7 @@ public class GeneratePdfService implements GeneratePdfUseCase {
 
             bodyTable.addCell(getCellVinFiniquito("", 3, Element.ALIGN_LEFT, cellFontSize, false, null));
             bodyTable.addCell(getCellVinFiniquito("Capital asegurado:", 7, Element.ALIGN_LEFT, cellFontSize, false, null));
-            bodyTable.addCell(getCellVinFiniquito(capitalInsured, 10, Element.ALIGN_CENTER, cellFontSize, false, bgGray));
+            bodyTable.addCell(getCellVinFiniquito(insuredCapital, 10, Element.ALIGN_CENTER, cellFontSize, false, bgGray));
             bodyTable.addCell(getCellVinFiniquito("", 9, Element.ALIGN_LEFT, cellFontSize, false, null));
             bodyTable.addCell(getCellVinFiniquito("Prima pagada: ", 6, Element.ALIGN_LEFT, cellFontSize, false, null));
             bodyTable.addCell(getCellVinFiniquito(premiumPaid, 9, Element.ALIGN_CENTER, cellFontSize, false, bgGray));
@@ -3893,6 +3882,12 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             bodyTable.addCell(rowBlank);
             bodyTable.addCell(rowBlank);
 
+            bodyTable.addCell(getCellVinFiniquito("", 3, Element.ALIGN_LEFT, cellFontSize, false, null));
+            bodyTable.addCell(getCellVinRescission("Aclaración: Si la solicitud de terminación es posterior a los primeros treinta (30) días continuos de vigencia, se devolverá considerando el valor de rescate (entendiéndose por valor de rescate a la suma de dinero provisionada por la Entidad Aseguradora en caso que la póliza termine antes del plazo establecido para la entrega al asegurado).",
+                    32, Element.ALIGN_JUSTIFIED, cellFontSize, false, null, Rectangle.NO_BORDER, false));
+            bodyTable.addCell(getCellVinFiniquito("", 13, Element.ALIGN_LEFT, cellFontSize, false, null));
+            bodyTable.addCell(rowBlank);
+
             bodyTable.addCell(getCellVinFiniquito("Firma:", 10, Element.ALIGN_LEFT, cellFontSize, false, null));
             bodyTable.addCell(getCellVinFiniquitoBorder("", 25, Element.ALIGN_LEFT, cellFontSize, false, null, Rectangle.BOTTOM));
             bodyTable.addCell(getCellVinFiniquito("", 13, Element.ALIGN_LEFT, cellFontSize, false, null));
@@ -3952,6 +3947,193 @@ public class GeneratePdfService implements GeneratePdfUseCase {
         return out.toByteArray();
     }
 
+    @Override
+    public byte[] generateVINRamsonSettlement(DocRescueStatement obj) {
+        DecimalFormat format = new DecimalFormat("#,##0.00");
+        Document document = new Document(PageSize.LETTER);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        FontFactory.register(properties.getPathFonts() + "Arial.ttf", "ARIAL");
+        FontFactory.register(properties.getPathFonts() + "Arial_Bold.ttf", "ARIAL_BOLD");
+        FontFactory.register(properties.getPathFonts() + "Arial_Italic.ttf", "ARIAL_ITALIC");
+        try {
+            PdfWriter writer = PdfWriter.getInstance(document, out);
+            Font arialBoldSize12 = FontFactory.getFont("ARIAL_BOLD");
+            arialBoldSize12.setSize(12);
+            Font arialSize8 = FontFactory.getFont("ARIAL");
+            arialSize8.setSize(8);
+            Font arialBoldSize7 = FontFactory.getFont("ARIAL_BOLD");
+            arialBoldSize7.setSize(7);
+            Font arialItalic7 = FontFactory.getFont("ARIAL_ITALIC");
+            arialItalic7.setSize(7);
+            Font arialFontItalicSize8 = FontFactory.getFont("ARIAL", Font.ITALIC, Color.BLACK);
+            arialFontItalicSize8.setSize(8);
+
+            Color bgGray = new Color(191, 191, 191);
+            Color bgLightGray = new Color(242, 242, 242);
+            PdfPCell rowBlank = getCellVinFiniquito(" ", 48, Element.ALIGN_LEFT, 6, false, null);
+            int cellFontSize = 8;
+            Paragraph jumpLine = new Paragraph("\n");
+
+            GenericHeaderPdfTemplate event = new GenericHeaderPdfTemplate(properties);
+            writer.setPageEvent(event);
+            document.open();
+
+            try {
+                Image img = Image.getInstance(properties.getPathImages()+"SC-Vida-y-Salud-fondo-blanco.jpg");
+                img.scaleToFit(210,316);
+                img.setAbsolutePosition(25,712);
+                document.add(img);
+            } catch (Exception x) {
+                x.printStackTrace();
+            }
+            //            Title
+            document.add(jumpLine);
+            document.add(jumpLine);
+            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            Paragraph title = new Paragraph("COMUNICADO DE DEVOLUCIÓN DE RESCATE SCS-GTE/"
+                    + String.format("%03d", obj.getDocumentNumber())+"-" +currentYear,arialBoldSize12);
+            title.setAlignment(Element.ALIGN_RIGHT);
+            document.add(title);
+            document.add(jumpLine);
+
+            PdfPTable dateTable = new PdfPTable(48);
+            dateTable.setTotalWidth(Utilities.millimetersToPoints(190));
+            dateTable.setLockedWidth(true);
+            dateTable.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+            dateTable.addCell(getCellVinFiniquito("DE :", 9, Element.ALIGN_LEFT, cellFontSize, true, null));
+            dateTable.addCell(getCellVinFiniquito(obj.getNameOf(), 21, Element.ALIGN_LEFT, cellFontSize, false, null));
+            dateTable.addCell(getCellVinFiniquito("AREA : ", 6, Element.ALIGN_LEFT, cellFontSize, true, null));
+            dateTable.addCell(getCellVinFiniquito(obj.getAreaSend(), 12, Element.ALIGN_LEFT, cellFontSize, false, null));
+
+            dateTable.addCell(getCellVinFiniquito("PARA :", 9, Element.ALIGN_LEFT, cellFontSize, true, null));
+            dateTable.addCell(getCellVinFiniquito(obj.getNameFor(), 21, Element.ALIGN_LEFT, cellFontSize, false, null));
+            dateTable.addCell(getCellVinFiniquito("AREA : ", 6, Element.ALIGN_LEFT, cellFontSize, true, null));
+            dateTable.addCell(getCellVinFiniquito(obj.getAreaReception(), 12, Element.ALIGN_LEFT, cellFontSize, false, null));
+
+            dateTable.addCell(getCellVinFiniquito("FECHA :", 9, Element.ALIGN_LEFT, cellFontSize, true, null));
+            dateTable.addCell(getCellVinFiniquito(obj.getRequestDate(), 39, Element.ALIGN_LEFT, cellFontSize, false, null));
+
+            dateTable.addCell(getCellVinFiniquito("REF :", 9, Element.ALIGN_LEFT, cellFontSize, true, null));
+            dateTable.addCell(getCellVinFiniquito(obj.getRef(), 39, Element.ALIGN_LEFT, cellFontSize, false, null));
+
+            dateTable.addCell(rowBlank);
+            document.add(dateTable);
+
+            PdfPTable policyTable = new PdfPTable(48);
+            policyTable.setTotalWidth(Utilities.millimetersToPoints(190));
+            policyTable.setLockedWidth(true);
+            policyTable.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+            policyTable.addCell(rowBlank);
+            policyTable.addCell(getCellVinFiniquito("", 48, Element.ALIGN_LEFT, 8, true, bgGray));
+
+            policyTable.addCell(getCellVinFiniquito("Forma de Pago: ", 9, Element.ALIGN_LEFT, cellFontSize, true, null));
+            policyTable.addCell(getCellVinFiniquito(obj.getPaymentMethod() +" : "+obj.getNumberPaymentMethod(), 27, Element.ALIGN_LEFT, cellFontSize, false, null));
+            policyTable.addCell(getCellVinFiniquito("Moneda: ", 6, Element.ALIGN_LEFT, cellFontSize, true, null));
+            policyTable.addCell(getCellVinFiniquito(obj.getCurrencyPayment(), 6, Element.ALIGN_LEFT, cellFontSize, false, null));
+
+            policyTable.addCell(getCellVinFiniquito("A nombre de: ", 9, Element.ALIGN_LEFT, cellFontSize, true, null));
+            policyTable.addCell(getCellVinFiniquito(obj.getToNamePayment(), 27, Element.ALIGN_LEFT, cellFontSize, false, null));
+            policyTable.addCell(getCellVinFiniquito("Nro. Póliza: ", 6, Element.ALIGN_LEFT, cellFontSize, true, null));
+            policyTable.addCell(getCellVinFiniquito(obj.getPolicyNumber(), 6, Element.ALIGN_LEFT, cellFontSize, false, null));
+
+            policyTable.addCell(getCellVinFiniquito("No. Cédula de Identidad", 9, Element.ALIGN_LEFT, cellFontSize, true, null));
+            policyTable.addCell(getCellVinFiniquito(obj.getIdentificationNumber()+" "+obj.getExtension() , 39, Element.ALIGN_LEFT, cellFontSize, false, null));
+
+            policyTable.addCell(rowBlank);
+            document.add(policyTable);
+
+            PdfPTable part2 = new PdfPTable(48);
+            part2.setTotalWidth(Utilities.millimetersToPoints(190));
+            part2.setLockedWidth(true);
+            part2.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+            part2.addCell(getCellVinFiniquito("Capital Asegurado Total", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part2.addCell(getCellVinFiniquito("Valor del Rescate a Devolver", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part2.addCell(getCellVinFiniquito("Prima Neta Rescatada", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part2.addCell(getCellVinFiniquito("Prima Adicional Rescatada", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part2.addCell(getCellVinFiniquito("APS", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part2.addCell(getCellVinFiniquito("FPA", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part2.addCell(getCellVinFiniquito("Prima de Riesgo", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part2.addCell(getCellVinFiniquito("Servicio de Cobranza Rescatado", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+
+            part2.addCell(getCellVinFiniquito(format.format(obj.getCapitalAseguradoTotal()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(format.format(obj.getValorRescateADevolver()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(format.format(obj.getPrimaNetaRescatada()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(format.format(obj.getPrimaAdicionalRescatada()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(format.format(obj.getAps()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(format.format(obj.getFpa()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(format.format(obj.getPrimaRiesgo()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part2.addCell(getCellVinFiniquito(format.format(obj.getServicioCobranzaRescatado()), 6, Element.ALIGN_RIGHT, 8, false, null));
+
+            part2.addCell(rowBlank);
+            document.add(part2);
+
+            PdfPTable part3 = new PdfPTable(48);
+            part3.setTotalWidth(Utilities.millimetersToPoints(190));
+            part3.setLockedWidth(true);
+            part3.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+            part3.addCell(getCellVinFiniquito("Prima Cedida Rescatada", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part3.addCell(getCellVinFiniquito("Capital Cedido Rescatado", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part3.addCell(getCellVinFiniquito("Reserva Matemática", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part3.addCell(getCellVinFiniquito("Inpuestos Remesas", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part3.addCell(getCellVinFiniquito("Comisión Broker Rescatada", 6, Element.ALIGN_CENTER, 8, true, bgGray));
+            part3.addCell(getCellVinFiniquito("", 18, Element.ALIGN_CENTER, 8, false, null));
+
+            part3.addCell(getCellVinFiniquito(format.format(obj.getPrimaCedidaRescatada()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part3.addCell(getCellVinFiniquito(format.format(obj.getCapitalCedidoRescatado()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part3.addCell(getCellVinFiniquito(format.format(obj.getReservaMatematica()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part3.addCell(getCellVinFiniquito(format.format(obj.getImpuestosRemesas()), 6, Element.ALIGN_RIGHT, 8, false, null));
+            part3.addCell(getCellVinFiniquito(format.format(obj.getComisionBrokerRescata()), 6, Element.ALIGN_RIGHT, 8,false, null));
+            part3.addCell(getCellVinFiniquito("", 18, Element.ALIGN_RIGHT, 8, false, null));
+
+            part3.addCell(rowBlank);
+            part3.addCell(rowBlank);
+
+            document.add(part3);
+
+            PdfPTable acceptanceTable = new PdfPTable(48);
+            acceptanceTable.setTotalWidth(Utilities.millimetersToPoints(190));
+            acceptanceTable.setLockedWidth(true);
+            acceptanceTable.setHorizontalAlignment(Element.ALIGN_LEFT);
+            acceptanceTable.addCell(getCellVinFiniquito("AUTORIZACIONES", 48, Element.ALIGN_CENTER, cellFontSize, true, bgGray));
+            acceptanceTable.addCell(rowBlank);
+            acceptanceTable.addCell(rowBlank);
+            acceptanceTable.addCell(rowBlank);
+            acceptanceTable.addCell(rowBlank);
+            acceptanceTable.addCell(rowBlank);
+            acceptanceTable.addCell(rowBlank);
+            acceptanceTable.addCell(rowBlank);
+            acceptanceTable.addCell(rowBlank);
+            acceptanceTable.addCell(rowBlank);
+            acceptanceTable.addCell(rowBlank);
+            acceptanceTable.addCell(getCellVinFiniquito("", 5,Element.ALIGN_LEFT, cellFontSize,true,null));
+            acceptanceTable.addCell(getCellVinFiniquitoBorder("Gerente Técnico", 17,Element.ALIGN_CENTER, cellFontSize,true,null, Rectangle.BOTTOM));
+            acceptanceTable.addCell(getCellVinFiniquito("", 4,Element.ALIGN_LEFT, cellFontSize,true,null));
+            acceptanceTable.addCell(getCellVinFiniquitoBorder("Gerente General", 17,Element.ALIGN_CENTER, cellFontSize,true,null, Rectangle.BOTTOM));
+            acceptanceTable.addCell(getCellVinFiniquito("", 5,Element.ALIGN_LEFT, cellFontSize,true,null));
+            acceptanceTable.addCell(rowBlank);
+            document.add(acceptanceTable);
+
+//            PdfPTable firmsFinish = new PdfPTable(1);
+//            Image imgFirst = Image.getInstance(properties.getPathImages() + "firmasEscaneadas.jpg");
+//            imgFirst.scaleAbsolute(400, 100);
+//            PdfPCell firstNameAuthFirm = new PdfPCell();
+//            firstNameAuthFirm.setBorder(Rectangle.NO_BORDER);
+//            firstNameAuthFirm.setHorizontalAlignment(Element.ALIGN_CENTER);
+//            firstNameAuthFirm.addElement(imgFirst);
+//            firmsFinish.addCell(firstNameAuthFirm);
+//            document.add(firmsFinish);
+            document.close();
+
+
+        }catch (Exception e) {
+            logger.error("Error al querer exportar a PDF " + e.getMessage());
+        }
+        return out.toByteArray();
+    }
 
     //#region GEL - Cells format
     private PdfPCell getCell(String content, int cm, int textAlign) {

@@ -2,9 +2,11 @@ package com.scfg.core.adapter.persistence.transaction;
 
 import com.scfg.core.application.port.out.TransactionPort;
 import com.scfg.core.common.PersistenceAdapter;
+import com.scfg.core.common.enums.PersistenceStatusEnum;
 import com.scfg.core.domain.Transaction;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -27,8 +29,20 @@ public class TransactionPersistenceAdapter implements TransactionPort {
         return transaction.get() != null ? mapToDomain(transaction.get()) : null;
     }
 
+    @Override
+    public Transaction findLastByPaymentPlanId(Long paymentPlanId) {
+        List<TransactionJpaEntity> transactionJpaEntityList = this.transactionRepository.findLAllByPaymentPlanId(
+                paymentPlanId,
+                PersistenceStatusEnum.CREATED_OR_UPDATED.getValue()
+        );
+        if(transactionJpaEntityList.isEmpty()){
+            return null;
+        }
+        return mapToDomain(transactionJpaEntityList.get(0));
+    }
+
     private Transaction mapToDomain(TransactionJpaEntity transactionJpaEntity) {
-        Transaction transaction=Transaction.builder()
+        return Transaction.builder()
                 .id(transactionJpaEntity.getId())
                 .paymentPlanId(transactionJpaEntity.getPaymentPlanId())
                 .amount(transactionJpaEntity.getAmount())
@@ -44,8 +58,8 @@ public class TransactionPersistenceAdapter implements TransactionPort {
                 .voucherNumber(transactionJpaEntity.getVoucherNumber())
                 .createdAt(transactionJpaEntity.getCreatedAt())
                 .lastModifiedAt(transactionJpaEntity.getLastModifiedAt())
+                .transactionFileDocumentId(transactionJpaEntity.getTransactionFileDocumentId())
                 .build();
-        return transaction;
     }
 
     //#region Mappers
@@ -67,6 +81,7 @@ public class TransactionPersistenceAdapter implements TransactionPort {
                 .voucherNumber(transaction.getVoucherNumber())
                 .createdAt(transaction.getCreatedAt())
                 .lastModifiedAt(transaction.getLastModifiedAt())
+                .transactionFileDocumentId(transaction.getTransactionFileDocumentId())
                 .build();
         return transactionJpaEntity;
     }

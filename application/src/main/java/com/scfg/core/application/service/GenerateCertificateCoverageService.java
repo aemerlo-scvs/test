@@ -181,7 +181,9 @@ public class GenerateCertificateCoverageService implements GenerateCertificateCo
             LocalDate timeNow = LocalDate.now();
             LocalDate birthDate = person.getNaturalPerson().getBirthDate().toLocalDate();
             Period period = Period.between(birthDate,timeNow);
-            List<MathReserve> mathReserveList = mathReservePort.getAllByInsurerYearAndTotalYear(period.getYears(),generalRequest.getCreditTermInYears());
+            List<MathReserve> mathReserveList = mathReservePort.getAllByVersionInsurerYearAndTotalYear(
+                    MathReserveVersionEnum.V2.getValue(), period.getYears(), generalRequest.getCreditTermInYears()
+            );
             List<PolicyItemMathReserve> policyItemMathReserveList = new ArrayList<>();
             for (int i = 0; i <= mathReserveList.size()-1; i++) {
                 PolicyItemMathReserve policyItemMathReserve = PolicyItemMathReserve.builder()

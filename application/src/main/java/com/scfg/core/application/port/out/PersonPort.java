@@ -24,4 +24,6 @@ public interface PersonPort {
     List<Person> findAllByListOfPersonId(List<Long> personIdList);
 
     Person findByNitNumber(Long nitNumber);
+
+    Person findByPolicyIdWhenPolicyAndPersonIsOneToOne(Long policyId);
 }

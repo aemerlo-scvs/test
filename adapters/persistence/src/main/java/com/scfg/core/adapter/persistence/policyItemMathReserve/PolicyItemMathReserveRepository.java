@@ -11,4 +11,13 @@ public interface PolicyItemMathReserveRepository extends JpaRepository<PolicyIte
     @Query("SELECT p FROM PolicyItemMathReserveJpaEntity p \n" +
             "WHERE p.policyItemId = :policyItemId AND p.status = :status")
     List<PolicyItemMathReserveJpaEntity> findAllByPolicyItemId(@Param("policyItemId") Long policyItemId, @Param("status") Integer status);
+
+
+    @Query("SELECT p FROM PolicyItemMathReserveJpaEntity p " +
+            "WHERE p.policyItemId = :policyItemId " +
+            "AND p.year = :year " +
+            "AND p.status = :status")
+    PolicyItemMathReserveJpaEntity findByPolicyItemIdAndYear(@Param("policyItemId") Long policyItemId,
+                                                                   @Param("year") Integer year,
+                                                                   @Param("status") Integer status);
 }

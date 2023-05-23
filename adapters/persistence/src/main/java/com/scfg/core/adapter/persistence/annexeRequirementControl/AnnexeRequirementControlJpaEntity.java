@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "AnnexeRequirementControl")
@@ -24,14 +25,17 @@ public class AnnexeRequirementControlJpaEntity extends BaseJpaEntity {
     @Column(name = "comment")
     private String comment;
     @Column(name = "requestDate")
-    private String requestDate;
+    private LocalDateTime requestDate;
     @Column(name = "receptionDate")
-    private String receptionDate;
+    private LocalDateTime receptionDate;
     @Column(name = "fileDocumentId")
     private Long fileDocumentId;
     @Column(name = "requirementId")
     private Long requirementId;
     @Column(name = "requestAnnexeId")
     private Long requestAnnexeId;
+
+    @Column(name = "signed")
+    private Boolean signed;
 
 }

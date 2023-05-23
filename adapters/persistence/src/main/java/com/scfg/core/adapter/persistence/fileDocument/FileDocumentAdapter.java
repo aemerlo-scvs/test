@@ -1,15 +1,11 @@
 package com.scfg.core.adapter.persistence.fileDocument;
 
-import com.scfg.core.adapter.persistence.requirementControl.RequirementControlJpaEntity;
-import com.scfg.core.adapter.persistence.beneficiary.BeneficiaryJpaEntity;
-import com.scfg.core.adapter.persistence.policy.PolicyJpaEntity;
 import com.scfg.core.application.port.out.FileDocumentPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.PolicyStatusEnum;
 import com.scfg.core.common.enums.TypesAttachmentsEnum;
-import com.scfg.core.common.enums.TypesDocumentPersonEnum;
-import com.scfg.core.domain.Beneficiary;
 import com.scfg.core.common.enums.PersistenceStatusEnum;
+import com.scfg.core.common.util.ModelMapperConfig;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.dto.FileDocumentDTO;
 import com.scfg.core.domain.dto.credicasas.FileDocumentByRequestDTO;
@@ -68,6 +64,18 @@ public class FileDocumentAdapter implements FileDocumentPort {
             System.out.println("Error al obtener los documentos: " + e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public FileDocument findLastByPolicyItemIdAndDocumentTypeIdc(Long policyItemId, Integer documentTypeIdc) {
+        List<FileDocumentJpaEntity> list = fileDocumentRepository.findAllDocumentsByPolicyItemIdAndDocumentTypeIdc(
+                policyItemId, documentTypeIdc, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+
+        if (list.isEmpty()) {
+            return null;
+        }
+
+        return new ModelMapperConfig().getStrictModelMapper().map(list.get(0), FileDocument.class);
     }
 
     @Override
