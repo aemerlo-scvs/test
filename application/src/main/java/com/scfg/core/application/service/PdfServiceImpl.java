@@ -19,29 +19,29 @@ public class PdfServiceImpl implements PdfService {
         htmlContent="<!DOCTYPE HTML>\n" +
                 "<html>\n" +
                 "<head>\n" +
-                "    <style>\n" +
-                "        h1 {\n" +
-                "            color: #25a7e7;\n" +
-                "            text-align: center;\n" +
-                "        }\n" +
-                "        .receipt-header {\n" +
-                "            width: 100%;\n" +
-                "        }\n" +
-                "        .receipt {\n" +
-                "            width: 100%;\n" +
-                "        }\n" +
-                "        .receipt, .receipt th, .receipt td {\n" +
-                "            border: 1px solid #25a7e7;\n" +
-                "            border-collapse: collapse;\n" +
-                "        }\n" +
-                "        .receipt th {\n" +
-                "            background-color: #25a7e7;\n" +
-                "            color: white;\n" +
-                "        }\n" +
-                "        .total {\n" +
-                "            text-align: right;\n" +
-                "        }\n" +
-                "    </style>\n" +
+//                "    <style>\n" +
+//                "        h1 {\n" +
+//                "            color: #25a7e7;\n" +
+//                "            text-align: center;\n" +
+//                "        }\n" +
+//                "        .receipt-header {\n" +
+//                "            width: 100%;\n" +
+//                "        }\n" +
+//                "        .receipt {\n" +
+//                "            width: 100%;\n" +
+//                "        }\n" +
+//                "        .receipt, .receipt th, .receipt td {\n" +
+//                "            border: 1px solid #25a7e7;\n" +
+//                "            border-collapse: collapse;\n" +
+//                "        }\n" +
+//                "        .receipt th {\n" +
+//                "            background-color: #25a7e7;\n" +
+//                "            color: white;\n" +
+//                "        }\n" +
+//                "        .total {\n" +
+//                "            text-align: right;\n" +
+//                "        }\n" +
+//                "    </style>\n" +
                 "</head>\n" +
                 "<body>\n "+
                 /*"<h1>Receipt</h1>\n" +

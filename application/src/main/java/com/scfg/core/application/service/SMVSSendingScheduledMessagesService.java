@@ -4,7 +4,9 @@ import com.scfg.core.application.port.out.AlertPort;
 import com.scfg.core.application.port.out.GeneralRequestPort;
 import com.scfg.core.common.enums.AlertEnum;
 import com.scfg.core.common.enums.SMVSMessageTypeEnum;
+import com.scfg.core.common.util.ConvertBase64ToPdf;
 import com.scfg.core.common.util.DateUtils;
+import com.scfg.core.common.util.HelpersMethods;
 import com.scfg.core.domain.Alert;
 import com.scfg.core.domain.Emailbody;
 import com.scfg.core.domain.dto.FileDocumentDTOInf;
@@ -106,7 +108,7 @@ public class SMVSSendingScheduledMessagesService {
         //#endregion
 
     }
-
+    @Profile(value="prod")
     private SendMessageDTO getMessageDTO(ContactCenterRequestDTO requestDTO) {
         return SendMessageDTO.builder()
                 .name(requestDTO.getCompleteName())
@@ -116,7 +118,7 @@ public class SMVSSendingScheduledMessagesService {
                 .messageTypeEnum(AlertEnum.SMVS_RECORDATORY)
                 .build();
     }
-
+    @Profile(value="prod")
     @Scheduled(cron = "0 30 23 * * *", zone = "America/La_Paz")
     public void sendReportCommercials() {
         ZoneId zid = ZoneId.of("America/La_Paz");
