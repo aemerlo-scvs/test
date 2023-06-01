@@ -48,7 +48,7 @@ public class CoverageController implements CoverageEndPoint {
     @ApiOperation(value = "Guardar las coberturas")
     public ResponseEntity guardar(@RequestBody Coverage coverage) {
         try {
-            PersistenceResponse response = coverageUseCase.registerCoverage(coverage);
+            PersistenceResponse response = coverageUseCase.saveOrUpdate(coverage);
             return ok(response);
         }catch (NotDataFoundException | OperationException e) {
             return CustomErrorType.badRequest("Coverage", e.getMessage());
@@ -61,7 +61,7 @@ public class CoverageController implements CoverageEndPoint {
     @ApiOperation(value = "Actualizar las coberturas")
     public ResponseEntity update(@RequestBody Coverage coverage) {
         try {
-            PersistenceResponse response = coverageUseCase.updateCoverage(coverage);
+            PersistenceResponse response = coverageUseCase.saveOrUpdate(coverage);
             return ok(response);
         }catch (NotDataFoundException | OperationException e) {
             return CustomErrorType.badRequest("Coverage", e.getMessage());

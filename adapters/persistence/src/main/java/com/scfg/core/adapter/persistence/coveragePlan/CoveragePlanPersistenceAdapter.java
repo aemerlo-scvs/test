@@ -17,16 +17,15 @@ import java.util.List;
 public class CoveragePlanPersistenceAdapter implements CoveragePlanPort {
     private final CoveragePlanRepository coveragePlanRepository;
     @Override
-    public PersistenceResponse save(CoveragePlan coveragePlan) {
+    public PersistenceResponse saveOrUpdate(CoveragePlan coveragePlan) {
         CoveragePlanJpaEntity coveragePlanJpaEntity = ObjectMapperUtils.map(coveragePlan, CoveragePlanJpaEntity.class);
         coveragePlanJpaEntity = coveragePlanRepository.save(coveragePlanJpaEntity);
-        return new PersistenceResponse(CoveragePlanPersistenceAdapter.class.getSimpleName(), ActionRequestEnum.CREATE, coveragePlanJpaEntity);
+        return new PersistenceResponse(
+                CoveragePlanPersistenceAdapter.class.getSimpleName(),
+                ActionRequestEnum.CREATE,
+                ObjectMapperUtils.map(coveragePlanJpaEntity, CoveragePlan.class));
     }
 
-    @Override
-    public PersistenceResponse update(CoveragePlan coveragePlan) {
-        return null;
-    }
 
     @Override
     public PersistenceResponse delete(Long id) {
@@ -48,4 +47,10 @@ public class CoveragePlanPersistenceAdapter implements CoveragePlanPort {
         List<CoveragePlanJpaEntity> coveragePlanJpaEntities = coveragePlanRepository.findAll();
         return coveragePlanJpaEntities.size() > 0 ? ObjectMapperUtils.mapAll(coveragePlanJpaEntities, CoveragePlan.class) : new ArrayList<>();
     }
+    @Override
+    public List<CoveragePlan> getAllCoveragePlanByPlanId(Long planId) {
+        List<CoveragePlanJpaEntity> coveragePlanJpaEntities = coveragePlanRepository.findALLByPlanId(planId);
+        return coveragePlanJpaEntities.size() > 0 ? ObjectMapperUtils.mapAll(coveragePlanJpaEntities, CoveragePlan.class) : new ArrayList<>();
+    }
+
 }

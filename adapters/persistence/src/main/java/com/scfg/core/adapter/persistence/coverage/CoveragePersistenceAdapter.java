@@ -24,32 +24,14 @@ public class CoveragePersistenceAdapter implements CoveragePort {
     private EntityManager em;
 
     @Override
-    public PersistenceResponse save(Coverage coverage, boolean returnEntity) {
-        CoverageJpaEntity coverageJpaEntity = ObjectMapperUtils.map(coverage, CoverageJpaEntity.class); //mapDomainToEntity(coverage);
+    public PersistenceResponse saveOrUpdate(Coverage coverage) {
+        CoverageJpaEntity coverageJpaEntity = ObjectMapperUtils.map(coverage, CoverageJpaEntity.class);
         coverageJpaEntity = coverageRepository.save(coverageJpaEntity);
         return new PersistenceResponse(
                 CoveragePersistenceAdapter.class.getSimpleName(),
                 ActionRequestEnum.CREATE,
                 coverageJpaEntity
         );
-
-    }
-
-//    private CoverageJpaEntity mapDomainToEntity(Coverage coverage) {
-//        CoverageJpaEntity coverageJpaEntity = modelMapper.map(coverage, CoverageJpaEntity.class);
-//        return coverageJpaEntity;
-//    }
-
-    @Override
-    public PersistenceResponse update(Coverage coverage) {
-        CoverageJpaEntity coverageJpaEntity = ObjectMapperUtils.map(coverage, CoverageJpaEntity.class);
-        coverageJpaEntity = coverageRepository.save(coverageJpaEntity);
-        return new PersistenceResponse(
-                CoveragePersistenceAdapter.class.getSimpleName(),
-                ActionRequestEnum.UPDATE,
-                coverageJpaEntity
-        );
-
     }
 
     @Override

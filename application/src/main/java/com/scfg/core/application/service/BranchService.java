@@ -37,24 +37,9 @@ public class BranchService implements BranchUseCase {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
     @Override
     public PersistenceResponse deleteBranch(Long id) {
-
         return branchPort.delete(id);
-
     }
-    @Override
-    public List<Branch> getfilterParamenter(FilterParamenter paramenter) {
-        List<Branch> list1 = branchPort.getfilterParamenters(paramenter);
-        // list1.stream().filter((s)->(s.getName().toUpperCase().contains(paramenter.getName().toUpperCase()))).collect(Collectors.toList());
 
-        if (paramenter.getName() != null && !paramenter.getName().isEmpty()) {
-            list1 = list1.stream().filter((s)->(s.getName().toUpperCase().contains(paramenter.getName().toUpperCase()))).collect(Collectors.toList());
-        }
-        if (list1.size() > 0 && paramenter.getDateto() != null && paramenter.getDatefrom() != null) {
-            list1 = list1.stream().filter(re -> re.getCreatedAt().after(paramenter.getDatefrom()) && re.getCreatedAt().before(paramenter.getDateto())).collect(Collectors.toList());
-        }
-        if (list1.size() > 0 && paramenter.getStatus() != null) {
-            list1 = list1.stream().filter(re -> re.getStatus() == paramenter.getStatus()).collect(Collectors.toList());
-        }
-        return list1;
-    }
+
+
 }

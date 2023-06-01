@@ -30,7 +30,6 @@ public class ClauseService implements ClauseUseCase {
     public List<Clause> getAllClauseByProductId(Long id) {
         return clausePort.findAllClauseByProductId(id);
     }
-
     @Override
     public PersistenceResponse saveOrUpdate(Clause clause) {
         return clausePort.saveOrUpdate(clause);

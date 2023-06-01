@@ -11,6 +11,4 @@ public interface BranchUseCase {
     PersistenceResponse registerBranch(Branch branch);
     PersistenceResponse updateBranch(Branch branch) ;
     PersistenceResponse deleteBranch(Long  id) ;
-    List<Branch> getfilterParamenter(FilterParamenter paramenter);
-    //f
 }
