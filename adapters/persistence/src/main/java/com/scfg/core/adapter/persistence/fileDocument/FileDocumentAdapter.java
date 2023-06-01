@@ -9,6 +9,9 @@ import com.scfg.core.common.util.ModelMapperConfig;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.dto.FileDocumentDTO;
 import com.scfg.core.domain.dto.credicasas.FileDocumentByRequestDTO;
+import com.scfg.core.domain.GeneralRequest;
+import org.modelmapper.ModelMapper;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -42,6 +45,11 @@ public class FileDocumentAdapter implements FileDocumentPort {
         List<FileDocumentJpaEntity> fileDocumentJpaEntities = mapToJpaEntityListCLF(fileDocument);
         fileDocumentJpaEntities = fileDocumentRepository.saveAll(fileDocumentJpaEntities);
         return mapToDomainListCLF(fileDocumentJpaEntities);
+    }
+    @Override
+    public List<FileDocument> findAllByPolicyItemId(Long policyItemId) {
+        List<FileDocumentJpaEntity> fileDocumentJpaEntities = fileDocumentRepository.getFileDocumentsByPolicyItemId(policyItemId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return fileDocumentJpaEntities.stream().map(o -> new ModelMapper().map(o, FileDocument.class)).collect(Collectors.toList());
     }
 
     @Override

@@ -302,6 +302,12 @@ public class GeneralRequestPersistenceAdapter implements GeneralRequestPort {
                 .build();
     }
 
+    @Override
+    public List<GeneralRequest> findAllByPlanIdAndCreditTermInYearsAndDateVIN(Long planId, Integer creditTermInYears, Date date) {
+        List<GeneralRequestJpaEntity> listAux = this.generalRequestRepository.getAllByPlanIdAndCreditTermInYearsAndDateVIN(planId, creditTermInYears,
+                date, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return listAux.stream().map(o -> new ModelMapper().map(o, GeneralRequest.class)).collect(Collectors.toList());
+    }
 
     //Todo Eliminar luego de utilizarlo cuando se deba / Delete this when no have more uses
     @Override

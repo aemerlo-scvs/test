@@ -19,10 +19,7 @@ import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
+import java.text.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -609,6 +606,12 @@ public class HelpersMethods {
 
     public static String formatStringOnlyDateAndHour(Date date) {
         return new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(date).toString();
+    }
+
+    public static Date formatOfStringToDate(String str) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MMM/yyyy", Locale.ENGLISH);
+        Date date = formatter.parse(str);
+        return date;
     }
 
     public static String formatStringOnlyLocalDateTime(LocalDateTime date) {

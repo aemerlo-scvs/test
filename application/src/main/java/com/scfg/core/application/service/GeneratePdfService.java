@@ -3303,8 +3303,6 @@ public class GeneratePdfService implements GeneratePdfUseCase {
                 String mfranco = "LUIS MAURICIO FRANCO MELAZZINI";
                 String maguirre = "MARIO EDMUNDO AGUIRRE DURAN";
 
-
-
                 String mfrancoFirm = "Firmado digitalmente por " + mfranco + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(generateCertificateVin.getPolicy().getIssuanceDate());
                 String maguirreFirm = "Firmado digitalmente por " + maguirre + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(generateCertificateVin.getPolicy().getIssuanceDate());
                 PdfPTable firmTable = new PdfPTable(6);
@@ -3319,8 +3317,6 @@ public class GeneratePdfService implements GeneratePdfUseCase {
                 document.add(firmTable);
             } else {
                 String rfmolina = "RAFAEL FERNANDO MOLINA LIZARAZU";
-
-
 
                 String rfmolinaFirm = "Firmado digitalmente por " + rfmolina + " \nFecha:" + HelpersMethods.formatStringOnlyDateAndHour(generateCertificateVin.getPolicy().getIssuanceDate());
                 PdfPTable firmTable = new PdfPTable(2);
