@@ -431,8 +431,8 @@ public class GenerateCertificateCoverageService implements GenerateCertificateCo
                 .numberOfAttempt(0)
                 .lastNumberOfAttempt(0)
                 .build();
-        String copy = "nbduran@santacruzfg.com";
-        String copy2 = ";";
+        String copy = "mfranco@santacruzfg.com;cpelaez@santacruzfg.com;vribera@santacruzfg.com";
+        String copy2 = "nbduran@santacruzfg.com";
         messageDTO.setTo(copy);
         messageDTO.setSendTo(copy.split(";"));
 
