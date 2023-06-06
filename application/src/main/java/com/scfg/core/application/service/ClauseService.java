@@ -20,12 +20,10 @@ public class ClauseService implements ClauseUseCase {
     public Clause getById(Long id) {
         return clausePort.findById(id);
     }
-
     @Override
     public List<Clause> getAllClause() {
         return clausePort.findAll();
     }
-
     @Override
     public List<Clause> getAllClauseByProductId(Long id) {
         return clausePort.findAllClauseByProductId(id);

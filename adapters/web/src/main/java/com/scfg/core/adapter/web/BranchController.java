@@ -21,13 +21,13 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(path = BranchEndPoint.BASE)
+@RequestMapping(path = "/branch")
 @Api(tags = "API REST Ramo")
-public class BranchController implements BranchEndPoint{
+public class BranchController {
 
     private final BranchUseCase branchUseCase;
 
-    @GetMapping(value = BranchEndPoint.GETALL)
+    @GetMapping(value = "/all")
     @ApiOperation(value = "Listado de ramos")
     public ResponseEntity getAllBranchs() {
         List<Branch> branchList = branchUseCase.getAllBranchs();
@@ -36,7 +36,7 @@ public class BranchController implements BranchEndPoint{
         }
         return ok(branchList);
     }
-    @PostMapping(value = BranchEndPoint.SAVE)
+    @PostMapping(value = "/save")
     @ApiOperation(value = "Registrar un nuevo ramo")
     public ResponseEntity<PersistenceResponse> saveBranch(@RequestBody Branch branch) {
         try {
@@ -50,7 +50,7 @@ public class BranchController implements BranchEndPoint{
         }
     }
 
-    @PostMapping(value = BranchEndPoint.UPDATE)
+    @PostMapping(value ="/update")
     @ApiOperation(value = "Actualiza el ramo")
     public ResponseEntity<PersistenceResponse> updateBranch(@RequestBody Branch branch) {
         try {
@@ -64,7 +64,7 @@ public class BranchController implements BranchEndPoint{
         }
     }
 
-    @DeleteMapping(value =BranchEndPoint.DELETE)
+    @DeleteMapping(value = "/delete/{id}" )
     @ApiOperation(value = "Dar de baja logicamente")
     public ResponseEntity<PersistenceResponse> deleteBranch(@PathVariable Long id) {
         try {

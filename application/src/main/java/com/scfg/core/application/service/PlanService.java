@@ -1,9 +1,10 @@
 package com.scfg.core.application.service;
 
 import com.scfg.core.application.port.in.PlanUseCase;
+import com.scfg.core.application.port.out.CoveragePlanPort;
 import com.scfg.core.application.port.out.PlanPort;
-import com.scfg.core.application.port.out.ProductPort;
 import com.scfg.core.common.util.PersistenceResponse;
+import com.scfg.core.domain.CoveragePlan;
 import com.scfg.core.domain.Plan;
 import com.scfg.core.domain.configuracionesSistemas.FilterParamenter;
 import com.scfg.core.domain.dto.credicasas.ClfPlanDTO;
@@ -18,6 +19,7 @@ import java.util.List;
 public class PlanService implements PlanUseCase {
 
     private final PlanPort planPort;
+    private final CoveragePlanPort coveragePlanPort;
 
     @Override
     public List<ClfPlanDTO> getAllPlans() {
@@ -44,14 +46,17 @@ public class PlanService implements PlanUseCase {
     }
 
     @Override
-    public PersistenceResponse register(Plan plan) {
-        return planPort.save(plan, true);
+    public PersistenceResponse saveOrUpdate(Plan plan) {
+        PersistenceResponse response = planPort.saveOrUpdate(plan);
+        Plan aux = (Plan) response.getData();
+        long idPlan = aux.getId();
+        for (CoveragePlan coveragePlan : plan.getCoveragePlanList()) {
+            coveragePlan.setPlanId(idPlan);
+            coveragePlanPort.saveOrUpdate(coveragePlan);
+        }
+        return response;
     }
 
-    @Override
-    public PersistenceResponse update(Plan plan) {
-        return planPort.update(plan);
-    }
 
     @Override
     public PersistenceResponse delete(Long id) {

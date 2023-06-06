@@ -5,6 +5,7 @@ import com.scfg.core.domain.dto.credicasas.ClfPlanDTO;
 import com.scfg.core.domain.dto.credicasas.PlanInformation;
 import com.scfg.core.domain.smvs.PlanDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -31,11 +32,14 @@ public interface PlanRepository extends JpaRepository<PlanJpaEntity, Long> {
             "WHERE p.status = :status")
     List<ClfPlanDTO> clfFindAll(@Param("status") Integer status);
 
-    @Query("SELECT p FROM PlanJpaEntity p " +
-            "INNER JOIN ProductJpaEntity po " +
-            "ON po.id = p.productId " +
-            "WHERE p.productId = :productId AND p.status = :status")
-    List<PlanJpaEntity> findAllByProductId(@Param("productId") Long productId, @Param("status") Integer status);
+    @Query("SELECT p FROM PlanJpaEntity p "+
+            "WHERE p.productId = :productId")
+    List<PlanJpaEntity> findAllByProductId(@Param("productId") Long productId);
+
+    @Modifying
+    @Query("UPDATE PlanJpaEntity p SET p.status = 0 " +
+            "WHERE p.productId= :productId")
+    void deleteByProductId(@Param("productId")Long productId);
 
     @Query("SELECT new com.scfg.core.domain.dto.credicasas.PlanInformation(pl.id, pl.name, pl.productId, pr.branchId) " +
             "FROM GeneralRequestJpaEntity r\n " +

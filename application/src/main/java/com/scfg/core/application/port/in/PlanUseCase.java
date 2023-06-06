@@ -17,8 +17,7 @@ public interface PlanUseCase {
     Plan getPlanByAgreementCode(Integer agreementCode);
     List<Plan> getAll();
     Plan getById(Long id);
-    PersistenceResponse register(Plan plan);
-    PersistenceResponse update(Plan plan);
+    PersistenceResponse saveOrUpdate(Plan plan);
 
     PersistenceResponse delete(Long id);
     List<Plan> getfilterParamenter(FilterParamenter paramenter);

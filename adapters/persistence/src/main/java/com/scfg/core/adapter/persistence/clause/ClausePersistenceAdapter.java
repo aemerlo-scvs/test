@@ -23,10 +23,12 @@ public class ClausePersistenceAdapter implements ClausePort {
 
     @Override
     public PersistenceResponse saveOrUpdate(Clause clause) {
-
         ClauseJpaEntity clauseJpaEntity = ObjectMapperUtils.map(clause, ClauseJpaEntity.class);
         clauseJpaEntity = clauseRepository.save(clauseJpaEntity);
-        return new PersistenceResponse(ClausePersistenceAdapter.class.getSimpleName(), ActionRequestEnum.CREATE, ObjectMapperUtils.map(clauseJpaEntity, Clause.class));
+        return new PersistenceResponse(
+                ClausePersistenceAdapter.class.getSimpleName(),
+                ActionRequestEnum.CREATE,
+                ObjectMapperUtils.map(clauseJpaEntity, Clause.class));
     }
 
     @Override

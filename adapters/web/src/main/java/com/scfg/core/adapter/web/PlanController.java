@@ -23,7 +23,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(path = PlanEndPoint.BASE)
+@RequestMapping(path = "/plan")
 @Api(tags = "API REST Planes")
 public class PlanController implements PlanEndPoint{
     private final PlanUseCase planUseCase;
@@ -38,24 +38,25 @@ public class PlanController implements PlanEndPoint{
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
-    @PostMapping(value = PlanEndPoint.SAVE)
+
+    @PostMapping(value = "/save")
     @ApiOperation(value = "Guardar planes")
     public ResponseEntity register(@RequestBody Plan plan) {
         try {
-            PersistenceResponse response = planUseCase.register(plan);
+            PersistenceResponse response = planUseCase.saveOrUpdate(plan);
             return ok(response);
         }catch (NotDataFoundException | OperationException e) {
             return CustomErrorType.badRequest("plan", e.getMessage());
         } catch (Exception ex) {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
-
     }
-    @PostMapping(value = PlanEndPoint.UPDATE)
+
+    @PostMapping(value = "/update")
     @ApiOperation(value = "Actualizar planes")
     public ResponseEntity update(@RequestBody Plan plan) {
         try {
-            PersistenceResponse response = planUseCase.update(plan);
+            PersistenceResponse response = planUseCase.saveOrUpdate(plan);
             return ok(response);
         }catch (NotDataFoundException | OperationException e) {
             return CustomErrorType.badRequest("Planes", e.getMessage());
@@ -63,7 +64,7 @@ public class PlanController implements PlanEndPoint{
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
-    @DeleteMapping(value = PlanEndPoint.DELETE)
+    @DeleteMapping(value = "/delete/{id}")
     @ApiOperation(value = "Dar de baja la Planes")
     public ResponseEntity delete(@PathVariable Long id) {
         try {
@@ -75,7 +76,7 @@ public class PlanController implements PlanEndPoint{
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
-    @GetMapping(value = PlanEndPoint.GETALL)
+    @GetMapping(value = "/all")
     @ApiOperation(value = "Retorna lista de planes")
     ResponseEntity getAll() {
         try {
@@ -85,7 +86,7 @@ public class PlanController implements PlanEndPoint{
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
-    @GetMapping(value = PlanEndPoint.GETBYID)
+    @GetMapping(value = "/findById/{id}")
     @ApiOperation(value = "Retorna un plan por su if")
     ResponseEntity getById(@PathVariable Long id) {
         try {
@@ -95,7 +96,7 @@ public class PlanController implements PlanEndPoint{
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
-    @PostMapping(value = PlanEndPoint.FILTER)
+    @PostMapping(value = "/filter")
     @ApiOperation(value = "Listado de planes por filtro")
     public ResponseEntity getAllBranchParents(@RequestBody FilterParamenter paramenter) {
         try {
@@ -105,7 +106,7 @@ public class PlanController implements PlanEndPoint{
             return CustomErrorType.notContent("Obtener planes",ex.getMessage());
         }
     }
-    @GetMapping(value = PlanEndPoint.CLF)
+    @GetMapping(value = "/clf")
     @ApiOperation(value = "Retorna una lista de planes")
     ResponseEntity getAllCLF() {
         try {
@@ -117,7 +118,7 @@ public class PlanController implements PlanEndPoint{
     }
 
 
-    @GetMapping(value = PlanEndPoint.GEL)
+    @GetMapping(value = "/gel")
     @ApiOperation(value = "Retorna una lista de planes")
     ResponseEntity getAllPlansByBusinessGroup(@RequestParam Integer businessGroupIdc) {
         try {
@@ -128,7 +129,7 @@ public class PlanController implements PlanEndPoint{
         }
     }
 
-    @GetMapping(value = PlanEndPoint.GETPLANBYPRODUCTID)
+    @GetMapping(value = "/findByProduct/{productId}")
     @ApiOperation(value = "Lista de planes por producto Id")
     public ResponseEntity findPlanByProductId(@PathVariable Long productId) {
         try {
@@ -139,7 +140,7 @@ public class PlanController implements PlanEndPoint{
         }
     }
 
-    @PostMapping(value = PlanEndPoint.GETPLANBYREQUESTID)
+    @PostMapping(value = "/findPlanByRequestId")
     @ApiOperation(value = "Lista de planes por requestId")
     public ResponseEntity findPlanByProductId(@RequestBody List<Long> requestList) {
         try {

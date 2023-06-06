@@ -3,6 +3,9 @@ package com.scfg.core.adapter.persistence.branch;
 import com.scfg.core.application.port.out.BranchPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.ActionRequestEnum;
+import com.scfg.core.common.enums.PersistenceStatusEnum;
+import com.scfg.core.common.util.ModelMapperConfig;
+import com.scfg.core.common.util.ObjectMapperUtils;
 import com.scfg.core.common.util.PersistenceResponse;
 import com.scfg.core.domain.configuracionesSistemas.FilterParamenter;
 import lombok.RequiredArgsConstructor;
@@ -23,12 +26,11 @@ public class BranchPersistenceAdapter implements BranchPort {
 
     @Override
     public PersistenceResponse save(Branch branch, boolean returnEntity) {
-        BranchJpaEntity branchJpaEntity = mapperDtoToEntity(branch);
+        BranchJpaEntity branchJpaEntity = mapToJpaEntity(branch);
         branchJpaEntity = branchRepository.save(branchJpaEntity);
-
         return new PersistenceResponse(
                 Branch.class.getSimpleName(),
-                ActionRequestEnum.UPDATE,
+                ActionRequestEnum.CREATE,
                 branchJpaEntity
         );
     }
@@ -50,11 +52,6 @@ public class BranchPersistenceAdapter implements BranchPort {
         );
     }
 
-    private BranchJpaEntity mapperDtoToEntity(Branch branch) {
-        BranchJpaEntity branchJpaEntity=modelMapper.map(branch,BranchJpaEntity.class);
-        return branchJpaEntity;
-    }
-
     @Override
     public PersistenceResponse delete(Long id) {
         Optional<BranchJpaEntity> branchJpaEntity = branchRepository.findById(id);
@@ -70,8 +67,8 @@ public class BranchPersistenceAdapter implements BranchPort {
 
     }
     public List<Branch> getAllBranch() {
-        Object list = branchRepository.findAll();
-        return (List<Branch>) list;
+        List<BranchJpaEntity> branchJpaEntities  = branchRepository.findAll(PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return branchJpaEntities.size() > 0 ? ObjectMapperUtils.mapAll(branchJpaEntities, Branch.class) : new ArrayList<>();
     }
 
     @Override
@@ -92,5 +89,12 @@ public class BranchPersistenceAdapter implements BranchPort {
     private Branch mapperEntityToDto(BranchJpaEntity obj) {
         Branch branch=modelMapper.map(obj,Branch.class);
         return branch;
+    }
+
+    private BranchJpaEntity mapToJpaEntity(Branch branch) {
+        return new ModelMapperConfig()
+                .getStrictModelMapper()
+                .map(branch, BranchJpaEntity.class);
+
     }
 }

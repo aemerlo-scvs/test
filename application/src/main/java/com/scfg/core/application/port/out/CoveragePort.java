@@ -14,4 +14,6 @@ public interface CoveragePort {
     String getAllCoverageNamesByGeneralRequestId(Long requestId);
     List<Coverage> getfilterParamenters(FilterParamenter paramenter);
     List<Coverage> findAllCoverageByProductId(Long productId);
+    PersistenceResponse deleteByProductId(Long productId);
+
 }
