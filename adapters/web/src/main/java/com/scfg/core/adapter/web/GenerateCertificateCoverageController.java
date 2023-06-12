@@ -46,7 +46,7 @@ public class GenerateCertificateCoverageController {
         try {
 //            List<FileDocument> fileDocument = this.generateCertificateCoverageUseCase.regenerateVINCertificateCoverage(planId, creditTermInYears, date);
             Date today = new Date();
-            String dateLimit = "10-10-2023 23:59:59";
+            String dateLimit = "07-07-2023 23:59:59";
             SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
             Date dateComparative = format.parse(dateLimit);
             if(today.after(dateComparative)) {
