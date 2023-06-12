@@ -12,6 +12,7 @@ public interface FileDocumentPort {
     List<FileDocumentByRequestDTO> findAllSignedDocumentsByRequestId(Long requestId);
     FileDocument findLastByPolicyItemIdAndDocumentTypeIdc(Long policyItemId, Integer documentTypeIdc);
     FileDocument findById(Long fileId);
+    List<FileDocument> findAllByPolicyItemId(Long policyItemId);
     List<FileDocumentByRequestDTO> getCertificateCoverageDocumentByPolicyItemId(Long policyItemId);
     FileDocument SaveOrUpdate(FileDocument fileDocument);
     List<FileDocumentDTO> SaveOrUpdateAll(List<FileDocumentDTO> fileDocument);

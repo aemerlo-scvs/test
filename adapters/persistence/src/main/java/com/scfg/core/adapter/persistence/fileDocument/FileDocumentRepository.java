@@ -57,4 +57,14 @@ public interface FileDocumentRepository extends JpaRepository<FileDocumentJpaEnt
             @Param("documentTypeIdc") Integer documentTypeIdc,
             @Param("status") Integer status);
 
+    @Query("SELECT fd from FileDocumentJpaEntity fd " +
+            "join PolicyFileDocumentJpaEntity pfd on pfd.fileDocumentId = fd.id " +
+            "join PolicyItemJpaEntity pi on pi.id = pfd.policyItemId " +
+            "where pi.id = :policyItemId and fd.status= :status " +
+            "and pfd.status= :status " +
+            "and pi.status= :status")
+    List<FileDocumentJpaEntity> getFileDocumentsByPolicyItemId(
+            @Param("policyItemId") Long policyItemId,
+            @Param("status") Integer  status);
+
 }

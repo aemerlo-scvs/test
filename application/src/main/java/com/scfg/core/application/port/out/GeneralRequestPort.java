@@ -12,6 +12,7 @@ import com.scfg.core.domain.smvs.ParametersFromDTO;
 import com.scfg.core.domain.smvs.VerifyActivationCodeDTO;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 public interface GeneralRequestPort {
@@ -59,4 +60,5 @@ public interface GeneralRequestPort {
     VinDetailOperationDTO getDetailOperation(RequestDetailOperationDTO requestDetailOperationDTO);
     Integer nextSequency(String initialProduct, String planName);
     PageableDTO findAllByPlanIdAndFilters(Long planId, RequestProposalSearchFiltersDto filtersDto, Integer page, Integer size);
+    List<GeneralRequest> findAllByPlanIdAndCreditTermInYearsAndDateVIN(Long planId, Integer creditTermInYears, Date date);
 }

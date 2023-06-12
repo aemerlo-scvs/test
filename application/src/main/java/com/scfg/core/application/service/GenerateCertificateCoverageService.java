@@ -322,6 +322,128 @@ public class GenerateCertificateCoverageService implements GenerateCertificateCo
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {Exception.class, RuntimeException.class, OperationException.class})
+    @Override
+    public String regenerateVINCertificateCoverage(Long planId, Integer creditTermInYears, Date date) {
+//    public List<FileDocument> regenerateVINCertificateCoverage(Long planId, Integer creditTermInYears, Date date) {
+        List<GeneralRequest> pendingToRegenerate = generalRequestPort.findAllByPlanIdAndCreditTermInYearsAndDateVIN(planId, creditTermInYears, date);
+        List<FileDocument> listFileDocument = new ArrayList<>();
+        List<AttachmentDTO> fileList = new ArrayList<>();
+        if (pendingToRegenerate.size() < 1) {
+            throw new OperationException("No se encontraron certificados para regenerar");
+        }
+        for (GeneralRequest greq : pendingToRegenerate) {
+            PolicyItem policyItem = policyItemPort.getPolicyItemByGeneralRequestId(greq.getId());
+            List<CoverageDTO> coverageDTOList = coverageProductPlanPort.findAllByPolicyItemId(policyItem.getId());
+            List<Beneficiary> beneficiaryList = beneficiaryPort.findAllByPolicyItemId(policyItem.getId());
+            Person person = personPort.findById(greq.getPersonId());
+            Person insurerCompany = personPort.findByNitNumber((long) CompanysNitNumber.SCVS.getValue());
+            Person holderCompany = personPort.findByNitNumber((long) CompanysNitNumber.FBS.getValue());
+            Policy policy = policyPort.getByRequestIdOneData(greq.getId());
+            Classifier moneyType = classifierPort.getClassifierByReferencesIds(policy.getCurrencyTypeIdc(), ClassifierTypeEnum.Currency.getReferenceId());
+            Classifier nationality = classifierPort.getClassifierByReferencesIds(person.getNationalityIdc(), ClassifierTypeEnum.Country.getReferenceId());
+            Classifier maritalStatus = classifierPort.getClassifierByReferencesIds(person.getNaturalPerson().getMaritalStatusIdc(), ClassifierTypeEnum.MaritalStatus.getReferenceId());
+            List<Classifier> relationShipList = classifierPort.getAllClassifiersByClassifierTypeReferenceId(
+                    ClassifierTypeEnum.Relationship.getReferenceId());
+            List<Classifier> regionalList = classifierPort.getAllClassifiersByClassifierTypeReferenceId(
+                    ClassifierTypeEnum.Regional.getReferenceId());
+            List<Classifier> extensions = classifierPort.getAllClassifiersByClassifierTypeReferenceId(
+                    ClassifierTypeEnum.ExtensionsDocumentType.getReferenceId());
+            Account account = accountPort.findLastByPersonIdAndPolicyId(greq.getPersonId(), policy.getId());
+            List<Direction> insurerDirections = directionPort.findAllByPersonId(person.getId());
+            person.setDirection(insurerDirections.stream().max(Comparator.comparing(Direction::getCreatedAt)).get());
+            insurerCompany.setDirections(directionPort.findAllByPersonId(insurerCompany.getId()));
+            insurerCompany.setTelephones(telephonePort.getAllByPersonId(insurerCompany.getId()));
+
+            BrokerDTO brokerDTO = new BrokerDTO();
+            brokerDTO.setBusinessName("SUCURSAL SANTA CRUZ");
+            User user = userPort.findById(policy.getCreatedBy());
+            Classifier reg = regionalList.stream().filter(x -> x.getReferenceId() == user.getRegionalIdc()).findFirst().orElse(null);
+            MessageDTO message = new MessageDTO();
+            List<MessageDTO> messageList = new ArrayList<>();
+            messageList = messageSentPort.findAllByReferenceIdAndTableReferenceIdc(greq.getId(),
+                    (int) ClassifierEnum.REFERENCE_TABLE_GENERALREQUEST.getReferenceCode());
+
+            List<Long> messageSentIds = messageList.stream().map(MessageDTO::getId).collect(Collectors.toList());
+            MessageResponse messageResponse = messageResponsePort.getMessageByMessageSentIds(messageSentIds);
+            message = messageList.stream().filter(o -> o.getId().equals(messageResponse.getMessageSentId())).findFirst().get();
+            message.setCreatedAt(messageResponse.getCreatedAt());
+
+            GenerateCertificateVin generateCertificateVin = GenerateCertificateVin.builder()
+                    .insurer(person)
+                    .insurerCompany(insurerCompany)
+                    .holderCompany(holderCompany)
+                    .coverageDTOList(coverageDTOList)
+                    .beneficiaryList(beneficiaryList)
+                    .moneyType(moneyType)
+                    .relationShipList(relationShipList)
+                    .extensions(extensions)
+                    .request(greq)
+                    .policy(policy)
+                    .nationality(nationality)
+                    .maritalStatus(maritalStatus)
+                    .account(account)
+                    .regional(reg)
+                    .messageDTO(message)
+                    .brokerDTO(brokerDTO)
+                    .build();
+            byte[] certificate = generatePdfUseCase.generateVINCoverageCertificate(generateCertificateVin);
+            String base64 = Base64.getEncoder().encodeToString(certificate);
+            List<String> signList = new ArrayList<>();
+            if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
+                signList.add(CertificateOwnerEnum.MFRANCO.getValue());
+                signList.add(CertificateOwnerEnum.MAGUIRRE.getValue());
+            } else {
+                signList.add(CertificateOwnerEnum.RFMOLINA.getValue());
+            }
+            Date newDate = policy.getIssuanceDate();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(newDate);
+            String signedB64 = jksCertificateService.signDocumentWithP12Cert(base64, signList, DateUtils.asDateToLocalDateTime(policy.getIssuanceDate()));
+            FileDocument fileDocument = FileDocument.builder()
+                    .mime("application/pdf")
+                    .description(policy.getNumberPolicy())
+                    .content(signedB64)
+                    .typeDocument(TypesAttachmentsEnum.COVERAGECERTIFICATE.getValue())
+                    .build();
+
+            fileDocument = fileDocumentPort.SaveOrUpdate(fileDocument);
+            PolicyFileDocument policyFileDocument = PolicyFileDocument.builder()
+                    .fileDocumentId(fileDocument.getId())
+                    .policyItemId(policyItem.getId())
+                    .isSigned(0)
+                    .build();
+            policyFileDocument = policyFileDocumentPort.saveOrUpdate(policyFileDocument);
+
+            listFileDocument.add(fileDocument);
+
+            AttachmentDTO attachmentDTO = new AttachmentDTO();
+            attachmentDTO.setContent(Base64.getDecoder().decode(signedB64));
+            attachmentDTO.setFileName(policy.getNumberPolicy() + ".pdf");
+            attachmentDTO.setMimeType("application/pdf");
+            fileList.add(attachmentDTO);
+        }
+        MessageDTO messageDTO = MessageDTO.builder()
+                .id(0l)
+                .subject("Regeneración de certificados con vigencia de 5 años")
+                .message("Se adjuntan los certificados regenerados con la vigencia corregida.")
+                .messageTypeIdc(MessageTypeEnum.EMAIL.getValue())
+                .numberOfAttempt(0)
+                .lastNumberOfAttempt(0)
+                .build();
+        String copy = "mfranco@santacruzfg.com;cpelaez@santacruzfg.com;vribera@santacruzfg.com";
+        String copy2 = "nbduran@santacruzfg.com";
+        messageDTO.setTo(copy);
+        messageDTO.setSendTo(copy.split(";"));
+
+        messageDTO.setCc(copy2);
+        messageDTO.setSendCc(copy2.split(";"));
+
+        senderService.setStrategy(emailSenderService);
+        senderService.sendMessageWithAttachment(messageDTO, fileList);
+        return "Se regeneraron un total de: " + listFileDocument.size() + " certificados.";
+    }
+
     //#region Mappers
     private Payment mapToDomainPayment(double totalPayment, int currencyType, long requestId) {
 

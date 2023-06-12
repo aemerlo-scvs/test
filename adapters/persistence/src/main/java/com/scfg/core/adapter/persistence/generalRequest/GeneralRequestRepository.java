@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Date;
 import java.util.Optional;
 
 public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJpaEntity, Long> {
@@ -320,5 +321,19 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
                 "gr.planId = " + planId + " AND\n" +
                 "gr.status = " + PersistenceStatusEnum.CREATED_OR_UPDATED.getValue() + " ";
     }
+
+    @Query("SELECT g FROM GeneralRequestJpaEntity g " +
+            "INNER JOIN PolicyItemJpaEntity pitem on pitem.generalRequestId = g.id " +
+            "INNER JOIN PolicyFileDocumentJpaEntity pdoc on pdoc.policyItemId = pitem.id " +
+            "INNER JOIN FileDocumentJpaEntity fdoc on fdoc.id = pdoc.fileDocumentId " +
+            "INNER JOIN PolicyJpaEntity p on p.generalRequestId = g.id " +
+            "WHERE g.planId = :plan " +
+            "AND g.creditTermInYears =:years " +
+            "AND fdoc.createdAt < :date AND g.status =:status AND pitem.status =:status AND pdoc.status =:status " +
+            "AND fdoc.status =:status AND p.status =:status AND p.policyStatusIdc = 1")
+    List<GeneralRequestJpaEntity> getAllByPlanIdAndCreditTermInYearsAndDateVIN(@Param("plan") Long plan,
+                                                                               @Param("years") Integer years,
+                                                                               @Param("date") Date date,
+                                                                               @Param("status") Integer status);
 
 }
