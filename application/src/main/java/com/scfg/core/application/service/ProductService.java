@@ -76,10 +76,6 @@ public class ProductService implements ProductUseCase {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
     public PersistenceResponse deleteProduct(Long productId) {
-        // TODO ya no desactivat
-        clausePort.deleteByProductId(productId);
-        planPort.deleteByProductId(productId);
-        coveragePort.deleteByProductId(productId);
         PersistenceResponse persistenceResponse=productPort.delete(productId);
         return persistenceResponse;
     }
