@@ -19,4 +19,6 @@ public interface MenuPort {
     Menu update(Menu menu);
 
     Boolean delete(Menu menu);
+
+    Boolean existNameFather(String name);
 }

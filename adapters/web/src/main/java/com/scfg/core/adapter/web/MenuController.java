@@ -5,7 +5,6 @@ import com.scfg.core.application.port.in.MenuUseCase;
 import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.domain.common.Menu;
-import com.scfg.core.domain.common.RoleMenuDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ import static org.springframework.http.ResponseEntity.ok;
 public class MenuController implements MenuEndPoint {
 
     private final MenuUseCase menuUseCase;
-
+    String className=MenuController.class.getName();
     @GetMapping
     @ApiOperation(value = "Retorna una lista de Menus")
     ResponseEntity getAll() {
@@ -96,7 +95,20 @@ public class MenuController implements MenuEndPoint {
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
-
+    @GetMapping(value = "/exists/{name}")
+    @ApiOperation(value = "Retorna si el nombre del rol existe")
+    ResponseEntity existsNameFather(@PathVariable String name) {
+        try{
+            Boolean sw = menuUseCase.existNameFather(name);
+            return ok(sw);
+        }catch (NotDataFoundException e){
+            log.error("Ocurrio un error al obtener el rol: [{}]", className, e);
+            return  CustomErrorType.badRequest("Bad Request", e.getMessage());
+        }catch (Exception e){
+            log.error("Ocurrio un error al obtener el rol: [{}]", className, e);
+            return CustomErrorType.serverError("Server Error", e.getMessage());
+        }
+    }
     @DeleteMapping(MenuEndPoint.PARAM_ID)
     @ApiOperation(value = "Elimina un Menu")
     ResponseEntity delete(@PathVariable long menuId) {

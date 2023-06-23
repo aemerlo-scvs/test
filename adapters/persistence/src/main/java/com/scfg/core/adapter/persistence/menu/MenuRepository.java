@@ -34,5 +34,7 @@ public interface MenuRepository extends JpaRepository<MenuJpaEntity, Long> {
 //    Optional<List<MenuJpaEntity>> findAllByIdOrParentId(long id, long parentId);
 
     List<MenuJpaEntity> findAllByParentIdIsNull();
+    @Query("select case when count(c)> 0 then true else false end from MenuJpaEntity c where c.status=1 and c.parentId is null and lower(c.name) = lower(:name)")
+    Boolean exitNameFather(@Param("name")String name);
 
 }

@@ -18,4 +18,6 @@ public interface RolePort {
 
     Role delete(Role role);
 
+    Boolean existName(String name);
+
 }
