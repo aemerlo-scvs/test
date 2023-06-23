@@ -60,6 +60,11 @@ public class PlanService implements PlanUseCase {
 
     @Override
     public PersistenceResponse delete(Long id) {
+        List<CoveragePlan> coveragePlanList = coveragePlanPort.getAllCoveragePlanByPlanId(id);
+        coveragePlanList.forEach((item) -> {
+            coveragePlanPort.delete(item.getId());
+        });
+
         return planPort.delete(id);
     }
 
