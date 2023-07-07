@@ -24,14 +24,17 @@ public class DirectionJpaEntity extends BaseJpaEntity {
 
     @Column(name = "description")
     private String description;
-
+    @Column(name = "internalNumber")
+    private String internalNumber;
+    @Column(name = "telephoneTypeIdc")
+    private Integer telephoneTypeIdc;
     @Column(name = "directionTypeIdc")
     private Integer directionTypeIdc;
-
+    //todo esta columna no corresponde, debe eliminarse
     @Column(name = "cellPhone")
     private String cellPhone;
-
     @Column(name = "personId")
     private Long personId;
-
+    @Column(name = "newPersonId")
+    private Long newPersonId;
 }
