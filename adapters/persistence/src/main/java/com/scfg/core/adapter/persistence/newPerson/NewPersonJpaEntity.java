@@ -1,13 +1,20 @@
-package com.scfg.core.adapter.persistence.person;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
+package com.scfg.core.adapter.persistence.newPerson;
 import com.scfg.core.adapter.persistence.BaseJpaEntity;
-import com.scfg.core.adapter.persistence.juridicalPerson.JuridicalPersonJpaEntity;
-import com.scfg.core.adapter.persistence.naturalPerson.NaturalPersonJpaEntity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-
+@Entity
+@Table(name = "NewPerson")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
 public class NewPersonJpaEntity extends BaseJpaEntity {
 
     @Column(name = "documentTypeIdc")
@@ -54,8 +61,8 @@ public class NewPersonJpaEntity extends BaseJpaEntity {
     @Column(name = "workEntryYear")
     private String workEntryYear;
 
-    @Column(name = "WorkPosition", length = 200)
-    private String WorkPosition;
+    @Column(name = "workPosition", length = 200)
+    private String workPosition;
 
     @Column(name = "monthlyIncomeRangeIdc", length = 200)
     private Integer monthlyIncomeRangeIdc;
@@ -71,8 +78,11 @@ public class NewPersonJpaEntity extends BaseJpaEntity {
     @Column(name = "eventualClient")
     private Integer eventualClient;
     @Column(name = "internalClientCode")
-    private Integer internalClientCode;
+    private String internalClientCode;
     @Column(name = "institutionalClientCode")
-    private Integer institutionalClientCode;
+    private String institutionalClientCode;
+
+    @Column(name = "assignedGroupIdc")
+    private Integer assignedGroupIdc;
 
 }

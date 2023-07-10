@@ -12,27 +12,28 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Pep")
+@Table(name = "ReferencePerson")
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Where(clause = HelpersConstants.FILTER_ACTIVE_RECORDS_FOR_PERSIST)
 @SuperBuilder
+
 public class ReferencePersonJpaEntity extends BaseJpaEntity {
 
     @Column(name = "personId")
-    private String personId;
+    private Long personId;
 
     @Column(name = "referencePersonName")
     private String referencePersonName;
 
     @Column(name = "referenceRelationshipIdc")
-    private String referenceRelationshipIdc;
+    private Integer referenceRelationshipIdc;
 
     @Column(name = "referenceTelephone")
     private String referenceTelephone;
 
     @Column(name = "referenceActivityIdc")
-    private String referenceActivityIdc;
+    private Integer referenceActivityIdc;
 
 }
