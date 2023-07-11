@@ -16,7 +16,6 @@ public class Telephone extends BaseDomain {
     @ApiModelProperty(notes = "Person (viene de: Person) ", example = "1")
     private Long personId;
     @ApiModelProperty(notes = "NewPerson (viene de: NewPerson)", example = "1")
-
     private Long newPersonId;
     @ApiModelProperty(notes = "Número de teléfono", example = "76336529")
     private String number;

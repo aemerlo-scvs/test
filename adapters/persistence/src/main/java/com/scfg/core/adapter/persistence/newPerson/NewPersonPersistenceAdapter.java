@@ -1,4 +1,5 @@
 package com.scfg.core.adapter.persistence.newPerson;
+
 import com.scfg.core.application.port.out.NewPersonPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.domain.person.NewPerson;
@@ -81,18 +82,18 @@ public class NewPersonPersistenceAdapter implements NewPersonPort {
                 .activityIdc(newPerson.getActivityIdc())
                 .professionIdc(newPerson.getProfessionIdc())
                 .workerTypeIdc(newPerson.getWorkerTypeIdc())
-//                .workerCompany(newPerson.getWorkerCompany())
-//                .workEntryYear(newPerson.getWorkEntryYear())
-//                .workPosition(newPerson.getWorkPosition())
+                .workerCompany(newPerson.getWorkerCompany())
+                .workEntryYear(newPerson.getWorkEntryYear())
+                .workPosition(newPerson.getWorkPosition())
                 .monthlyIncomeRangeIdc(newPerson.getMonthlyIncomeRangeIdc())
                 .yearlyIncomeRangeIdc(newPerson.getYearlyIncomeRangeIdc())
                 .businessTypeIdc(newPerson.getBusinessTypeIdc())
-//                .businessRegistrationNumber(newPerson.getBusinessRegistrationNumber())
-//                .email(newPerson.getEmail())
-//                .eventualClient(newPerson.getEventualClient())
-//                .internalClientCode(newPerson.getInternalClientCode())
-//                .institutionalClientCode(newPerson.getInstitutionalClientCode())
-//                .assignedGroupIdc(newPerson.getAssignedGroupIdc())
+                .businessRegistrationNumber(newPerson.getBusinessRegistrationNumber())
+                .email(newPerson.getEmail())
+                .eventualClient(newPerson.getEventualClient())
+                .internalClientCode(newPerson.getInternalClientCode())
+                .institutionalClientCode(newPerson.getInstitutionalClientCode())
+                .assignedGroupIdc(newPerson.getAssignedGroupIdc())
                 .createdAt(newPerson.getCreatedAt())
                 .lastModifiedAt(newPerson.getLastModifiedAt())
                 .build();

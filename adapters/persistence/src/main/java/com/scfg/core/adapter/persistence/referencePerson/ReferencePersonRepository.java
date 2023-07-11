@@ -1,4 +1,6 @@
 package com.scfg.core.adapter.persistence.referencePerson;
 
-public interface ReferencePersonRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ReferencePersonRepository extends JpaRepository<ReferencePersonJpaEntity,Long> {
 }
