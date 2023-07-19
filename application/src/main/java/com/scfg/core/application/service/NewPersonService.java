@@ -27,8 +27,8 @@ public class NewPersonService implements NewPersonUseCase {
     private final AccountPort accountPort;
     private final ReferencePersonPort referencePersonPort;
     @Override
-    public Object searchPerson(Long docType, String documentNumber, String name) {
-        return newPersonPort.searchPerson(docType,documentNumber, name);
+    public Object searchPerson(Long documentTypeIdc, String identificationNumber, String name) {
+        return newPersonPort.searchPerson(documentTypeIdc,identificationNumber, name);
     }
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {OperationException.class, Exception.class})
     @Override

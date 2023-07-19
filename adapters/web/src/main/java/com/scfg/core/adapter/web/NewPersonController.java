@@ -33,9 +33,9 @@ public class NewPersonController {
     }
     @GetMapping(value = "/searchPerson")
     @ApiOperation(value = "Retorna un listado de personas")
-    ResponseEntity searchPerson(@RequestParam Long docType, @RequestParam(required = false) String documentNumber, @RequestParam(required = false) String name) {
+    ResponseEntity searchPerson(@RequestParam Long documentTypeIdc, @RequestParam(required = false) String identificationNumber, @RequestParam(required = false) String name) {
         try {
-            Object newPerson = newPersonUseCase.searchPerson(docType,documentNumber, name);
+            Object newPerson = newPersonUseCase.searchPerson(documentTypeIdc,identificationNumber, name);
             return ok(newPerson);
         } catch (NotDataFoundException e) {
             return CustomErrorType.badRequest("Bad Request", e.getMessage());

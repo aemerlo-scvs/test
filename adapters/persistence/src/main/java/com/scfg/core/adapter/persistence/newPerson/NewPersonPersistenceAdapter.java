@@ -27,20 +27,20 @@ public class NewPersonPersistenceAdapter implements NewPersonPort {
         return newPersonJpaEntity.getId();
     }
 
-    public Object searchPerson(Long documentType, String documentNumber, String personName) {
+    public Object searchPerson(Long documentTypeIdc, String identificationNumber, String name) {
         StoredProcedureQuery query = em.createStoredProcedureQuery("proc_search_persons")
                 .registerStoredProcedureParameter(
-                        "documentType",
+                        "documentTypeIdc",
                         Integer.class,
                         ParameterMode.IN
                 )
                 .registerStoredProcedureParameter(
-                        "documentNumber",
+                        "identificationNumber",
                         String.class,
                         ParameterMode.IN
                 )
                 .registerStoredProcedureParameter(
-                        "personName",
+                        "name",
                         String.class,
                         ParameterMode.IN
                 )
@@ -49,9 +49,9 @@ public class NewPersonPersistenceAdapter implements NewPersonPort {
                         NTextType.class,
                         ParameterMode.OUT
                 )
-                .setParameter("documentType", documentType.intValue())
-                .setParameter("documentNumber", documentNumber)
-                .setParameter("personName", personName);
+                .setParameter("documentTypeIdc", documentTypeIdc.intValue())
+                .setParameter("identificationNumber", identificationNumber)
+                .setParameter("name", name);
         query.execute();
 
         Object list = (Object) query.getOutputParameterValue("result");

@@ -28,7 +28,7 @@ public class PersonPersistenceAdapter implements PersonPort {
 
     private final EntityManager em;
 
-    private static String GET_REQUEST_ALL_BY_FILTER = "exec proc_search_persons :documentType,:documentNumber,:personName";
+    private static String GET_REQUEST_ALL_BY_FILTER = "exec proc_search_persons :documentTypeIdc,:identificationNumber,:name";
 
     @Override
     public List<Person> findAll() {
