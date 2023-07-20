@@ -49,7 +49,8 @@ public enum ClassifierEnum {
 
     // Identification Type
     IdentityCard_IdentificationType(1, 12),
-    TaxIdentificationNumber_IdentificationType(6, 12),
+    NIT_IdentificationType(6, 12),
+
 
 
     // Insurance Request Status DH
@@ -81,6 +82,16 @@ public enum ClassifierEnum {
     CI_NATIONAL(1,12),
     CI_EXT(2,12),
     CI_EM_EXT(3,12),
+
+    //Parentescos
+    GRANDFATHER_OR_GRANDMOTHER(1, 13), //Abuelo/a
+    SPOUSE(2, 13), //Esposo(a)/Cónyuge
+    BROTHER(4, 13), //Hermano
+    SON_OR_DAUGHTER(5, 13), //Hijo(a)
+    MOTHER_OR_FATHER(6,13), //Padre/Madre
+    ANOTHER_FAMILY_MEMBER(7,13), //Otro familiar
+    OTHER(8, 13), // Tercero
+    FATHER_OR_MOTHER_IN_LAW(9,13), //Suegro(a)
 
     // Natural Persona - Marital Status
     MARRIED_STATUS(1,14), // Casado
@@ -145,6 +156,8 @@ public enum ClassifierEnum {
     REFERENCE_TABLE_MESSAGERESPONSE(2,68), // Tabla de referencia respuesta propuesta - MessageResponse
     REFERENCE_TABLE_REQUESTANNEXE(3,68), // Tabla de referencia - RequestAnnexe
     REFERENCE_TABLE_TRANSACTION(4,68); // Tabla de referencia - Transaction
+
+
 
     private long referenceCode;
     private long referenceCodeType;

@@ -21,7 +21,7 @@ public class Telephone extends BaseDomain {
     private String number;
     @ApiModelProperty(notes = "Tipo de teléfono (viene de: Classifier)", example = "1")
     private Integer telephoneTypeIdc;
-    @ApiModelProperty(notes = "Número interno", example = "8238")
+    @ApiModelProperty(notes = "Número interno", example = "8238a")
     private String internalNumber;
     @ApiModelProperty(notes = "Tipo de número de teléfono (viene de: Classifier)", example = "1")
     private Integer numberTypeIdc;

@@ -1,6 +1,7 @@
 package com.scfg.core.domain.person;
 
 import com.scfg.core.domain.common.BaseDomain;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,9 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+@ApiModel(description = "Model para crear una persona de referencia")
 public class ReferencePerson extends BaseDomain {
     @ApiModelProperty(notes = "Persona (viene de: NewPerson)", example = "1")
     private Long personId;

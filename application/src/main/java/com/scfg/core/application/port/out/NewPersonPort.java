@@ -4,5 +4,5 @@ import com.scfg.core.domain.person.NewPerson;
 
 public interface NewPersonPort {
     long saveOrUpdate(NewPerson newPerson);
-    Object searchPerson(Long docType, String documentNumber, String name);
+    Object searchPerson(Long documentTypeIdc, String identificationNumber, String name);
 }
