@@ -10,13 +10,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping(path ="/newPerson")
-@Api(tags = "API REST NewPersona")
+@Api(tags = "API REST Persona")
 public class NewPersonController {
     private final NewPersonUseCase newPersonUseCase;
     @PostMapping

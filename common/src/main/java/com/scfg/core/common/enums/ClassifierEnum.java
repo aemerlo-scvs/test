@@ -43,6 +43,10 @@ public enum ClassifierEnum {
     CreditCard_Coverage(7,6),
     Unemployment_Coverage(8,6),
 
+    //Gender
+    MALE(1, 7),
+    FEMALE(2, 7),
+
     // Currency
     Bs_Currency(1, 11),
     USD_Currency(2, 11),

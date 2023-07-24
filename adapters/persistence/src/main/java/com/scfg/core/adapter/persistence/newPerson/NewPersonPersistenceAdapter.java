@@ -1,14 +1,17 @@
 package com.scfg.core.adapter.persistence.newPerson;
 
+import com.scfg.core.adapter.persistence.personRole.PersonRoleJpaEntity;
 import com.scfg.core.application.port.out.NewPersonPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.domain.person.NewPerson;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.type.NTextType;
-
+import org.modelmapper.ModelMapper;
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
+import java.util.ArrayList;
+import java.util.List;
 
 @PersistenceAdapter
 @RequiredArgsConstructor
@@ -27,6 +30,18 @@ public class NewPersonPersistenceAdapter implements NewPersonPort {
         return newPersonJpaEntity.getId();
     }
 
+    @Override
+    public boolean saveOrUpdateAll(List<NewPerson> newPersonList){
+        List<NewPersonJpaEntity> newPersonJpaEntityList = new ArrayList<>();
+        newPersonList.forEach(e -> {
+            NewPersonJpaEntity newPerson = mapToJpaEntity(e);
+            newPersonJpaEntityList.add(newPerson);
+        });
+        newPersonRepository.saveAll(newPersonJpaEntityList);
+        return true;
+    }
+
+    @Override
     public Object searchPerson(Long documentTypeIdc, String identificationNumber, String name) {
         StoredProcedureQuery query = em.createStoredProcedureQuery("proc_search_persons")
                 .registerStoredProcedureParameter(
@@ -60,43 +75,19 @@ public class NewPersonPersistenceAdapter implements NewPersonPort {
         return list;
     }
 
+    @Override
+    public boolean findByIdentificationNumber(String identificationNumber){
+        return this.newPersonRepository.findByIdentificationNumber(identificationNumber);
+    }
+
 
     //#region Mappers
-
     public static NewPersonJpaEntity mapToJpaEntity(NewPerson newPerson) {
-        NewPersonJpaEntity newPersonJpaEntity = NewPersonJpaEntity.builder()
-                .id(newPerson.getId())
-                .documentTypeIdc(newPerson.getDocumentTypeIdc())
-                .identificationNumber(newPerson.getIdentificationNumber())
-                .extIdc(newPerson.getExtIdc())
-                .name(newPerson.getName())
-                .lastName(newPerson.getLastName())
-                .motherLastName(newPerson.getMotherLastName())
-                .marriedLastName(newPerson.getMarriedLastName())
-                .genderIdc(newPerson.getGenderIdc())
-                .maritalStatusIdc(newPerson.getMaritalStatusIdc())
-                .birthDate(newPerson.getBirthDate())
-                .birthPlaceIdc(newPerson.getBirthPlaceIdc())
-                .nationalityIdc(newPerson.getNationalityIdc())
-                .residencePlaceIdc(newPerson.getResidencePlaceIdc())
-                .activityIdc(newPerson.getActivityIdc())
-                .professionIdc(newPerson.getProfessionIdc())
-                .workerTypeIdc(newPerson.getWorkerTypeIdc())
-                .workerCompany(newPerson.getWorkerCompany())
-                .workEntryYear(newPerson.getWorkEntryYear())
-                .workPosition(newPerson.getWorkPosition())
-                .monthlyIncomeRangeIdc(newPerson.getMonthlyIncomeRangeIdc())
-                .yearlyIncomeRangeIdc(newPerson.getYearlyIncomeRangeIdc())
-                .businessTypeIdc(newPerson.getBusinessTypeIdc())
-                .businessRegistrationNumber(newPerson.getBusinessRegistrationNumber())
-                .email(newPerson.getEmail())
-                .eventualClient(newPerson.getEventualClient())
-                .internalClientCode(newPerson.getInternalClientCode())
-                .institutionalClientCode(newPerson.getInstitutionalClientCode())
-                .assignedGroupIdc(newPerson.getAssignedGroupIdc())
-                .createdAt(newPerson.getCreatedAt())
-                .lastModifiedAt(newPerson.getLastModifiedAt())
-                .build();
-        return newPersonJpaEntity;
+        return new ModelMapper().map(newPerson,NewPersonJpaEntity.class);
     }
+
+    public static NewPerson mapToDomain(NewPersonJpaEntity newPersonJpaEntity) {
+        return new ModelMapper().map(newPersonJpaEntity, NewPerson.class);
+    }
+    //#endregion
 }

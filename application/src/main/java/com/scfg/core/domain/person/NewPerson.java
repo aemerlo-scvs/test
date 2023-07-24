@@ -86,5 +86,6 @@ public class NewPerson extends BaseDomain {
     private List<Telephone> telephones;
     private List<Direction> directions;
     private List<Account> accounts;
+    private List<PersonRole> relatedPersons;
 
 }
