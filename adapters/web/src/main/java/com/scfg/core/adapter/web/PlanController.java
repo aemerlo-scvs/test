@@ -43,7 +43,7 @@ public class PlanController implements PlanEndPoint{
     @ApiOperation(value = "Guardar planes")
     public ResponseEntity register(@RequestBody Plan plan) {
         try {
-            PersistenceResponse response = planUseCase.saveOrUpdate(plan);
+            PersistenceResponse response = planUseCase.save(plan);
             return ok(response);
         }catch (NotDataFoundException | OperationException e) {
             return CustomErrorType.badRequest("plan", e.getMessage());
@@ -56,7 +56,7 @@ public class PlanController implements PlanEndPoint{
     @ApiOperation(value = "Actualizar planes")
     public ResponseEntity update(@RequestBody Plan plan) {
         try {
-            PersistenceResponse response = planUseCase.saveOrUpdate(plan);
+            PersistenceResponse response = planUseCase.update(plan);
             return ok(response);
         }catch (NotDataFoundException | OperationException e) {
             return CustomErrorType.badRequest("Planes", e.getMessage());

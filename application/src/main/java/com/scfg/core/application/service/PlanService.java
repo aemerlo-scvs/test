@@ -12,6 +12,7 @@ import com.scfg.core.domain.dto.credicasas.PlanInformation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -40,23 +41,48 @@ public class PlanService implements PlanUseCase {
     public List<Plan> getAll() {
         return planPort.getList();
     }
+
     @Override
     public Plan getById(Long id) {
         return planPort.getPlanById(id);
     }
 
     @Override
-    public PersistenceResponse saveOrUpdate(Plan plan) {
+    public PersistenceResponse save(Plan plan) {
         PersistenceResponse response = planPort.saveOrUpdate(plan);
         Plan aux = (Plan) response.getData();
         long idPlan = aux.getId();
         for (CoveragePlan coveragePlan : plan.getCoveragePlanList()) {
             coveragePlan.setPlanId(idPlan);
-            coveragePlanPort.saveOrUpdate(coveragePlan);
+            coveragePlanPort.save(coveragePlan);
         }
         return response;
     }
 
+    @Override
+    public PersistenceResponse update(Plan plan) {
+        PersistenceResponse response = planPort.saveOrUpdate(plan);
+        Plan aux = (Plan) response.getData();
+        List<CoveragePlan> listCoveragePlan = coveragePlanPort.getAllCoveragePlanByPlanId(aux.getId());
+        Long[] newsIds = plan.getCoveragePlanList().stream().map(CoveragePlan::getId).toArray(Long[]::new);
+        if (newsIds.length == 0) {
+            listCoveragePlan.forEach(item -> {
+                coveragePlanPort.delete(item.getId());
+            });
+        } else {
+            listCoveragePlan.forEach(item -> {
+                if (Arrays.asList(newsIds).contains(item.getId())) {
+                    CoveragePlan coveragePlan = plan.getCoveragePlanList().stream().findFirst().filter(e -> e.getId() == item.getId()).get();
+                    coveragePlanPort.update(coveragePlan);
+                } else {
+                    coveragePlanPort.delete(item.getId());
+                }
+            });
+            plan.getCoveragePlanList().stream().filter(e -> e.getId() == 0).forEach(coveragePlanPort::save);
+        }
+
+        return response;
+    }
 
     @Override
     public PersistenceResponse delete(Long id) {
