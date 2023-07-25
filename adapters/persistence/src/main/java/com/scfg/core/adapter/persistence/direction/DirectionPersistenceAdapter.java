@@ -62,10 +62,14 @@ public class DirectionPersistenceAdapter implements DirectionPort {
     public static DirectionJpaEntity mapToJpaEntity(Direction direction) {
         DirectionJpaEntity directionJpaEntity = DirectionJpaEntity.builder()
                 .id(direction.getId())
+                .cellPhone(direction.getCellPhone())
                 .description(direction.getDescription())
                 .directionTypeIdc(direction.getDirectionTypeIdc())
-                .cellPhone(direction.getCellPhone())
                 .personId(direction.getPersonId())
+                .newPersonId(direction.getNewPersonId())
+                .departmentIdc(direction.getDepartmentIdc())
+                .cityIdc(direction.getCityIdc())
+                .referenceDirection(direction.getReferenceDirection())
                 .createdAt(direction.getCreatedAt())
                 .lastModifiedAt(direction.getLastModifiedAt())
                 .build();

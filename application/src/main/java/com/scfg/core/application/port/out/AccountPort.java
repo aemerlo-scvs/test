@@ -12,4 +12,5 @@ public interface AccountPort {
     Account findLastByPersonIdAndPolicyId(Long personId, Long policyId);
     Account saveOrUpdate(Account account);
 
+    boolean saveOrUpdateAll(List<Account> accountList);
 }

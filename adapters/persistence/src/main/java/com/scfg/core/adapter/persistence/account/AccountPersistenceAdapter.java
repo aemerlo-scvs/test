@@ -7,6 +7,7 @@ import com.scfg.core.common.util.ModelMapperConfig;
 import com.scfg.core.domain.dto.vin.Account;
 import lombok.RequiredArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,17 @@ public class AccountPersistenceAdapter implements AccountPort {
         AccountJpaEntity accountJpa = mapToJpaEntity(account);
         accountJpa = accountRepository.save(accountJpa);
         return mapToDomain(accountJpa);
+    }
+
+    @Override
+    public boolean saveOrUpdateAll(List<Account> accountList){
+        List<AccountJpaEntity> accountJpaEntityList = new ArrayList<>();
+        accountList.forEach(e ->{
+            AccountJpaEntity account = mapToJpaEntity(e);
+            accountJpaEntityList.add(account);
+        });
+        accountRepository.saveAll(accountJpaEntityList);
+        return true;
     }
 
     //#region Mappers

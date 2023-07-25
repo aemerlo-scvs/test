@@ -22,16 +22,28 @@ import javax.persistence.Table;
 @SuperBuilder
 public class DirectionJpaEntity extends BaseJpaEntity {
 
+    //todo esta columna no corresponde, debe eliminarse
+    @Column(name = "cellPhone")
+    private String cellPhone;
+
     @Column(name = "description")
     private String description;
 
     @Column(name = "directionTypeIdc")
     private Integer directionTypeIdc;
 
-    @Column(name = "cellPhone")
-    private String cellPhone;
-
     @Column(name = "personId")
     private Long personId;
 
+    @Column(name= "departmentIdc")
+    private Integer departmentIdc;
+
+    @Column(name = "cityIdc")
+    private Integer cityIdc;
+
+    @Column(name = "referenceDirection")
+    private String referenceDirection;
+
+    @Column(name = "newPersonId")
+    private Long newPersonId;
 }

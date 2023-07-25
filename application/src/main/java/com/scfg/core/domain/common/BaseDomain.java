@@ -15,8 +15,8 @@ public class BaseDomain {
 
     private Long id;
 
-    /*@NotNull
-    @Getter private Integer status;*/
+//    @NotNull
+//    private Integer status;
 
     @NotNull
     private Date createdAt;
@@ -26,5 +26,4 @@ public class BaseDomain {
     private Long createdBy;
 
     private Long lastModifiedBy;
-
 }

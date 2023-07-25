@@ -228,7 +228,7 @@ public class GenerateCertificateCoverageService implements GenerateCertificateCo
             } else {
                 signList.add(CertificateOwnerEnum.RFMOLINA.getValue());
             }
-            String signedB64 = jksCertificateService.signDocumentWithP12Cert(base64, signList);
+            String signedB64 = jksCertificateService.signDocumentWithP12Cert(base64, signList, DateUtils.asDateToLocalDateTime(policy.getIssuanceDate()));
 
             String fileName = policy.getNumberPolicy();
             FileDocument fileDocument = FileDocument.builder()

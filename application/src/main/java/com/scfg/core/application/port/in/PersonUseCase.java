@@ -3,6 +3,7 @@ package com.scfg.core.application.port.in;
 import com.scfg.core.domain.dto.PersonDTO;
 import com.scfg.core.domain.dto.credicasas.SearchClientDTO;
 import com.scfg.core.domain.person.Person;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 

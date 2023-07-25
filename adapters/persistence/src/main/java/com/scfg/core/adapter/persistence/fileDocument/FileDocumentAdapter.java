@@ -14,6 +14,7 @@ import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.dto.FileDocumentDTO;
 import com.scfg.core.domain.dto.credicasas.FileDocumentByRequestDTO;
 import com.scfg.core.domain.GeneralRequest;
+import config.ModelMapperConfig;
 import org.modelmapper.ModelMapper;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +77,18 @@ public class FileDocumentAdapter implements FileDocumentPort {
             System.out.println("Error al obtener los documentos: " + e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public FileDocument findLastByPolicyItemIdAndDocumentTypeIdc(Long policyItemId, Integer documentTypeIdc) {
+        List<FileDocumentJpaEntity> list = fileDocumentRepository.findAllDocumentsByPolicyItemIdAndDocumentTypeIdc(
+                policyItemId, documentTypeIdc, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+
+        if (list.isEmpty()) {
+            return null;
+        }
+
+        return new ModelMapperConfig().getStrictModelMapper().map(list.get(0), FileDocument.class);
     }
 
     @Override

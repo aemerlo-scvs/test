@@ -136,7 +136,7 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         documentDTO.setRequestDate(requestDate);
         documentDTO.setDaysPassed(daysPassed - (oneYear * policyYearsPassed));
         documentDTO.setYearsPassed(policyYearsPassed);
-        documentDTO.setCrediTermInYears(generalRequest.getCreditTermInYears());
+        documentDTO.setCreditTermInYears(generalRequest.getCreditTermInYears());
         documentDTO.setAccountNumber(account.getAccountNumber());
         documentDTO.setAmountAccepted(valueToReturn);
         documentDTO.setCurrencyAbbreviation(currencyAbbreviation);
@@ -145,7 +145,7 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         documentDTO.setPremiumPaid(rescueValue);
         documentDTO.setPremiumPaidAnnual(premiumPaidAnnual);
         documentDTO.setAdminExpenses(adminExpenses);
-        documentDTO.setDiscountProrataDay(discountPerPassedDays);
+        documentDTO.setDiscountPerDay(discountPerPassedDays);
         documentDTO.setValueToReturn(valueToReturn);
         documentDTO.setAssuranceName(requestAnnexeDTO.getPersonCompleteName());
         documentDTO.setAssuranceIdentificationNumber(requestAnnexeDTO.getPolicyDetail().getIdentificationNumber());
