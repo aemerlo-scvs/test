@@ -12,6 +12,9 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
+
     compile group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 
     implementation ('org.springframework.boot:spring-boot-starter-security')

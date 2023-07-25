@@ -57,6 +57,11 @@ public class RolePersistenceAdapter implements RolePort {
         return mapToDomain(roleJpaEntity);
     }
 
+    @Override
+    public Boolean existName(String name) {
+        return roleRepository.existsByName(name);
+    }
+
     //#region Mapper
     public static RoleJpaEntity mapToJpaEntity(Role role) {
         RoleJpaEntity roleJpaEntity = RoleJpaEntity.builder()

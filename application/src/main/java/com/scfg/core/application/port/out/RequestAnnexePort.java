@@ -10,10 +10,9 @@ import java.text.ParseException;
 import java.util.List;
 
 public interface RequestAnnexePort {
-    List<RequestAnnexe> findAllRequestByPolicyIdAndAnnexeTypeIdAndRequestStatus(Long policyId, Long annexeTypeId,
-                                                                                List<Integer> requestAnnexeStatusList);
+    Long saveOrUpdate(RequestAnnexe requestAnnexe);
+    List<RequestAnnexe> getRequestByPolicyIdAndAnnexeTypeId(Long policyId, Long annexeTypeId);
     PageableDTO findAllPageByFilters(RequestAnnexeSearchFiltersDto filtersDto, Integer page, Integer size) throws ParseException;
 
     RequestAnnexe findRequestAnnexeIdOrThrowExcepcion (Long requestAnnexeId);
-    Long saveOrUpdate(RequestAnnexe requestAnnexe);
 }

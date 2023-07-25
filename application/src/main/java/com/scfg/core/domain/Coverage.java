@@ -18,5 +18,11 @@ public class Coverage extends BaseDomain {
     private String name;
     private Integer code;
     private Integer coverageTypeIdc;
-    private Long branchId;
+    private String apsCode;
+    private String resolution;
+    private Integer minimumAge;
+    private Integer maximumAge;
+    private  Integer limitAge;
+    private Long productId;
+    private Integer status;
 }

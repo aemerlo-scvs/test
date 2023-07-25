@@ -1,6 +1,11 @@
 package com.scfg.core.adapter.persistence.coverage;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 
 public interface CoverageRepository extends JpaRepository<CoverageJpaEntity, Long> {
@@ -16,5 +21,21 @@ public interface CoverageRepository extends JpaRepository<CoverageJpaEntity, Lon
                 "cp.status = " + status + " AND cv.status = " + status + " AND pi2.status = " + status + " \n" +
                 "GROUP BY pi2.id";
     }
+//    default  String getCoverageByProductId(Long productId){
+//        return  "select a.*,b.id as coverageProductId, a.id as coverageId, 0 as insuredCapital from Coverage a \n"+
+//                "inner join CoverageProduct b \n"+
+//                "on a.id=b.coverageId and a.status=1 and b.status=1 \n"+
+//                "where b.productId= "+productId +"\n"+
+//                "order by createdAt asc \n"+
+//                "for json path";
+//    }
+    @Query("SELECT c FROM CoverageJpaEntity c " +
+            "WHERE c.productId= :productId AND c.status = :status")
+    List<CoverageJpaEntity> findAllCoverageByProductId(@Param("productId")Long productId, @Param("status") Integer status);
 
+
+    @Modifying
+    @Query("UPDATE CoverageJpaEntity c SET c.status = 0 " +
+            "WHERE c.productId= :productId")
+    void deleteByProductId(@Param("productId")Long productId);
 }

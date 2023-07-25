@@ -68,6 +68,11 @@ public class MenuService implements MenuUseCase {
         return menuPort.delete(menuAux);
     }
 
+    @Override
+    public Boolean existNameFather(String name) {
+        return menuPort.existNameFather(name);
+    }
+
     String validateMenu(Menu menu){
         String field = null;
         if(menu.getName() == null || menu.getName().isEmpty() ) {

@@ -1,5 +1,6 @@
 package com.scfg.core.adapter.persistence.mathReserve;
 
+import com.scfg.core.adapter.persistence.messageResponse.MessageResponseJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,10 +14,9 @@ public interface MathReserveRepository extends JpaRepository<MathReserveJpaEntit
     MathReserveJpaEntity findById(@Param("mathReserveId") Long messageSentId, @Param("status") Integer status);
 
     @Query("SELECT m FROM MathReserveJpaEntity m \n" +
-            "WHERE m.version = :version AND m.age = :age AND m.vigencyYears <= :totalYear AND m.status = :status \n" +
+            "WHERE m.age = :age AND m.vigencyYears <= :totalYear AND m.status = :status \n" +
             "ORDER BY m.vigencyYears DESC")
-    List<MathReserveJpaEntity> findAllByVersionAgeAndTotalYear(@Param("version") String version,
-                                                               @Param("age") Integer age,
-                                                               @Param("totalYear") Integer totalYear,
-                                                               @Param("status") Integer status);
+    List<MathReserveJpaEntity> findAllByAgeAndTotalYear(@Param("age") Integer age,
+                                                        @Param("totalYear") Integer totalYear,
+                                                        @Param("status") Integer status);
 }

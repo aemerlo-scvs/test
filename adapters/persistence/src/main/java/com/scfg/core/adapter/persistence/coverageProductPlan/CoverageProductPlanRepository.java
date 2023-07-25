@@ -51,7 +51,7 @@ public interface CoverageProductPlanRepository extends JpaRepository<CoveragePro
             "JOIN CoverageProductJpaEntity cp on cp.coverageId = cv.id \n" +
             "JOIN CoverageProductPlanJpaEntity cpl on cpl.coverageProductId = cp.id \n" +
             "JOIN PlanJpaEntity pl on pl.id = cpl.planId \n" +
-            "where pl.agreementCode = :agreementCode AND pl.status = :status AND cv.status = :status \n" +
+            "where pl.bfsAgreementCode = :agreementCode AND pl.status = :status AND cv.status = :status \n" +
             "AND cpl.status = :status AND cp.status = :status")
     List<CoverageDTO> findAllByAgreementCodePlan(@Param("agreementCode") Integer agreementCode,
                                                  @Param("status") Integer status);

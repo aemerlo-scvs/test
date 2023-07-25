@@ -15,10 +15,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Branch extends BaseDomain {
 
-    private Integer apsCode;
     private String name;
     private String description;
-    @ApiModelProperty(notes = "Id Padre Ramo", example = "null", value = "null")
-    private Long branchId;
+
+    private Integer modalityIdc;
     private Integer status;
 }

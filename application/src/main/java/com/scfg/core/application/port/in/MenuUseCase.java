@@ -20,5 +20,5 @@ public interface MenuUseCase {
     Boolean update(Menu role);
 
     Boolean delete(long menuId);
-
+    Boolean existNameFather(String name);
 }

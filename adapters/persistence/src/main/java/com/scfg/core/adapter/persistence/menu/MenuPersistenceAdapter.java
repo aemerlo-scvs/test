@@ -95,6 +95,11 @@ public class MenuPersistenceAdapter implements MenuPort {
         return true;
     }
 
+    @Override
+    public Boolean existNameFather(String name) {
+        return menuRepository.exitNameFather(name);
+    }
+
     //#region Mappers
     public static MenuJpaEntity mapToJpaEntity(Menu menu) {
         MenuJpaEntity menuJpaEntity = MenuJpaEntity.builder()

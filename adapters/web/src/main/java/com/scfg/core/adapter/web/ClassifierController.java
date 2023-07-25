@@ -21,7 +21,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = ClassifierEndpoint.CLASSIFIER_BASE_ROUTE)
-@Api(value = "API Clasificadores")
+@Api(tags = "API Clasificadores")
 public class ClassifierController  implements ClassifierEndpoint  {
 
     private final ClassifierUseCase classifierUseCase;

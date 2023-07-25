@@ -61,5 +61,6 @@ public class PolicyItemEconomicJpaEntity extends BaseJpaEntity {
     private Double individualCollectionServiceCommission;
     @Column(name = "individualPremiumCeded")
     private Double individualPremiumCeded;
-
+    @Column(name = "individualPremiumRetained")
+    private Double individualPremiumRetained;
 }

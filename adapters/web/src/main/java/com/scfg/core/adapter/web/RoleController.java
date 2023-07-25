@@ -24,6 +24,7 @@ import static org.springframework.http.ResponseEntity.ok;
 public class RoleController implements RoleEndPoint {
 
     private final RoleUseCase roleUseCase;
+    private String className=RoleController.class.getName();
 
     @GetMapping
     @ApiOperation(value = "Retorna una lista de roles")
@@ -46,7 +47,20 @@ public class RoleController implements RoleEndPoint {
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
-
+    @GetMapping(value = "/roleMenu/{name}")
+    @ApiOperation(value = "Retorna si el nombre del rol existe")
+    ResponseEntity getByName(@PathVariable String name) {
+        try{
+            Boolean role = roleUseCase.existName(name);
+            return ok(role);
+        }catch (NotDataFoundException e){
+            log.error("Ocurrio un error al obtener el rol: [{}]", className, e);
+          return  CustomErrorType.badRequest("Bad Request", e.getMessage());
+        }catch (Exception e){
+            log.error("Ocurrio un error al obtener el rol: [{}]", className, e);
+            return CustomErrorType.serverError("Server Error", e.getMessage());
+        }
+    }
     @PostMapping
     @ApiOperation(value = "Guarda un Rol")
     ResponseEntity save(@RequestBody Role role) {

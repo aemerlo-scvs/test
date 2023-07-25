@@ -20,7 +20,6 @@ import javax.persistence.*;
 @Where(clause = HelpersConstants.FILTER_ACTIVE_RECORDS_FOR_PERSIST)
 @SuperBuilder
 public class PlanJpaEntity extends BaseJpaEntity {
-
     @Column(name = "name", length = 100)
     private String name;
 
@@ -33,14 +32,8 @@ public class PlanJpaEntity extends BaseJpaEntity {
     @Column(name = "rate")
     private Integer rate;
 
-    @Column(name = "totalInsuredCapital")
-    private Double totalInsuredCapital;
-
     @Column(name = "applyDiscount")
     private Integer applyDiscount;
-
-    @Column(name = "creditPremiumSurcharge")
-    private Double creditPremiumSurcharge;
 
     @Column(name = "currencyTypeIdc")
     private Integer currencyTypeIdc;
@@ -48,8 +41,10 @@ public class PlanJpaEntity extends BaseJpaEntity {
     @Column(name = "productId")
     private Long productId;
 
-    @Column(name = "agreementCode")
-    private Integer agreementCode;
+
+    @Column(name = "bfsAgreementCode")
+    private Integer bfsAgreementCode;
+
 
 //    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    @JoinColumn(name = "productId")
