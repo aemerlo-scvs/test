@@ -16,20 +16,15 @@ import javax.persistence.Table;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Where(clause = HelpersConstants.FILTER_ACTIVE_RECORDS_FOR_PERSIST)
+//@Where(clause = HelpersConstants.FILTER_ACTIVE_RECORDS_FOR_PERSIST)
 @SuperBuilder
 public class BranchJpaEntity extends BaseJpaEntity {
 
-    @Column(name = "apsCode")
-    private Integer apsCode;
-
     @Column(name = "name", length = 100)
     private String name;
-
     @Column(name = "description", length = 150)
     private String description;
-
-    @Column(name = "branchId")
-    private Long branchId;
+    @Column(name = "modalityIdc")
+    private Integer modalityIdc;
 
 }

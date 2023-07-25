@@ -3738,7 +3738,7 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             String yearlyPremium = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(obj.getPremiumPaidAnnual(), "Bs");
             String years = obj.getYearsPassed().toString();
             String days = obj.getDaysPassed().toString();
-            String rescueValue = HelpersMethods.convertNumberToCompanyFormatNumber(obj.getRescueValue());
+            String rescueValue = HelpersMethods.formatStringOnlyDate(obj.getRequestDate());
             String expenseManagement = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getAdminExpenses(), "");
             String rescueDiscount = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(

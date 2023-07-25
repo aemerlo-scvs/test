@@ -1,9 +1,15 @@
 package com.scfg.core.adapter.web;
 
 import com.scfg.core.adapter.web.util.CustomErrorType;
+import com.scfg.core.application.port.in.PlanUseCase;
 import com.scfg.core.application.port.in.PolicyUseCase;
+import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.exception.OperationException;
+import com.scfg.core.domain.Plan;
+import com.scfg.core.domain.Policy;
+import com.scfg.core.domain.dto.PageableDTO;
 import com.scfg.core.domain.dto.PersonDTO;
+import com.scfg.core.domain.dto.credicasas.ClfPlanDTO;
 import com.scfg.core.domain.dto.credicasas.groupthefont.GELPolicyDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,7 +26,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping(path = "/policy")
-@Api(tags = "API REST Planes")
+@Api(tags = "API REST Polizas")
 public class PolicyController implements PlanEndPoint{
     private final PolicyUseCase policyUseCase;
 
@@ -51,9 +57,9 @@ public class PolicyController implements PlanEndPoint{
 
     @PostMapping(value = "/person-filters")
     @ApiOperation(value = "Retorna una lista de pólizas pertenecientes al grupo empresarial Lafuente")
-    ResponseEntity getAllByPageAndPersonFilters(@RequestBody PersonDTO personDTO) {
+    ResponseEntity getAllByPageAndPersonFilters(@RequestParam Integer page, @RequestParam Integer size, @RequestBody PersonDTO personDTO) {
         try {
-            String response = policyUseCase.getAllByPersonFilters(personDTO);
+            PageableDTO response = policyUseCase.getAllByPageAndPersonFilters(page, size, personDTO);
             return ok(response);
         } catch (OperationException e) {
             log.error("Ocurrió un error al obtener la lista de solicitudes: [{}]", e.toString());

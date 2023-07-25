@@ -1,5 +1,6 @@
 package com.scfg.core.domain.dto.vin;
 
+import com.scfg.core.domain.Document;
 import com.scfg.core.domain.common.AnnexeRequirementControl;
 import com.scfg.core.domain.common.RequestAnnexe;
 import lombok.AllArgsConstructor;

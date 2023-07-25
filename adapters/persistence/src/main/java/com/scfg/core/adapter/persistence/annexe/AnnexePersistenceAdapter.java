@@ -4,7 +4,6 @@ import com.scfg.core.application.port.out.AnnexePort;
 import com.scfg.core.common.PersistenceAdapter;
 
 import com.scfg.core.common.enums.PersistenceStatusEnum;
-import com.scfg.core.common.enums.RequestAnnexeStatusEnum;
 import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.util.DateUtils;
 import com.scfg.core.domain.dto.RequestAnnexeCancelaltionDto;
@@ -24,12 +23,12 @@ public class AnnexePersistenceAdapter implements AnnexePort {
 
     @Override
     public Long saveOrUpdate(RequestAnnexeCancelaltionDto annexe, Long requestAnnexeId) {
-        Long annexeNumber = this.annexeRepository.getAnnexeNumber(annexe.getPolicyId());
+        Long annexeNumber = this.annexeRepository.getNumberAnnexe(annexe.getPolicyId());
         AnnexeJpaEntity annexeJpaEntity = AnnexeJpaEntity.builder()
                 .annexeNumber(annexeNumber != null ? annexeNumber.intValue()+1 : 1)
-                .policyId(annexe.getPolicyId())
+                .policy(annexe.getPolicyId())
                 .annexeTypeIdc(annexe.getAnnexeTypeId().intValue())
-                .requestAnnexeId(requestAnnexeId)
+                .requestAnnexe(requestAnnexeId)
                 .startDate(LocalDateTime.now())
                 .endDate(DateUtils.asDateToLocalDateTime(annexe.getEndDate()))
                 .issuanceDate(LocalDateTime.now())
@@ -51,22 +50,10 @@ public class AnnexePersistenceAdapter implements AnnexePort {
     }
 
     @Override
-    public AnnexeDTO findAnnexeById(Long annexeId) {
+    public AnnexeDTO findAnnexeByIdOrThrowExcepcion(Long annexeId) {
         AnnexeJpaEntity annexeJpaEntity = annexeRepository.findOptionalById(annexeId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue())
                 .orElseThrow(() -> new NotDataFoundException("Anexo no encontrado"));
         return new ModelMapper().map(annexeJpaEntity, AnnexeDTO.class);
-    }
-
-    @Override
-    public String findPaymentDescByRequestAnnexeId(Long requestAnnexeId) {
-        List<Object> list = annexeRepository.findPaymentDescByRequestAnnexeId(requestAnnexeId, RequestAnnexeStatusEnum.PAID.getValue(),
-                PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
-
-        if (list.isEmpty()) {
-            return "";
-        }
-
-        return list.get(0).toString();
     }
 
 }

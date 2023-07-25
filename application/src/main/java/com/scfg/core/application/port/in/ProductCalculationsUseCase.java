@@ -8,4 +8,5 @@ import java.util.List;
 public interface ProductCalculationsUseCase {
 
     PolicyItem calculateVariables (PolicyItem policyItem);
+    PolicyItem calculateVariablesWithYear (PolicyItem policyItem, Integer year, Double intermediaryCommissionRate);
 }

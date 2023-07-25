@@ -226,7 +226,7 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
             "INNER JOIN PlanJpaEntity pl ON pl.id = g.planId \n" +
             "INNER JOIN ProductJpaEntity p ON p.id = pl.productId \n" +
             "WHERE g.creditNumber = :operationNumber " +
-            "AND pl.agreementCode = :planAgreementCode " +
+            "AND pl.bfsAgreementCode = :planAgreementCode " +
             "AND p.agreementCode = :productAgreementCode " +
             "AND g.status = :status " +
             "AND pl.status = :status " +

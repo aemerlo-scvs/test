@@ -2,7 +2,11 @@ package com.scfg.core.adapter.web;
 
 import com.scfg.core.adapter.web.util.CustomErrorType;
 import com.scfg.core.application.port.in.PlanUseCase;
+import com.scfg.core.common.exception.NotDataFoundException;
+import com.scfg.core.common.exception.OperationException;
+import com.scfg.core.common.util.PersistenceResponse;
 import com.scfg.core.domain.Plan;
+import com.scfg.core.domain.configuracionesSistemas.FilterParamenter;
 import com.scfg.core.domain.dto.credicasas.ClfPlanDTO;
 import com.scfg.core.domain.dto.credicasas.PlanInformation;
 import io.swagger.annotations.Api;
@@ -19,7 +23,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(path = PlanEndPoint.BASE)
+@RequestMapping(path = "/plan")
 @Api(tags = "API REST Planes")
 public class PlanController implements PlanEndPoint{
     private final PlanUseCase planUseCase;
@@ -35,9 +39,76 @@ public class PlanController implements PlanEndPoint{
         }
     }
 
-    @GetMapping(value = PlanEndPoint.CLF)
-    @ApiOperation(value = "Retorna una lista de planes")
+    @PostMapping(value = "/save")
+    @ApiOperation(value = "Guardar planes")
+    public ResponseEntity register(@RequestBody Plan plan) {
+        try {
+            PersistenceResponse response = planUseCase.save(plan);
+            return ok(response);
+        }catch (NotDataFoundException | OperationException e) {
+            return CustomErrorType.badRequest("plan", e.getMessage());
+        } catch (Exception ex) {
+            return CustomErrorType.serverError("Server Error", ex.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/update")
+    @ApiOperation(value = "Actualizar planes")
+    public ResponseEntity update(@RequestBody Plan plan) {
+        try {
+            PersistenceResponse response = planUseCase.update(plan);
+            return ok(response);
+        }catch (NotDataFoundException | OperationException e) {
+            return CustomErrorType.badRequest("Planes", e.getMessage());
+        } catch (Exception ex) {
+            return CustomErrorType.serverError("Server Error", ex.getMessage());
+        }
+    }
+    @DeleteMapping(value = "/delete/{id}")
+    @ApiOperation(value = "Dar de baja la Planes")
+    public ResponseEntity delete(@PathVariable Long id) {
+        try {
+            PersistenceResponse response = planUseCase.delete(id);
+            return ok(response);
+        }catch (NotDataFoundException | OperationException e) {
+            return CustomErrorType.badRequest("Planes", e.getMessage());
+        } catch (Exception ex) {
+            return CustomErrorType.serverError("Server Error", ex.getMessage());
+        }
+    }
+    @GetMapping(value = "/all")
+    @ApiOperation(value = "Retorna lista de planes")
     ResponseEntity getAll() {
+        try {
+            List<Plan> list = planUseCase.getAll();
+            return ok(list);
+        } catch (Exception e) {
+            return CustomErrorType.serverError("Server Error", e.getMessage());
+        }
+    }
+    @GetMapping(value = "/findById/{id}")
+    @ApiOperation(value = "Retorna un plan por su if")
+    ResponseEntity getById(@PathVariable Long id) {
+        try {
+            Plan plan = planUseCase.getById(id);
+            return ok(plan);
+        } catch (Exception e) {
+            return CustomErrorType.serverError("Server Error", e.getMessage());
+        }
+    }
+    @PostMapping(value = "/filter")
+    @ApiOperation(value = "Listado de planes por filtro")
+    public ResponseEntity getAllBranchParents(@RequestBody FilterParamenter paramenter) {
+        try {
+            List<Plan> listPlan = planUseCase.getfilterParamenter(paramenter);
+            return ok(listPlan);
+        }catch (Exception ex){
+            return CustomErrorType.notContent("Obtener planes",ex.getMessage());
+        }
+    }
+    @GetMapping(value = "/clf")
+    @ApiOperation(value = "Retorna una lista de planes")
+    ResponseEntity getAllCLF() {
         try {
             List<ClfPlanDTO> list = planUseCase.getAllPlans();
             return ok(list);
@@ -46,7 +117,8 @@ public class PlanController implements PlanEndPoint{
         }
     }
 
-    @GetMapping(value = PlanEndPoint.GEL)
+
+    @GetMapping(value = "/gel")
     @ApiOperation(value = "Retorna una lista de planes")
     ResponseEntity getAllPlansByBusinessGroup(@RequestParam Integer businessGroupIdc) {
         try {
@@ -57,7 +129,7 @@ public class PlanController implements PlanEndPoint{
         }
     }
 
-    @GetMapping(value = PlanEndPoint.GETPLANBYPRODUCTID)
+    @GetMapping(value = "/findByProduct/{productId}")
     @ApiOperation(value = "Lista de planes por producto Id")
     public ResponseEntity findPlanByProductId(@PathVariable Long productId) {
         try {
@@ -68,7 +140,7 @@ public class PlanController implements PlanEndPoint{
         }
     }
 
-    @PostMapping(value = PlanEndPoint.GETPLANBYREQUESTID)
+    @PostMapping(value = "/findPlanByRequestId")
     @ApiOperation(value = "Lista de planes por requestId")
     public ResponseEntity findPlanByProductId(@RequestBody List<Long> requestList) {
         try {

@@ -40,6 +40,7 @@ public class PolicyItemEconomic extends BaseDomain {
     private Integer individualCollectionServiceCommissionIndicatorIdc;
     private Double individualCollectionServiceCommission;
     private Double individualPremiumCeded;
+    private Double individualPremiumRetained;
     private Integer status;
 
     //#region Constructors
@@ -77,6 +78,7 @@ public class PolicyItemEconomic extends BaseDomain {
         this.individualCollectionServiceCommissionIndicatorIdc = newPolicyItemEconomic.individualCollectionServiceCommissionIndicatorIdc;
         this.individualCollectionServiceCommission = newPolicyItemEconomic.individualCollectionServiceCommission;
         this.individualPremiumCeded = newPolicyItemEconomic.individualPremiumCeded;
+        this.individualPremiumRetained = newPolicyItemEconomic.individualPremiumRetained;
 
         this.setCreatedBy(newPolicyItemEconomic.getCreatedBy());
         this.setLastModifiedBy(newPolicyItemEconomic.getLastModifiedBy());

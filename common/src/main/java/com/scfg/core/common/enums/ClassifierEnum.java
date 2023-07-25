@@ -141,11 +141,11 @@ public enum ClassifierEnum {
     NUMBER_TYPE_CEL(4,67), // Tipo de número Celular
 
     //References Table's
-    REFERENCE_TABLE_GENERALREQUEST(1,68), // Tabla de referencia mensajeria - GeneralRequest
-    REFERENCE_TABLE_MESSAGERESPONSE(2,68), // Tabla de referencia respuesta propuesta - MessageResponse
-    REFERENCE_TABLE_REQUESTANNEXE(3,68), // Tabla de referencia - RequestAnnexe
-    REFERENCE_TABLE_TRANSACTION(4,68); // Tabla de referencia - Transaction
+    REFERENCE_TABLE_GENERALREQUEST(1,68), //Tabla de referencia mensajeria - GeneralRequest
+    REFERENCE_TABLE_MESSAGERESPONSE(2,68), //Tabla de referencia respuesta propuesta - MessageResponse
 
+    REFERENCE_TABLE_MESSAGESENT(2,68), //Tabla de referencia respuesta propuesta - MessageSent
+    REFERENCE_TABLE_REQUESTANNEXE(1,69); //Tabla de referencia a solicitud de anexo
     private long referenceCode;
     private long referenceCodeType;
 

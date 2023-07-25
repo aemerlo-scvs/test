@@ -30,7 +30,7 @@ public class AnnexeJpaEntity extends BaseJpaEntity {
     @Column(name = "issuanceDate")
     private LocalDateTime issuanceDate;
     @Column(name = "policyId")
-    private Long policyId;
+    private Long policy;
     @Column(name = "requestAnnexeId")
-    private Long requestAnnexeId;
+    private Long requestAnnexe;
 }

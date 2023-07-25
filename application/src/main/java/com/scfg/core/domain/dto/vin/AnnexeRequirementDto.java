@@ -25,10 +25,6 @@ public class AnnexeRequirementDto {
    private Boolean signed;
    private Document fileDocument;
 
-    public AnnexeRequirementDto() {
-
-    }
-
     public AnnexeRequirementDto(Long id, Long requestAnnexeId, String description, LocalDateTime requestDate,
                                 LocalDateTime receptionDate, String comment, Long requirementId, Long fdId,
                                 String fdDescription, Integer fdDocumentTypeIdc, String content, String mimeType, Boolean signed) {

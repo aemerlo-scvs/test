@@ -68,35 +68,6 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
     private final CoveragePolicyItemPort coveragePolicyItemPort;
     private final UserPort userPort;
 
-    @Override
-    public RequestAnnexeDetailDTO getRequestAnnexeDetail(Long policyId, Long annexeTypeId) {
-        OperationException.throwExceptionIfNumberInvalid("Id poliza", policyId);
-        OperationException.throwExceptionIfNumberInvalid("Id tipo de anexo", annexeTypeId);
-
-        List<Integer> requestAnnexeStatusList = new ArrayList<>();
-        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.PENDING.getValue());
-        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.OBSERVED.getValue());
-        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.REQUESTED.getValue());
-        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.ACCEPTED.getValue());
-        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.REJECTED.getValue());
-        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.PAID.getValue());
-
-        List<RequestAnnexe> requestAnnexeList = requestAnnexePort.findAllRequestByPolicyIdAndAnnexeTypeIdAndRequestStatus(policyId,
-                annexeTypeId, requestAnnexeStatusList);
-
-        if (requestAnnexeList.isEmpty()) {
-            throw new OperationException("No encontró el detalle de la solicitud");
-        }
-
-        RequestAnnexe lastRequestAnnexe = requestAnnexeList.get(0);
-        String paymentDesc = annexePort.findPaymentDescByRequestAnnexeId(lastRequestAnnexe.getId());
-
-        return RequestAnnexeDetailDTO.builder()
-                .requestAnnexe(lastRequestAnnexe)
-                .paymentDesc(paymentDesc)
-                .annexeRequirementList(annexeRequirementControlPort.findAllByRequestAnnexeIdAndAnnexeTypeId(lastRequestAnnexe.getId()))
-                .build();
-    }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {Exception.class, RuntimeException.class, OperationException.class})
     @Override
@@ -107,13 +78,9 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         int oneYear = cal.getActualMaximum(Calendar.DAY_OF_YEAR);
 
         double currencyDollarValue = 6.86;
-        double intermediaryComissionPercentage = 0.0;
-        double insuredCapital = 70000;
         String policyName = "PÓLIZA DE SEGURO INDIVIDUAL TEMPORAL INCLUSIVO";
         String requirementControlComment = "GENERADO POR SISTEMA";
         String city = "Santa Cruz de la Sierra";
-        String coverageToSearch = "MUERTE";
-
 
         ZonedDateTime zonedUTC = requestAnnexeDTO.getRequestDate().atZone(ZoneId.of("UTC"));
         ZonedDateTime zonedIST = zonedUTC.withZoneSameInstant(ZoneId.of("America/La_Paz"));
@@ -153,31 +120,15 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         double adminExpenses = calcAdminExpenses(premiumPaidAnnual, daysPassed);
         double discountPerPassedDays = calcDiscountPerDay(rescueValue, daysPassed, policyDaysValidity);
         double valueToReturn = rescueValue - adminExpenses - discountPerPassedDays;
-
-        if (valueToReturn < 0) {
-            valueToReturn = 0;
-        }
-
-        if (valueToReturn > prodPolicyItemEconomic.getIndividualPremium()) {
-            valueToReturn = prodPolicyItemEconomic.getIndividualPremium();
-        }
+        valueToReturn = (valueToReturn < 0) ? 0 : valueToReturn;
 
 
         String insuredIdentificationExtension = extensionCi.getDescription();
         String insurerCompanyName = requestAnnexeDTO.getInsurerCompany().getJuridicalPerson().getName();
 
-        CoverageDTO deathCoverage = coverageDTOList.stream()
-                .filter(e -> e.getCoverageName().toUpperCase().trim().contains(coverageToSearch))
-                .findFirst()
-                .orElse(null);
-        if (deathCoverage != null) {
-            insuredCapital = deathCoverage.getInsuredCapitalCoverage();
-        }
-
         //#region DTO for Documents
 
         GenerateDocSettlement documentDTO = new GenerateDocSettlement();
-        documentDTO.setDate(requestDate);
         documentDTO.setPolicyName(policyName);
         documentDTO.setPolicyNumber(policy.getNumberPolicy());
         documentDTO.setPolicyFromDate(policy.getFromDate());
@@ -185,44 +136,38 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         documentDTO.setRequestDate(requestDate);
         documentDTO.setDaysPassed(daysPassed - (oneYear * policyYearsPassed));
         documentDTO.setYearsPassed(policyYearsPassed);
-        documentDTO.setCreditTermInYears(generalRequest.getCreditTermInYears());
+        documentDTO.setCrediTermInYears(generalRequest.getCreditTermInYears());
         documentDTO.setAccountNumber(account.getAccountNumber());
         documentDTO.setAmountAccepted(valueToReturn);
         documentDTO.setCurrencyAbbreviation(currencyAbbreviation);
         documentDTO.setCurrencyDesc(currencyDesc);
         documentDTO.setCurrencyDollarValue(currencyDollarValue);
-        documentDTO.setPremiumPaid(policy.getTotalPremium());
+        documentDTO.setPremiumPaid(rescueValue);
         documentDTO.setPremiumPaidAnnual(premiumPaidAnnual);
-        documentDTO.setRescueValue(rescueValue);
         documentDTO.setAdminExpenses(adminExpenses);
-        documentDTO.setDiscountPerDay(discountPerPassedDays);
+        documentDTO.setDiscountProrataDay(discountPerPassedDays);
         documentDTO.setValueToReturn(valueToReturn);
         documentDTO.setAssuranceName(requestAnnexeDTO.getPersonCompleteName());
         documentDTO.setAssuranceIdentificationNumber(requestAnnexeDTO.getPolicyDetail().getIdentificationNumber());
         documentDTO.setAssuranceIdentificationExtension(insuredIdentificationExtension);
         documentDTO.setInsurerCompanyName(insurerCompanyName);
-        documentDTO.setNroSettlement("0");
-        documentDTO.setInsuredCapital(insuredCapital);
+        documentDTO.setNroSettlement("0001"); //TODO nro de finiquito
+        documentDTO.setInsuredCapital(policyItem.getIndividualInsuredCapital());
         documentDTO.setCellphone(person.getTelephone());
         documentDTO.setCity(city);
 
         //#endregion
 
-        Long docSettlementNumber = this.annexeFileDocumentPort.getNextNumber(
-                AnnulmentRequestAnnexeDocumentTypeClassifierEnum.SETTLEMENT.getValue());
-        documentDTO.setNroSettlement(String.format("%04d", docSettlementNumber));
         byte[] docSettlement = generatePdfUseCase.generateVINSettlement(documentDTO);
         byte[] docRescue = generatePdfUseCase.generateVINRescission(documentDTO);
         String docSettlementBase64 = Base64.getEncoder().encodeToString(docSettlement);
         String docRescueBase64 = Base64.getEncoder().encodeToString(docRescue);
-
 
         Document settlementFileDocument = Document.builder()
                 .mimeType(HelpersConstants.PDF)
                 .description(requestAnnexeDTO.getPolicyDetail().getIdentificationNumber() + '_' +
                         AnnexeRequirementEnum.SETTLEMENT.getValue().toUpperCase() + '_' + requestDate.getTime())
                 .content(docSettlementBase64)
-                .documentNumber(docSettlementNumber)
                 .documentTypeIdc(AnnulmentRequestAnnexeDocumentTypeClassifierEnum.SETTLEMENT.getValue())
                 .build();
 
@@ -276,20 +221,15 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         requestAnnexeDTO.getRequestList().add(signedReqRescue);
 
         PolicyItemEconomic policyItemEconomic = new PolicyItemEconomic(policyItem.getId(),
-                PolicyMovementTypeClassifierEnum.ANNULMENT.getValue(), prodPolicyItemEconomic.getIntermediaryId(), valueToReturn);
+                PolicyMovementTypeClassifierEnum.ANNULMENT.getValue(), policy.getBrokerId(), valueToReturn);
         policyItemEconomic.setStatus(PersistenceStatusEnum.DELETED.getValue());
 
         double totalPremiumCeded = productCalculationsService.calcPolicyItemEconomicReinsuranceTotalPremiumCededVIN(
                 prodPolicyItemEconomicReinsuranceList, generalRequest.getCreditTermInYears(), policy.getFromDate(),
                 policy.getToDate(), requestDate);
 
-        if (prodPolicyItemEconomic.getIndividualIntermediaryCommissionPercentage() != null &&
-                prodPolicyItemEconomic.getIndividualIntermediaryCommissionPercentage() > 0) {
-            intermediaryComissionPercentage = prodPolicyItemEconomic.getIndividualIntermediaryCommissionPercentage() / 100;
-        }
-
         productCalculationsService.calcPolicyItemEconomicVIN(policyItemEconomic, prodPolicyItemEconomic,
-                totalPremiumCeded, generalRequest.getCreditTermInYears(), intermediaryComissionPercentage,
+                totalPremiumCeded, generalRequest.getCreditTermInYears(), policy.getIntermediaryCommissionPercentage(),
                 policy.getFromDate(), policy.getToDate(), requestDate);
 
         policyItemEconomic = policyItemEconomicPort.saveOrUpdate(policyItemEconomic);
@@ -300,7 +240,7 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
 
             productCalculationsService.calcPolicyItemEconomicReinsuranceVIN(policyItemEconomicReinsurance,
                     prodPolicyItemEconomicReinsuranceList, policyItemEconomic.getMovementTypeIdc(),
-                    coverage, policyItemEconomic.getIndividualNetPremium(),
+                    coverage, totalPremiumCeded, policyItemEconomic.getIndividualNetPremium(),
                     generalRequest.getCreditTermInYears(), policy.getFromDate(), policy.getToDate(), requestDate);
 
             policyItemEconomicReinsurance.setStatus(PersistenceStatusEnum.DELETED.getValue());
@@ -326,40 +266,32 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {Exception.class, RuntimeException.class, OperationException.class})
     public List<AnnexeRequirementDto> processRequest(UpdateRequestAnnexeDTO updateRequestAnnexeDTO) {
-
         OperationException.throwExceptionIfNumberInvalid("anexo", updateRequestAnnexeDTO.getRequestAnnexeId());
         OperationException.throwExceptionIfNumberInvalid("motivo de anulación", updateRequestAnnexeDTO.getAnnulmentReasonIdc().longValue());
-
         RequestAnnexe requestAnnexe = this.requestAnnexePort.findRequestAnnexeIdOrThrowExcepcion(updateRequestAnnexeDTO.getRequestAnnexeId());
         requestAnnexe.setReasonIdc(updateRequestAnnexeDTO.getAnnulmentReasonIdc());
         this.requestAnnexePort.saveOrUpdate(requestAnnexe);
         if (updateRequestAnnexeDTO.getRequestList().size() > 0) {
             if (updateRequestAnnexeDTO.getRequestList().get(0).getFileDocument() != null) {
-                this.annexeFileDocumentPort.saveOrUpdate(updateRequestAnnexeDTO.getRequestList().get(0).getFileDocument());
+               this.annexeFileDocumentPort.saveOrUpdate(updateRequestAnnexeDTO.getRequestList().get(0).getFileDocument());
             }
         }
-
-        return this.annexeRequirementControlPort.findAllByRequestAnnexeIdAndAnnexeTypeId(requestAnnexe.getId());
+        return this.annexeRequirementControlPort.findAllByRequestAnnexeIdAndAnnexeTypeId(
+                requestAnnexe.getId()
+        );
     }
 
     @Override
     public RequestAnnexeFileDocumentDTO hasPendingRequests(Long policyId, Long annexeTypeId) {
         OperationException.throwExceptionIfNumberInvalid("Id poliza", policyId);
         OperationException.throwExceptionIfNumberInvalid("Id tipo de anexo", annexeTypeId);
-
-        List<Integer> requestAnnexeStatusList = new ArrayList<>();
-        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.PENDING.getValue());
-        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.OBSERVED.getValue());
-        requestAnnexeStatusList.add(RequestAnnexeStatusEnum.REQUESTED.getValue());
-
-        List<RequestAnnexe> requestAnnexeList = requestAnnexePort.findAllRequestByPolicyIdAndAnnexeTypeIdAndRequestStatus(policyId,
-                annexeTypeId, requestAnnexeStatusList);
-
+        List<RequestAnnexe> requestAnnexeList = requestAnnexePort.getRequestByPolicyIdAndAnnexeTypeId(policyId,
+                annexeTypeId);
         RequestAnnexeFileDocumentDTO requestAnnexeFileDocumentDTO = RequestAnnexeFileDocumentDTO.builder().build();
         if (requestAnnexeList.size() > 0) {
             RequestAnnexe requestAnnexe = requestAnnexeList.get(0);
-            if (requestAnnexe.getStatusIdc().equals(RequestAnnexeStatusEnum.REQUESTED.getValue())) {
-                throw new OperationException("No se pudo realizar la operación, la póliza ya tiene una solicitud de rescate en curso");
+            if(requestAnnexe.getStatusIdc().equals(RequestAnnexeStatusEnum.REQUESTED.getValue())) {
+                throw new OperationException("No se pudo realizar la operación, la póliza ya tiene una solicitud de rescate");
             }
             requestAnnexeFileDocumentDTO.setRequestAnnexe(requestAnnexe);
             Document ciDocument = this.annexeFileDocumentPort.getFileByRequestAnnexeIdAndTypeDocumentIdc(
@@ -370,7 +302,8 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
             annexeRequirementControl.setFileDocument(ciDocument);
             requestAnnexeFileDocumentDTO.setAnnexeRequirementControl(annexeRequirementControl);
             return requestAnnexeFileDocumentDTO;
-        } else return null;
+        }
+        else return null;
     }
 
     @Override
@@ -403,23 +336,22 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         User user = this.userPort.findById(requestAnnexe.getCreatedBy());
         valuesToReplace.add(user.getCompleteName());
 
-        if (statusTechnicalPosition.getReferenceId().equals((long) StatusTechnicalPositionEnum.ACCEPTED.getValue())) {
+        if(statusTechnicalPosition.getReferenceId().equals((long) StatusTechnicalPositionEnum.ACCEPTED.getValue())) {
             requestAnnexe.setStatusIdc(RequestAnnexeStatusEnum.ACCEPTED.getValue());
             this.annexeTypePort.findByIdOrExcepcion(requestAnnexeCancelaltionDto.getAnnexeTypeId());
             requestAnnexeCancelaltionDto.setEndDate(policy.getToDate());
-            Long annexeId = this.annexePort.saveOrUpdate(requestAnnexeCancelaltionDto, requestAnnexeId);
+            Long annexeId =this.annexePort.saveOrUpdate(requestAnnexeCancelaltionDto, requestAnnexeId);
 
             policy.setPolicyStatusIdc(PolicyStatusEnum.CANCELED.getValue());
             this.policyPort.saveOrUpdate(policy);
 
-            Long documentNumber = this.paymentFileDocumentPort.getMaxNumberTransactionFileDocument();
-            AttachmentDTO attachmentDTO = this.generateReportPDFRamsonStatement(policy, documentNumber);
+            AttachmentDTO attachmentDTO = this.generateReportPDFRamsonStatement(policy);
             fileList.add(attachmentDTO);
             PaymentFileDocument paymentFileDocument = PaymentFileDocument.builder()
                     .content(Base64.getEncoder().encodeToString(attachmentDTO.getContent()))
                     .description(attachmentDTO.getFileName())
                     .mimeType(attachmentDTO.getMimeType())
-                    .documentNumber(String.valueOf(documentNumber))
+                    .documentNumber(String.valueOf(this.paymentFileDocumentPort.getMaxNumberTransactionFileDocument()))
                     .documentTypeIdc(AnnulmentRequestAnnexeDocumentTypeClassifierEnum.RESCUE_NOTE.getValue())
                     .build();
             AttachmentDTO finiquito = this.getSettlement(requestAnnexeId);
@@ -466,41 +398,41 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
             valuesToReplace.add(requestAnnexeCancelaltionDto.getCommentTechnicalPosition());
             alert = alertService.getAlertByEnumReplacingContent(AlertEnum.VIN_REQUESTANNEXE_ACEPTED, valuesToReplace, valuesSubjectToReplace);
         }
-        if (statusTechnicalPosition.getReferenceId().equals((long) StatusTechnicalPositionEnum.OBSERVED.getValue())) {
-            requestAnnexe.setStatusIdc(RequestAnnexeStatusEnum.OBSERVED.getValue());
-            ;
+        if(statusTechnicalPosition.getReferenceId().equals((long) StatusTechnicalPositionEnum.OBSERVED.getValue())){
+            requestAnnexe.setStatusIdc(RequestAnnexeStatusEnum.OBSERVED.getValue());;
             valuesToReplace.add(requestAnnexeCancelaltionDto.getCommentTechnicalPosition());
             alert = alertService.getAlertByEnumReplacingContent(AlertEnum.VIN_REQUESTANNEXE_OBSERVED, valuesToReplace, valuesSubjectToReplace);
         }
-        if (statusTechnicalPosition.getReferenceId().equals((long) StatusTechnicalPositionEnum.REJECTED.getValue())) {
+        if(statusTechnicalPosition.getReferenceId().equals((long) StatusTechnicalPositionEnum.REJECTED.getValue())) {
             requestAnnexe.setStatusIdc(RequestAnnexeStatusEnum.REJECTED.getValue());
             valuesToReplace.add(requestAnnexeCancelaltionDto.getCommentTechnicalPosition());
             alert = alertService.getAlertByEnumReplacingContent(AlertEnum.VIN_REQUESTANNEXE_REJECTED, valuesToReplace, valuesSubjectToReplace);
         }
-
-        alert.setMail_to(user.getEmail().concat(";").concat(alert.getMail_to()));
         messageDTO.setMessage(alert.getMail_body());
         messageDTO.setSubject(alert.getMail_subject());
+        messageDTO.setTo(alert.getMail_to());
         messageDTO.setSendTo(alert.getMail_to().split(";"));
+        messageDTO.setCc(alert.getMail_cc());
         messageDTO.setSendCc(alert.getMail_cc().split(";"));
         messageDTO.setMessageTypeIdc(MessageTypeEnum.EMAIL.getValue());
         messageDTO.setReferenceId(requestAnnexeId);
         messageDTO.setReferenceTableIdc((int) ClassifierEnum.REFERENCE_TABLE_REQUESTANNEXE.getReferenceCode());
         messageDTO.setNumberOfAttempt(0);
         messageDTO.setLastNumberOfAttempt(0);
-
         requestAnnexe.setComment(requestAnnexeCancelaltionDto.getCommentTechnicalPosition());
         this.requestAnnexePort.saveOrUpdate(requestAnnexe);
-        senderService.sendMessage(messageDTO);
-
-        if (statusTechnicalPosition.getReferenceId().equals((long) StatusTechnicalPositionEnum.ACCEPTED.getValue())) {
+        if(statusTechnicalPosition.getReferenceId().equals((long) StatusTechnicalPositionEnum.ACCEPTED.getValue())){
+            senderService.sendMessageWithAttachment(messageDTO, fileList);
             Alert alert2 = alertService.getAlertByEnumReplacingContent(AlertEnum.VIN_REQUESTANNEXE_ACEPTED_ACCOUTING, valuesToReplace, valuesSubjectToReplace);
-            this.sendMail(alert2, requestAnnexeId, (int) ClassifierEnum.REFERENCE_TABLE_REQUESTANNEXE.getReferenceCode(), fileList);
+            this.sendMail(alert2, false, null);
+        }
+        else {
+            senderService.sendMessage(messageDTO);
         }
     }
 
     @Override
-    public Long validateVoucherPayment(Long requestAnnexeId) {
+    public Long validateVousherPayment(Long requestAnnexeId) {
         HelpersMethods.throwExceptionIfInvalidNumber("requestAnnexeId", requestAnnexeId, true, 0L);
         RequestAnnexe requestAnnexe = this.requestAnnexePort.findRequestAnnexeIdOrThrowExcepcion(requestAnnexeId);
         List<AnnexeDTO> annexeList = this.annexePort.getAllAnnexeByAnnexeTypeAndRequestAnnexeId(requestAnnexe.getAnnexeTypeId(), requestAnnexeId);
@@ -513,12 +445,10 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {Exception.class, RuntimeException.class, OperationException.class})
     public void saveVoucherPayment(Long annexeId, RequestSaveVoucherPaymentDto requestSaveVoucherPaymentDto) {
-
         HelpersMethods.throwExceptionIfInvalidNumber("voucherNumber", requestSaveVoucherPaymentDto.getVoucherNumber(), true, 0L);
         HelpersMethods.throwExceptionRequiredIfNull("voucher", requestSaveVoucherPaymentDto.getVoucher());
         HelpersMethods.throwExceptionIfInvalidNumber("requestAnnexeId", annexeId, true, 0L);
-
-        AnnexeDTO annexeDTO = this.annexePort.findAnnexeById(annexeId);
+        AnnexeDTO annexeDTO = this.annexePort.findAnnexeByIdOrThrowExcepcion(annexeId);
         Policy policy = this.policyPort.findByPolicyIdOrThrowExcepcion(annexeDTO.getPolicy());
         PaymentPlan paymentPlan = this.paymentPlanPort.findByAnnexeIdOrExcepcion(annexeId);
         boolean newTransaction = false;
@@ -527,6 +457,7 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         Alert alert = new Alert();
         if(transaction == null || transaction.getAmount() > 0) {
             newTransaction = true;
+            LocalDateTime dateNow = LocalDateTime.now();
             transactionFileDocument = TransactionFileDocument.builder()
                     .content(requestSaveVoucherPaymentDto.getVoucher().getContent())
                     .description(requestSaveVoucherPaymentDto.getVoucher().getDescription())
@@ -536,7 +467,7 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
                     .build();
              transaction = new Transaction(
                     paymentPlan.getAmount(),
-                     requestSaveVoucherPaymentDto.getPayDate(),
+                    dateNow,
                     policy.getCurrencyTypeIdc(),
                     paymentPlan.getId(),
                     requestSaveVoucherPaymentDto.getVoucherNumber().toString()
@@ -553,7 +484,6 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
             requestAnnexePort.saveOrUpdate(requestAnnexe);
         } else {
             transaction.setVoucherNumber(requestSaveVoucherPaymentDto.getVoucherNumber().toString());
-            transaction.setDatePaid(requestSaveVoucherPaymentDto.getPayDate());
             transactionFileDocument = this.transactionFileDocumentPort.findByTransactionFileDocumentId(transaction.getTransactionFileDocumentId());
             if(transactionFileDocument == null) {
                 transactionFileDocument = TransactionFileDocument.builder()
@@ -568,10 +498,7 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         Long transactionFileDocumentId = this.transactionFileDocumentPort.saveOrUpdate(transactionFileDocument);
         transaction.setTransactionFileDocumentId(transactionFileDocumentId);
         this.transactionPort.saveOrUpdate(transaction);
-
-        if (newTransaction) {
-            this.sendMail(alert, transaction.getId(), (int) ClassifierEnum.REFERENCE_TABLE_TRANSACTION.getReferenceCode(), null);
-        }
+        if(newTransaction) { this.sendMail(alert, false, null);}
     }
 
     @Override
@@ -631,30 +558,30 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         }
         return valueTypeDocumentIdc;
     }
-
-    public void sendMail(Alert alert, Long referenceId, Integer referenceTableIdc, List<AttachmentDTO> attachmentlist) {
+    public void sendMail(Alert alert, Boolean attachment, List<AttachmentDTO> attachmentlist) {
         MessageDTO messageDTO = new MessageDTO();
+        senderService.setStrategy(emailSenderService);
         messageDTO.setMessage(alert.getMail_body());
         messageDTO.setSubject(alert.getMail_subject());
+        messageDTO.setTo(alert.getMail_to());
         messageDTO.setSendTo(alert.getMail_to().split(";"));
+        messageDTO.setCc(alert.getMail_cc());
         messageDTO.setSendCc(alert.getMail_cc().split(";"));
         messageDTO.setMessageTypeIdc(MessageTypeEnum.EMAIL.getValue());
-        messageDTO.setReferenceId(referenceId);
-        messageDTO.setReferenceTableIdc(referenceTableIdc);
+        messageDTO.setReferenceId(null);
+        messageDTO.setReferenceTableIdc((int) ClassifierEnum.REFERENCE_TABLE_REQUESTANNEXE.getReferenceCode());
         messageDTO.setNumberOfAttempt(0);
         messageDTO.setLastNumberOfAttempt(0);
-
-        senderService.setStrategy(emailSenderService);
-        if (attachmentlist != null && attachmentlist.size() > 0) {
+        if(attachment){
             senderService.sendMessageWithAttachment(messageDTO, attachmentlist);
-        } else {
+        }
+        else {
             senderService.sendMessage(messageDTO);
         }
     }
 
-    public AttachmentDTO generateReportPDFRamsonStatement (Policy policy, Long documentNumber) {
+    public AttachmentDTO generateReportPDFRamsonStatement (Policy policy) {
         DocRescueStatement docRescueStatement = this.getDataDocRescueStatement(policy);
-        docRescueStatement.setDocumentNumber(documentNumber);
         byte[] ransomStatement = generatePdfUseCase.generateVINRamsonSettlement(docRescueStatement);
         String docRescueBase64 = Base64.getEncoder().encodeToString(ransomStatement);
         AttachmentDTO attachmentDTO = new AttachmentDTO();
@@ -788,7 +715,7 @@ public class RequestAnnexeService implements RequestAnnexeUseCase {
         List<Classifier> currencyList = classifierPort.getAllClassifiersByClassifierTypeReferenceId(ClassifierTypeEnum.Currency.getReferenceId());
 
         Classifier currency = currencyList.stream()
-                .filter(e -> e.getReferenceId().intValue() == searchCurrency)
+                .filter(e -> e.getReferenceId().equals(searchCurrency))
                 .findFirst()
                 .orElse(null);
 
