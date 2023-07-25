@@ -19,7 +19,7 @@ import javax.persistence.Table;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Where(clause = HelpersConstants.FILTER_ACTIVE_RECORDS_FOR_PERSIST)
+//@Where(clause = HelpersConstants.FILTER_ACTIVE_RECORDS_FOR_PERSIST)
 @SuperBuilder
 public class ProductJpaEntity extends BaseJpaEntity {
     @Column(name = "renewalIdc")

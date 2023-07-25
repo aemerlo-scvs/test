@@ -20,14 +20,21 @@ public class CoveragePlanPersistenceAdapter implements CoveragePlanPort {
     public PersistenceResponse save(CoveragePlan coveragePlan) {
         CoveragePlanJpaEntity coveragePlanJpaEntity = ObjectMapperUtils.map(coveragePlan, CoveragePlanJpaEntity.class);
         coveragePlanJpaEntity = coveragePlanRepository.save(coveragePlanJpaEntity);
-        return new PersistenceResponse(CoveragePlanPersistenceAdapter.class.getSimpleName(), ActionRequestEnum.CREATE, coveragePlanJpaEntity);
+        return new PersistenceResponse(
+                CoveragePlanPersistenceAdapter.class.getSimpleName(),
+                ActionRequestEnum.CREATE,
+                ObjectMapperUtils.map(coveragePlanJpaEntity, CoveragePlan.class));
     }
 
     @Override
     public PersistenceResponse update(CoveragePlan coveragePlan) {
-        return null;
+        CoveragePlanJpaEntity coveragePlanJpaEntity = ObjectMapperUtils.map(coveragePlan, CoveragePlanJpaEntity.class);
+        coveragePlanJpaEntity = coveragePlanRepository.save(coveragePlanJpaEntity);
+        return new PersistenceResponse(
+                CoveragePlanPersistenceAdapter.class.getSimpleName(),
+                ActionRequestEnum.UPDATE,
+                ObjectMapperUtils.map(coveragePlanJpaEntity, CoveragePlan.class));
     }
-
     @Override
     public PersistenceResponse delete(Long id) {
         CoveragePlanJpaEntity coveragePlanJpaEntity = coveragePlanRepository.findById(id).get();
@@ -37,15 +44,12 @@ public class CoveragePlanPersistenceAdapter implements CoveragePlanPort {
         return new PersistenceResponse(CoveragePlanPersistenceAdapter.class.getSimpleName(), ActionRequestEnum.DELETE, coveragePlanJpaEntity);
     }
 
-    @Override
-    public CoveragePlan getCoveragePlanByPlanIdAndCoverageId(Long planId, Long coverageId) {
-        CoveragePlanJpaEntity coveragePlanJpaEntity = coveragePlanRepository.findByPlanIdAndCoverageId(planId, coverageId);
-        return ObjectMapperUtils.map(coveragePlanJpaEntity,CoveragePlan.class);
-    }
+
 
     @Override
-    public List<CoveragePlan> getAllCoveragePlan() {
-        List<CoveragePlanJpaEntity> coveragePlanJpaEntities = coveragePlanRepository.findAll();
+    public List<CoveragePlan> getAllCoveragePlanByPlanId(Long planId) {
+        List<CoveragePlanJpaEntity> coveragePlanJpaEntities = coveragePlanRepository.findALLByPlanId(planId);
         return coveragePlanJpaEntities.size() > 0 ? ObjectMapperUtils.mapAll(coveragePlanJpaEntities, CoveragePlan.class) : new ArrayList<>();
     }
+
 }

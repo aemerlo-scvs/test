@@ -1,6 +1,7 @@
 package com.scfg.core.adapter.persistence.coverage;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,7 +29,13 @@ public interface CoverageRepository extends JpaRepository<CoverageJpaEntity, Lon
 //                "order by createdAt asc \n"+
 //                "for json path";
 //    }
-    @Query("select v from CoverageJpaEntity v " +
-            "where v.productId= :productId")
-    List<CoverageJpaEntity> findAllCoverageByProductId(@Param("productId")Long productId);
+    @Query("SELECT c FROM CoverageJpaEntity c " +
+            "WHERE c.productId= :productId AND c.status = :status")
+    List<CoverageJpaEntity> findAllCoverageByProductId(@Param("productId")Long productId, @Param("status") Integer status);
+
+
+    @Modifying
+    @Query("UPDATE CoverageJpaEntity c SET c.status = 0 " +
+            "WHERE c.productId= :productId")
+    void deleteByProductId(@Param("productId")Long productId);
 }

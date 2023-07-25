@@ -9,27 +9,22 @@ import lombok.experimental.SuperBuilder;
 
 
 import java.io.Serializable;
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @SuperBuilder
 public class Plan extends BaseDomain implements Serializable {
-
     private String name;
-
     private String description;
-
     private Double totalPremium;
-
     private Integer rate;
-
     private Integer applyDiscount;
-
     private Integer currencyTypeIdc;
     private Integer status;
-
     private Long productId;
     private  Integer bfsAgreementCode;
-
+    private List<CoveragePlan> coveragePlanList;
 }

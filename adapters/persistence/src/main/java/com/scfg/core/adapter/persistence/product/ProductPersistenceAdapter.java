@@ -6,6 +6,7 @@ import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.ActionRequestEnum;
 import com.scfg.core.common.enums.PersistenceStatusEnum;
 import com.scfg.core.common.exception.NotDataFoundException;
+import com.scfg.core.common.util.ModelMapperConfig;
 import com.scfg.core.common.util.PersistenceResponse;
 import com.scfg.core.domain.Product;
 import com.scfg.core.domain.common.ObjectDTO;
@@ -62,7 +63,6 @@ public class ProductPersistenceAdapter implements ProductPort {
     }
     @Override
     public PersistenceResponse save(Product product, boolean returnEntity) {
-
         ProductJpaEntity productJpaEntity = mapToJpaEntity(product);
         productJpaEntity=productRepository.save(productJpaEntity);
         product=mapToDomain(productJpaEntity);
@@ -73,19 +73,15 @@ public class ProductPersistenceAdapter implements ProductPort {
         );
     }
 
-    private ProductJpaEntity mapToJpaEntity(Product product) {
-        ProductJpaEntity productJpaEntity = modelMapper.map(product, ProductJpaEntity.class);
-        return productJpaEntity;
-    }
-
     @Override
     public PersistenceResponse update(Product product) {
         ProductJpaEntity productJpaEntity = mapToJpaEntity(product);
-        productRepository.save(productJpaEntity);
+        productJpaEntity = productRepository.save(productJpaEntity);
+        product = mapToDomain(productJpaEntity);
         return new PersistenceResponse(
                 ProductPersistenceAdapter.class.getSimpleName(),
                 ActionRequestEnum.UPDATE,
-                productJpaEntity
+                product
         );
     }
 
@@ -147,22 +143,23 @@ public class ProductPersistenceAdapter implements ProductPort {
         }
     }
     //#region Mappers
-
+    private ProductJpaEntity mapToJpaEntity(Product product) {
+        return new ModelMapperConfig().getStrictModelMapper().map(product, ProductJpaEntity.class);
+    }
     public static Product mapToDomain(ProductJpaEntity productJpaEntity) {
-
         return new ModelMapper().map(productJpaEntity, Product.class);
     }
-
     public static PlanDTO mapToDomainPlanDTO(PlanJpaEntity planJpaEntity) {
-
         PlanDTO planDTO = PlanDTO.builder()
                 .id(planJpaEntity.getId())
                 .descripcion(planJpaEntity.getName())
                 .tipo_moneda(planJpaEntity.getCurrencyTypeIdc())
                 .monto(planJpaEntity.getTotalPremium())
                 .build();
-
         return planDTO;
     }
+
+
+
     //#endregion
 }

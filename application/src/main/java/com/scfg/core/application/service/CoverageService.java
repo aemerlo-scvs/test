@@ -22,13 +22,8 @@ public class CoverageService implements CoverageUseCase {
     }
 
     @Override
-    public PersistenceResponse registerCoverage(Coverage coverage) {
-        return coveragePort.save(coverage, true);
-    }
-
-    @Override
-    public PersistenceResponse updateCoverage(Coverage coverage) {
-        return coveragePort.update(coverage);
+    public PersistenceResponse saveOrUpdate(Coverage coverage) {
+        return coveragePort.saveOrUpdate(coverage);
     }
 
     @Override
@@ -57,11 +52,6 @@ public class CoverageService implements CoverageUseCase {
     public List<Coverage> getAllCoverageByProductId(Long productId) {
         return coveragePort.findAllCoverageByProductId(productId);
     }
-
-//    @Override
-//    public List<Coverage> findByBranchId(Long branchId) {
-//        return ;
-//    }
 
 
 }

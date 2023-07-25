@@ -20,18 +20,18 @@ import static org.springframework.http.ResponseEntity.ok;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = ClauseEndPoint.BASE)
+@RequestMapping(path ="/clause")
 @Api(tags = "API REST Clausulas")
 public class ClauseController {
     private  final ClauseUseCase clauseUseCase;
-    @GetMapping(value = ClauseEndPoint.GETALL)
+    @GetMapping(value ="/all")
     @ApiOperation(value = "Listado de las clausulas")
     public ResponseEntity findAll() {
         List<Clause> clauseList = clauseUseCase.getAllClause();
         return ok(clauseList);
     }
 
-    @PostMapping(value = ClauseEndPoint.SAVE)
+    @PostMapping(value = "/save")
     @ApiOperation(value = "Guardar las clausulas")
     public ResponseEntity save(@RequestBody Clause clause) {
         try {
@@ -44,7 +44,7 @@ public class ClauseController {
         }
 
     }
-    @PostMapping(value = ClauseEndPoint.UPDATE)
+    @PostMapping(value = "/update")
     @ApiOperation(value = "Actualizar las Clausulas")
     public ResponseEntity update(@RequestBody Clause clause) {
         try {
@@ -56,7 +56,7 @@ public class ClauseController {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
-    @DeleteMapping(value = ClauseEndPoint.DELETE)
+    @DeleteMapping(value =  "/delete/{id}")
     @ApiOperation(value = "Dar de baja la clasulas")
     public ResponseEntity delete(@PathVariable Long id) {
         try {
@@ -68,7 +68,7 @@ public class ClauseController {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
-    @GetMapping(value = ClauseEndPoint.GETBYID)
+    @GetMapping(value = "/findById/{id}")
     @ApiOperation(value = "Obtener clausula por ID")
     public ResponseEntity findById(@PathVariable Long id) {
         try {
@@ -81,7 +81,7 @@ public class ClauseController {
         }
     }
 
-    @GetMapping(value = ClauseEndPoint.GETALLBYPRODUCT)
+    @GetMapping(value = "/findByProduct/{productId}")
     @ApiOperation(value = "Listado de clausulas por productos id")
     public ResponseEntity findClauseByProductId(@PathVariable Long productId) {
         try {
@@ -92,5 +92,6 @@ public class ClauseController {
         }
 
     }
+
 
 }

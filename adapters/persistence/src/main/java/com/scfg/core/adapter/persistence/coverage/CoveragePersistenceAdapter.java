@@ -4,11 +4,13 @@ import com.scfg.core.application.port.out.CoveragePort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.ActionRequestEnum;
 import com.scfg.core.common.enums.PersistenceStatusEnum;
+import com.scfg.core.common.util.ModelMapperConfig;
 import com.scfg.core.common.util.ObjectMapperUtils;
 import com.scfg.core.common.util.PersistenceResponse;
 import com.scfg.core.domain.Coverage;
 import com.scfg.core.domain.configuracionesSistemas.FilterParamenter;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
@@ -22,34 +24,17 @@ public class CoveragePersistenceAdapter implements CoveragePort {
 
     private final CoverageRepository coverageRepository;
     private EntityManager em;
+    private ModelMapper modelMapper;
 
     @Override
-    public PersistenceResponse save(Coverage coverage, boolean returnEntity) {
-        CoverageJpaEntity coverageJpaEntity = ObjectMapperUtils.map(coverage, CoverageJpaEntity.class); //mapDomainToEntity(coverage);
+    public PersistenceResponse saveOrUpdate(Coverage coverage) {
+        CoverageJpaEntity coverageJpaEntity = ObjectMapperUtils.map(coverage, CoverageJpaEntity.class);
         coverageJpaEntity = coverageRepository.save(coverageJpaEntity);
         return new PersistenceResponse(
                 CoveragePersistenceAdapter.class.getSimpleName(),
                 ActionRequestEnum.CREATE,
                 coverageJpaEntity
         );
-
-    }
-
-//    private CoverageJpaEntity mapDomainToEntity(Coverage coverage) {
-//        CoverageJpaEntity coverageJpaEntity = modelMapper.map(coverage, CoverageJpaEntity.class);
-//        return coverageJpaEntity;
-//    }
-
-    @Override
-    public PersistenceResponse update(Coverage coverage) {
-        CoverageJpaEntity coverageJpaEntity = ObjectMapperUtils.map(coverage, CoverageJpaEntity.class);
-        coverageJpaEntity = coverageRepository.save(coverageJpaEntity);
-        return new PersistenceResponse(
-                CoveragePersistenceAdapter.class.getSimpleName(),
-                ActionRequestEnum.UPDATE,
-                coverageJpaEntity
-        );
-
     }
 
     @Override
@@ -74,10 +59,19 @@ public class CoveragePersistenceAdapter implements CoveragePort {
 
     @Override
     public List<Coverage> findAllCoverageByProductId(Long productId) {
-        List<CoverageJpaEntity> coverageJpaEntities = coverageRepository.findAllCoverageByProductId(productId);
+        List<CoverageJpaEntity> coverageJpaEntities = coverageRepository.findAllCoverageByProductId(
+                productId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
         return coverageJpaEntities.size() > 0 ? ObjectMapperUtils.mapAll(coverageJpaEntities, Coverage.class) : new ArrayList<>();
     }
-
+    @Override
+    public PersistenceResponse deleteByProductId(Long productId) {
+        coverageRepository.deleteByProductId(productId);
+        return new PersistenceResponse(
+                Coverage.class.getSimpleName(),
+                ActionRequestEnum.DELETE,
+                null
+        );
+    }
     @Override
     public List<Coverage> getAllCoverage() {
         List<CoverageJpaEntity> coverageJpaEntities = coverageRepository.findAll();
@@ -92,19 +86,15 @@ public class CoveragePersistenceAdapter implements CoveragePort {
         return (coverageNames.size() > 0) ? coverageNames.get(0).toString() : "";
     }
 
-//    private List<Coverage> mapListToDomain(List<CoverageJpaEntity> coverageJpaEntities) {
-////        List<Coverage> coverages = new ArrayList<>();
-////        coverageJpaEntities.forEach(o -> {
-////            coverages.add(mapEntityToDomain(o));
-////        });
-//        //return coverages;
-//
-//        List<Coverage> coverageList = ObjectMapperUtils.mapAll(coverageJpaEntities, Coverage.class);
-//        return coverageList;
-//    }
+    private Coverage mapToDomain(CoverageJpaEntity obj) {
+        Coverage coverage = modelMapper.map(obj, Coverage.class);
+        return coverage;
+    }
 
-//    private Coverage mapEntityToDomain(CoverageJpaEntity p) {
-//        Coverage coverage = modelMapper.map(p, Coverage.class);
-//        return coverage;
-//    }
+    private CoverageJpaEntity mapToJpaEntity(Coverage coverage) {
+        return new ModelMapperConfig()
+                .getStrictModelMapper()
+                .map(coverage, CoverageJpaEntity.class);
+    }
+
 }

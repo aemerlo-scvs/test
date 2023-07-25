@@ -9,8 +9,6 @@ public interface CoveragePlanPort {
     PersistenceResponse save(CoveragePlan coveragePlan);
     PersistenceResponse update(CoveragePlan coveragePlan);
     PersistenceResponse delete(Long  id);
-    CoveragePlan getCoveragePlanByPlanIdAndCoverageId(Long planId, Long coverageId);
-    List<CoveragePlan> getAllCoveragePlan();
-
+    List<CoveragePlan> getAllCoveragePlanByPlanId(Long planId);
 
 }

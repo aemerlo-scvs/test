@@ -20,14 +20,15 @@ public interface PlanPort {
     List<Plan> getPlanByFinancialGroup(Integer financialGroupIdc);
 
     List<Plan> getPlanByProductId(Long productId);
+    PersistenceResponse deleteByProductId(Long productId);
     List<PlanInformation> getPlanByRequestId(List<Long> requestList);
 
     Plan getPlanByAgreementCodePlandAndAgreementCodeProduct(Integer agreementCodePlan, Integer agreementCodeProduct);
 
     Plan findPlanByAgreementCode(Integer agreementCode);
 
-    PersistenceResponse save(Plan plan, boolean returnEntity);
-    PersistenceResponse update(Plan plan);
+    PersistenceResponse saveOrUpdate(Plan plan);
+
     PersistenceResponse delete(Long planId);
 
 

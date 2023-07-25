@@ -7,7 +7,6 @@ import com.scfg.core.application.port.in.CoverageUseCase;
 import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.common.util.PersistenceResponse;
-import com.scfg.core.domain.Clause;
 import com.scfg.core.domain.Coverage;
 import com.scfg.core.domain.configuracionesSistemas.FilterParamenter;
 import com.scfg.core.domain.dto.CoverageDTO;
@@ -27,14 +26,14 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(path = CoverageEndPoint.BASE)
+@RequestMapping(path ="/coverage")
 @Api(tags = "API REST Coberturas")
-public class CoverageController implements CoverageEndPoint {
+public class CoverageController   {
 
     private final CoverageProductPlanUseCase coverageProductPlanUseCase;
     private final CoveragePolicyItemUseCase coveragePolicyItemUseCase;
     private final CoverageUseCase coverageUseCase;
-    @GetMapping(value =  CoverageEndPoint.GETALL)
+    @GetMapping(value =  "/all")
     @ApiOperation(value = "Listado de las coberturas")
     public ResponseEntity findAll() {
         List<Coverage> branchList = coverageUseCase.getAllCoverage();
@@ -44,24 +43,23 @@ public class CoverageController implements CoverageEndPoint {
         return ok(branchList);
     }
 
-    @PostMapping(value = CoverageEndPoint.SAVE)
+    @PostMapping(value ="/save")
     @ApiOperation(value = "Guardar las coberturas")
-    public ResponseEntity guardar(@RequestBody Coverage coverage) {
+    public ResponseEntity save(@RequestBody Coverage coverage) {
         try {
-            PersistenceResponse response = coverageUseCase.registerCoverage(coverage);
+            PersistenceResponse response = coverageUseCase.saveOrUpdate(coverage);
             return ok(response);
         }catch (NotDataFoundException | OperationException e) {
             return CustomErrorType.badRequest("Coverage", e.getMessage());
         } catch (Exception ex) {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
-
     }
-    @PostMapping(value = CoverageEndPoint.UPDATE)
+    @PostMapping(value = "/update")
     @ApiOperation(value = "Actualizar las coberturas")
     public ResponseEntity update(@RequestBody Coverage coverage) {
         try {
-            PersistenceResponse response = coverageUseCase.updateCoverage(coverage);
+            PersistenceResponse response = coverageUseCase.saveOrUpdate(coverage);
             return ok(response);
         }catch (NotDataFoundException | OperationException e) {
             return CustomErrorType.badRequest("Coverage", e.getMessage());
@@ -69,7 +67,7 @@ public class CoverageController implements CoverageEndPoint {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
-    @DeleteMapping(value = CoverageEndPoint.DELETE)
+    @DeleteMapping(value =  "/delete/{id}")
     @ApiOperation(value = "Dar de baja la coberturas")
     public ResponseEntity delete(@PathVariable Long id) {
         try {
@@ -82,7 +80,7 @@ public class CoverageController implements CoverageEndPoint {
         }
     }
 
-    @PostMapping(value = CoverageEndPoint.FILTER)
+    @PostMapping(value ="/filter")
     @ApiOperation(value = "Lista de Coberturas por filtro")
     public ResponseEntity getAllBranchParents(@RequestBody FilterParamenter paramenter) {
         try {
@@ -91,19 +89,8 @@ public class CoverageController implements CoverageEndPoint {
         }catch (Exception ex){
             return CustomErrorType.notContent("Get branchs",ex.getMessage());
         }
-
     }
-//    @GetMapping(value = CoverageEndPoint.FINDBYBRANCHID)
-//    @ApiOperation(value = "Lista de cobeturas por código de ramo")
-//    public ResponseEntity getAllBranchParents(@PathVariable Long branchId) {
-//        try {
-//            List<Coverage> branchList = coverageUseCase.findByBranchId(branchId);
-//            return ok(branchList);
-//        }catch (Exception ex){
-//            return CustomErrorType.notContent("Get branchs",ex.getMessage());
-//        }
-//
-//    }
+
     @GetMapping(value = "findCoverageByProductId/{productId}")
     @ApiOperation(value = "Listado de coberturas por productos id")
     public ResponseEntity getCoverageByProductId(@PathVariable Long productId) {
@@ -132,7 +119,8 @@ public class CoverageController implements CoverageEndPoint {
                                                                  @RequestParam long planId,
                                                                  @RequestParam long policyItemId) {
         try {
-            List<ClfProductPlanCoverageDTO> coverageDTOList = coverageProductPlanUseCase.getAllProductPlanCoverageByProductApsCodeAndPlanIdAndPolicyItemId(apsCode, planId, policyItemId);
+            List<ClfProductPlanCoverageDTO> coverageDTOList = coverageProductPlanUseCase
+                    .getAllProductPlanCoverageByProductApsCodeAndPlanIdAndPolicyItemId(apsCode, planId, policyItemId);
             return ok(coverageDTOList);
         } catch (Exception e) {
             return CustomErrorType.serverError("Server Error", e.getMessage());

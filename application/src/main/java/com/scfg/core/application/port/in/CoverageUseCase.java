@@ -8,18 +8,12 @@ import java.util.List;
 
 public interface CoverageUseCase {
     List<Coverage> getAllCoverage();
-
-    PersistenceResponse registerCoverage(Coverage coverage);
-
-    PersistenceResponse updateCoverage(Coverage coverage);
+    PersistenceResponse saveOrUpdate(Coverage coverage);
 
     PersistenceResponse deleteCoverage(Long id);
 
     List<Coverage> getfilterParamenter(FilterParamenter paramenter);
 
     List<Coverage> getAllCoverageByProductId(Long productId);
-
- //   List<Coverage> findByBranchId(Long branchId);
-
 
 }

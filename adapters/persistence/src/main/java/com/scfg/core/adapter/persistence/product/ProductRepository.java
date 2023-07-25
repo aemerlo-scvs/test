@@ -13,6 +13,11 @@ public interface ProductRepository extends JpaRepository<ProductJpaEntity, Long>
 
     ProductJpaEntity findByAgreementCode(int agreementCode);
 
+    @Query("SELECT pr " +
+            "FROM ProductJpaEntity pr " +
+            "ORDER BY pr.status DESC, pr.createdAt ASC")
+    List<ProductJpaEntity> findAll();
+
 
     @Query("SELECT pl " +
             "FROM ProductJpaEntity pr " +

@@ -23,13 +23,13 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(path = ProductEndPoint.BASE)
+@RequestMapping(path = "/product")
 @Api(tags = "API REST Productos")
-public class ProductController implements ProductEndPoint {
+public class ProductController {
 
     private final ProductUseCase productUseCase;
 
-    @GetMapping(value = BASE_PARAM_PLANS)
+    @GetMapping(value = "/plans/{agreementCode}")
     @ApiOperation(value = "Retorna una lista de planes por el codigo de convenio")
     ResponseEntity getPlansByAgreementCode(@PathVariable int agreementCode) {
         try {
@@ -39,7 +39,7 @@ public class ProductController implements ProductEndPoint {
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
-    @GetMapping(value = ProductEndPoint.GETALL)
+    @GetMapping(value = "/all")
     @ApiOperation(value = "Listado de productos")
     ResponseEntity getAll() {
         try {
@@ -50,7 +50,7 @@ public class ProductController implements ProductEndPoint {
         }
     }
 
-    @PostMapping(value = ProductEndPoint.SAVE)
+    @PostMapping(value = "/save")
     @ApiOperation(value = "Guardar las coberturas")
     public ResponseEntity save(@RequestBody Product product) {
         try {
@@ -63,7 +63,7 @@ public class ProductController implements ProductEndPoint {
         }
 
     }
-    @PostMapping(value = ProductEndPoint.UPDATE)
+    @PostMapping(value = "/update")
     @ApiOperation(value = "Actualizar las coberturas")
     public ResponseEntity update(@RequestBody Product product) {
         try {
@@ -75,7 +75,7 @@ public class ProductController implements ProductEndPoint {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
-    @DeleteMapping(value = ProductEndPoint.DELETE)
+    @DeleteMapping(value = "/delete/{productId}")
     @ApiOperation(value = "Dar de baja la coberturas")
     public ResponseEntity delete(@PathVariable Long productId) {
         try {
@@ -87,7 +87,7 @@ public class ProductController implements ProductEndPoint {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
-    @PostMapping(value = ProductEndPoint.PARAMETERFILTER)
+    @PostMapping(value = "/filter")
     @ApiOperation(value = "Lista de Coberturas por filtro")
     public ResponseEntity getAllBranchParents(@RequestBody FilterParamenter paramenter) {
         try {
@@ -98,7 +98,7 @@ public class ProductController implements ProductEndPoint {
         }
     }
 
-    @GetMapping(value = ProductEndPoint.GETALLPRODUCTWITHBRANCH)
+    @GetMapping(value = "/productallbr")
     @ApiOperation(value = "Lista de Productos con nombre del Ramo")
     public ResponseEntity getAllProductWithBranchName(@PathVariable Long branchId) {
         try {
@@ -109,7 +109,7 @@ public class ProductController implements ProductEndPoint {
             return CustomErrorType.notContent("Get products FAIL ",ex.getMessage());
         }
     }
-    @GetMapping(value = ProductEndPoint.GETALLBYBRANCH)
+    @GetMapping(value = "/getProductsByBranchId/{branchId}")
     @ApiOperation(value = "Lista todos los productos de un ramo")
     public ResponseEntity getProductsByBranchId(@PathVariable long branchId){
         List<ObjectDTO> productList = productUseCase.getAllProductsByBranchId(branchId);

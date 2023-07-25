@@ -1,6 +1,9 @@
 package com.scfg.core.application.service;
 
 import com.scfg.core.application.port.in.ProductUseCase;
+import com.scfg.core.application.port.out.ClausePort;
+import com.scfg.core.application.port.out.CoveragePort;
+import com.scfg.core.application.port.out.PlanPort;
 import com.scfg.core.application.port.out.ProductPort;
 import com.scfg.core.common.enums.SMVSResponseEnum;
 import com.scfg.core.common.util.PersistenceResponse;
@@ -23,6 +26,9 @@ import java.util.stream.Collectors;
 public class ProductService implements ProductUseCase {
 
     private final ProductPort productPort;
+    private final ClausePort clausePort;
+    private final PlanPort planPort;
+    private final CoveragePort coveragePort;
 
     @Override
     public List<Product> getAll() {
@@ -57,59 +63,20 @@ public class ProductService implements ProductUseCase {
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
     public PersistenceResponse registerProduct(Product product) {
-        //Product product = coverageProductDto.getProduct()
         PersistenceResponse persistenceResponse = productPort.save(product, true);
-//        Object data = persistenceResponse.getData();
-//        Product product1 = (Product) data;
-//        List<CoverageProduct> coverageProductPortList = coverageProductDto.getCoverageProducts();
-//        List<CoverageProduct> coverageProductList = new ArrayList<>();
-//        coverageProductPortList.forEach(x -> {
-//            CoverageProduct product2 = new CoverageProduct();
-//            product2.setProductId(product1.getId());
-//            product2.setCoverageId(x.getCoverageId());
-//            product2.setStatus(x.getStatus());
-//            coverageProductList.add(product2);
-//        });
-//        coverageProductPort.saveAll(coverageProductList);
         return persistenceResponse;
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
     public PersistenceResponse updateProduct(Product product) {
-        //Product product = coverageProductDto.getProduct();
-        PersistenceResponse persistenceResponse = productPort.update(product);
-//        coverageProductPort.saveAll(coverageProductDto.getCoverageProducts());
-//        List<CoverageProduct> coverageProduct = coverageProductDto.getCoverageProducts();
-//        List<CoverageProduct> coverageProductList = coverageProductPort.getAllCoverageProdcut();
-//        coverageProductList = coverageProductList.stream().filter(s -> s.getProductId() == product.getId()).collect(Collectors.toList());
-//        List<CoverageProduct> newList = new ArrayList<>();
-//        for (CoverageProduct element : coverageProductList) {
-//            for (CoverageProduct j : coverageProduct) {
-//                if (element.getProductId() == j.getProductId() && element.getCoverageId() != j.getCoverageId()) {
-//                    element.setStatus(0);
-//                    element.setLastModifiedAt(new Date());
-//                    coverageProductPort.update(element);
-//                }
-//            }
-
-//        }
-//        coverageProductPort.saveAll(coverageProductDto.getCoverageProducts());
-        return persistenceResponse;
+        return  productPort.update(product);
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {Exception.class})
     public PersistenceResponse deleteProduct(Long productId) {
         PersistenceResponse persistenceResponse=productPort.delete(productId);
-        //en caso de realizar la eliminacion logica del producto, deberia deberia darselo todo lo relacionado con el producto(plan, coverage,clause, anaxxe,etc.)
-//        List<CoverageProduct> coverageProductList = coverageProductPort.getAllCoverageProdcut();
-//        coverageProductList = coverageProductList.stream().filter(s -> s.getProductId() == productId).collect(Collectors.toList());
-//        coverageProductList.forEach(x->{
-//            x.setStatus(0);
-//            x.setLastModifiedAt(new Date());
-//            coverageProductPort.update(x);
-//        });
         return persistenceResponse;
     }
 

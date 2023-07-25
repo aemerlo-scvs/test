@@ -21,14 +21,14 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping(path = ProductDocumentEndPoint.BASE)
+@RequestMapping(path = "/productDocument")
 @Api(tags = "API REST Productos Documentos")
 public class ProductDocumentController {
 
 
     private final ProductDocumentUseCase productDocumentUseCase;
 
-    @GetMapping(value = ProductDocumentEndPoint.GETALL)
+    @GetMapping(value = "/all")
     @ApiOperation(value = "Listado de documentos de productos")
     ResponseEntity getAll() {
         try {
@@ -38,7 +38,7 @@ public class ProductDocumentController {
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
-    @GetMapping(value = ProductDocumentEndPoint.GETBYID)
+    @GetMapping(value = "/findById/{id}")
     @ApiOperation(value = "Documento de producto por id")
     ResponseEntity getById(@PathVariable Long id) {
         try {
@@ -49,7 +49,7 @@ public class ProductDocumentController {
         }
     }
 
-    @PostMapping(value = ProductDocumentEndPoint.SAVE)
+    @PostMapping(value = "/save")
     @ApiOperation(value = "Guardar documento de producto")
     public ResponseEntity save(@RequestBody ProductDocument obj) {
         try {
@@ -62,7 +62,7 @@ public class ProductDocumentController {
         }
 
     }
-    @PostMapping(value = ProductDocumentEndPoint.UPDATE)
+    @PostMapping(value = "/update")
     @ApiOperation(value = "Actualizar documento de producto")
     public ResponseEntity update(@RequestBody ProductDocument obj) {
         try {
@@ -74,7 +74,7 @@ public class ProductDocumentController {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
-    @DeleteMapping(value = ProductDocumentEndPoint.DELETE)
+    @DeleteMapping(value = "/delete/{id}")
     @ApiOperation(value = "Dar de baja documento de producto")
     public ResponseEntity delete(@PathVariable Long id) {
         try {
