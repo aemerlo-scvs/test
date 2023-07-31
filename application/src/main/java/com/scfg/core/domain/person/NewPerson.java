@@ -79,6 +79,10 @@ public class NewPerson extends BaseDomain {
     private String institutionalClientCode;
     @ApiModelProperty(notes = "Grupo empresarial asignado (viene de: Classifier)", example = "1")
     private Integer assignedGroupIdc;
+    @ApiModelProperty(notes = "Código cliente (algo referente al banco)", example = "12345789")
+    private Integer clientCode;
+    @ApiModelProperty(notes = "Tipo de cliente (Algo referente al banco)", example = "2")
+    private Integer clientType;
     @ApiModelProperty(notes = "Estado", example = "1")
     private Integer status;
     private ReferencePerson spouse;

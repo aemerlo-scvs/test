@@ -8,6 +8,7 @@ import com.scfg.core.domain.Telephone;
 import com.scfg.core.domain.common.Direction;
 import com.scfg.core.domain.dto.vin.Account;
 import com.scfg.core.domain.person.NewPerson;
+import com.scfg.core.domain.person.Person;
 import com.scfg.core.domain.person.PersonRole;
 import com.scfg.core.domain.person.ReferencePerson;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -37,11 +39,67 @@ public class NewPersonService implements NewPersonUseCase {
     public boolean validateIdentificationNumber(String identificationNumber){
         return newPersonPort.findByIdentificationNumber(identificationNumber);
     }
+
+    public NewPerson getById(long newPersonId) {
+        return newPersonPort.findById(newPersonId);
+    }
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {OperationException.class, Exception.class})
     @Override
     public Boolean save(NewPerson newPerson) {
-        try {
-            if(!validateIdentificationNumber(newPerson.getIdentificationNumber())){
+        try{
+
+
+//        Optional<Persona> existente = personaRepositorio.findById(persona.getId());
+//        Optional<NewPerson> newPersonAux = Optional.ofNullable(newPersonPort.findById(newPerson.getId()));
+            NewPerson newPersonAux = newPersonPort.findById(newPerson.getId());
+
+            if(newPersonAux != null || !newPersonAux.getName().isEmpty()){
+//        if(newPersonAux.isPresent()){
+//            NewPerson personUpdated = newPersonAux.get();
+                newPersonAux.setDocumentTypeIdc(newPerson.getDocumentTypeIdc());
+                newPersonAux.setIdentificationNumber(newPerson.getIdentificationNumber());
+                newPersonAux.setName(newPerson.getName());
+                newPersonAux.setLastName(newPerson.getLastName());
+                newPersonAux.setMotherLastName(newPerson.getMotherLastName());
+                newPersonAux.setMarriedLastName(newPerson.getMarriedLastName());
+                newPersonAux.setGenderIdc(newPerson.getGenderIdc());
+                newPersonAux.setMaritalStatusIdc(newPerson.getMaritalStatusIdc());
+                newPersonAux.setSpouse(newPerson.getSpouse());
+                newPersonAux.setBirthDate(newPerson.getBirthDate());
+                newPersonAux.setBirthPlaceIdc(newPerson.getBirthPlaceIdc());
+                newPersonAux.setNationalityIdc(newPerson.getNationalityIdc());
+                newPersonAux.setResidencePlaceIdc(newPerson.getResidencePlaceIdc());
+                newPersonAux.setActivityIdc(newPerson.getActivityIdc());
+                newPersonAux.setProfessionIdc(newPerson.getProfessionIdc());
+                newPersonAux.setWorkerTypeIdc(newPerson.getWorkerTypeIdc());
+                newPersonAux.setWorkerCompany(newPerson.getWorkerCompany());
+                newPersonAux.setWorkEntryYear(newPerson.getWorkEntryYear());
+                newPersonAux.setWorkPosition(newPerson.getWorkPosition());
+                newPersonAux.setMonthlyIncomeRangeIdc(newPerson.getMonthlyIncomeRangeIdc());
+                newPersonAux.setYearlyIncomeRangeIdc(newPerson.getYearlyIncomeRangeIdc());
+                newPersonAux.setBusinessTypeIdc(newPerson.getBusinessTypeIdc());
+                newPersonAux.setBusinessRegistrationNumber(newPerson.getBusinessRegistrationNumber());
+                newPersonAux.setEmail(newPerson.getEmail());
+                newPersonAux.setEventualClient(newPerson.getEventualClient());
+                newPersonAux.setInternalClientCode(newPerson.getInternalClientCode());
+                newPersonAux.setInstitutionalClientCode(newPerson.getInstitutionalClientCode());
+                newPersonAux.setClientCode(newPerson.getClientCode());
+                newPersonAux.setClientType(newPerson.getClientType());
+
+                newPersonAux.setTelephones(newPerson.getTelephones());
+                newPersonAux.setDirections(newPerson.getDirections());
+                newPersonAux.setDirections(newPerson.getDirections());
+                newPersonAux.setRelatedPersons(newPerson.getRelatedPersons());
+
+                newPersonPort.saveOrUpdate(newPersonAux);
+
+                return newPersonAux.getId() > 0;
+
+            } else {
+                if(validateIdentificationNumber(newPerson.getIdentificationNumber())){
+                    throw new OperationException("El número de identificación ya existe");
+                }
+
                 Long personId = newPersonPort.saveOrUpdate(newPerson);
                 List<Account> accountList = new ArrayList<>();
                 List<Telephone> telephoneList = new ArrayList<>();
@@ -99,10 +157,8 @@ public class NewPersonService implements NewPersonUseCase {
                     }
 
                 }
+
                 return personId > 0;
-            } else {
-                //obj que existe
-                throw new OperationException("El número de identificación ya existe");
             }
 
         } catch (OperationException e) {

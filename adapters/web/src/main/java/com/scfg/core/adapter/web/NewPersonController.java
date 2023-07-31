@@ -17,7 +17,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping(path ="/newPerson")
-@Api(tags = "API REST Persona")
+@Api(tags = "API REST NewPerson")
 public class NewPersonController {
     private final NewPersonUseCase newPersonUseCase;
     @PostMapping

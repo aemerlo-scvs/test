@@ -1,8 +1,10 @@
 package com.scfg.core.adapter.persistence.newPerson;
 
+import com.scfg.core.adapter.persistence.person.PersonJpaEntity;
 import com.scfg.core.adapter.persistence.personRole.PersonRoleJpaEntity;
 import com.scfg.core.application.port.out.NewPersonPort;
 import com.scfg.core.common.PersistenceAdapter;
+import com.scfg.core.common.enums.PersistenceStatusEnum;
 import com.scfg.core.domain.person.NewPerson;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.type.NTextType;
@@ -78,6 +80,13 @@ public class NewPersonPersistenceAdapter implements NewPersonPort {
     @Override
     public boolean findByIdentificationNumber(String identificationNumber){
         return this.newPersonRepository.findByIdentificationNumber(identificationNumber);
+    }
+
+    @Override
+    public NewPerson findById(long newPersonId) {
+        NewPersonJpaEntity newPersonJpaEntity = newPersonRepository.customFindById(newPersonId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return mapToDomain(newPersonJpaEntity);
+//        return (newPersonJpaEntity != null) ? mapToDomain(newPersonJpaEntity) : null;
     }
 
 
