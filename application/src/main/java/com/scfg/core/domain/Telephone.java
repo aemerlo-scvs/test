@@ -23,14 +23,12 @@ public class Telephone extends BaseDomain {
     private Integer telephoneTypeIdc;
     @ApiModelProperty(notes = "Número interno", example = "8238a")
     private String internalNumber;
-    @ApiModelProperty(notes = "Tipo de número de teléfono (viene de: Classifier)", example = "1")
-    private Integer numberTypeIdc;
 
     public Telephone() {}
 
-    public Telephone(Long personId, String number, Integer numberTypeIdc) {
+    public Telephone(Long personId, String number, Integer telephoneTypeIdc) {
         this.personId = personId;
         this.number = number;
-        this.numberTypeIdc = numberTypeIdc;
+        this.telephoneTypeIdc = telephoneTypeIdc;
     }
 }

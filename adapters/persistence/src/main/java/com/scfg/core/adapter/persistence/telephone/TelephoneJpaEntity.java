@@ -33,8 +33,6 @@ public class TelephoneJpaEntity extends BaseJpaEntity {
     @Column(name = "internalNumber")
     private String internalNumber;
 
-    @Column(name = "numberTypeIdc")
-    private Integer numberTypeIdc;
     @Column(name = "number")
     private Integer number;
 }

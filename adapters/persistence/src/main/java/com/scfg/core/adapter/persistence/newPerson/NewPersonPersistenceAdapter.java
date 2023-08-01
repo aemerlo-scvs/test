@@ -1,10 +1,16 @@
 package com.scfg.core.adapter.persistence.newPerson;
 
+import com.scfg.core.adapter.persistence.clause.ClauseJpaEntity;
+import com.scfg.core.adapter.persistence.clause.ClausePersistenceAdapter;
 import com.scfg.core.adapter.persistence.person.PersonJpaEntity;
 import com.scfg.core.adapter.persistence.personRole.PersonRoleJpaEntity;
 import com.scfg.core.application.port.out.NewPersonPort;
 import com.scfg.core.common.PersistenceAdapter;
+import com.scfg.core.common.enums.ActionRequestEnum;
 import com.scfg.core.common.enums.PersistenceStatusEnum;
+import com.scfg.core.common.util.ObjectMapperUtils;
+import com.scfg.core.common.util.PersistenceResponse;
+import com.scfg.core.domain.Clause;
 import com.scfg.core.domain.person.NewPerson;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.type.NTextType;
@@ -14,6 +20,9 @@ import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import static mssql.googlecode.concurrentlinkedhashmap.Weighers.map;
 
 @PersistenceAdapter
 @RequiredArgsConstructor
@@ -27,7 +36,7 @@ public class NewPersonPersistenceAdapter implements NewPersonPort {
 
     @Override
     public long saveOrUpdate(NewPerson newPerson) {
-        NewPersonJpaEntity newPersonJpaEntity = mapToJpaEntity(newPerson);
+        NewPersonJpaEntity newPersonJpaEntity = ObjectMapperUtils.map(newPerson, NewPersonJpaEntity.class);
         newPersonJpaEntity = newPersonRepository.save(newPersonJpaEntity);
         return newPersonJpaEntity.getId();
     }
@@ -84,9 +93,8 @@ public class NewPersonPersistenceAdapter implements NewPersonPort {
 
     @Override
     public NewPerson findById(long newPersonId) {
-        NewPersonJpaEntity newPersonJpaEntity = newPersonRepository.customFindById(newPersonId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
-        return mapToDomain(newPersonJpaEntity);
-//        return (newPersonJpaEntity != null) ? mapToDomain(newPersonJpaEntity) : null;
+        Optional<NewPersonJpaEntity> newPerson = Optional.ofNullable(newPersonRepository.customFindById(newPersonId, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue()));
+        return newPerson.isPresent() ? ObjectMapperUtils.map(newPerson.get(), NewPerson.class): null;
     }
 
 

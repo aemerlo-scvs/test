@@ -22,9 +22,6 @@ public class Direction extends BaseDomain {
     @ApiModelProperty(notes = "Tipo de Dirección (viene de: Classifier)", example = "1")
     private Integer directionTypeIdc;
 
-    @ApiModelProperty(notes = "Número de Celular de la casa?", example = "72182046")
-    private String cellPhone;
-
     @ApiModelProperty(notes = "Persona (viene de: Person)", example = "1")
     private Long personId;
     @ApiModelProperty(notes = "Persona (viene de: NewPerson)", example = "1")
