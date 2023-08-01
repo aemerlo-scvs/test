@@ -7,6 +7,7 @@ import com.scfg.core.application.service.SMVSGeneratePolicy;
 import com.scfg.core.common.enums.SMVSResponseEnum;
 import com.scfg.core.common.exception.NotFileWriteReadException;
 import com.scfg.core.domain.Emailbody;
+import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.common.Classifier;
 import com.scfg.core.domain.dto.FileDocumentDTO;
 import com.scfg.core.domain.person.Person;
@@ -16,10 +17,18 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.badRequest;
@@ -193,6 +202,32 @@ public class SMVSController implements SMVSEndpoint {
             while (e.getCause() != null)
                 e = (Exception) e.getCause();
             log.error("Ocurrió un error al realizar la activación del seguro en el rango de periodo", "Fechas: " + fromDate + " hasta:"  + toDate, e);
+            return CustomErrorType.serverError("Server Error", e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/send-whatsapp-test")
+    @ApiOperation(value = "WhatsApp prueba")
+    ResponseEntity WppTest(@RequestParam String message,@RequestParam String number, @RequestParam long docId) throws MessagingException {
+        automaticGeneratePolicy.testWhatsAppSender(number, message, docId);
+        boolean res = false;
+        return ok("HOla mundo");
+    }
+
+    @GetMapping(value = "/download-doc")
+    @ApiOperation(value = "Descarga de archivo formato")
+    ResponseEntity<Resource> downloadDoc(@RequestParam long id) {
+        try {
+            FileDocument file = automaticGeneratePolicy.getDocument(id);
+            byte[] attachment = Base64.getDecoder().decode(file.getContent().getBytes(StandardCharsets.UTF_8));
+            InputStream stream = new ByteArrayInputStream(attachment);
+            InputStreamResource resource = new InputStreamResource(stream);
+            return ResponseEntity.ok().contentType(MediaType.parseMediaType(file.getMime()))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getDescription() + "\"")
+                    .body(resource);
+
+        } catch (Exception e) {
+            log.error("Error al queres descargar el documento de formato", e);
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }

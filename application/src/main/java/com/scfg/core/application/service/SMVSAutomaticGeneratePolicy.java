@@ -1,17 +1,19 @@
 package com.scfg.core.application.service;
 
-import com.scfg.core.application.port.out.DirectionPort;
-import com.scfg.core.application.port.out.GeneralRequestPort;
-import com.scfg.core.application.port.out.PersonPort;
-import com.scfg.core.application.port.out.ReceiptPort;
+import com.scfg.core.application.port.out.*;
+import com.scfg.core.application.service.sender.SenderService;
+import com.scfg.core.application.service.sender.WhatsAppSenderService;
 import com.scfg.core.common.enums.TypesDocumentPersonEnum;
 import com.scfg.core.common.exception.NotFileWriteReadException;
 import com.scfg.core.common.util.DateUtils;
 import com.scfg.core.domain.Beneficiary;
+import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.GeneralRequest;
 import com.scfg.core.domain.Receipt;
 import com.scfg.core.domain.common.Direction;
+import com.scfg.core.domain.dto.AttachmentDTO;
 import com.scfg.core.domain.dto.FileDocumentDTO;
+import com.scfg.core.domain.dto.MessageDTO;
 import com.scfg.core.domain.person.Person;
 import com.scfg.core.domain.smvs.PendingActivateErrorDTO;
 import com.scfg.core.domain.smvs.SavePolicyDTO;
@@ -24,6 +26,7 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
+import javax.mail.Message;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -45,6 +48,10 @@ public class SMVSAutomaticGeneratePolicy {
     private final PersonPort personPort;
     private final DirectionPort directionPort;
     private final ReceiptPort receiptPort;
+    private final FileDocumentPort fileDocumentPort;
+
+    private final SenderService senderService;
+    private final WhatsAppSenderService whatsAppSenderService;
 
     public List<PendingActivateErrorDTO> generatePendingFromPeriod(String fromDate, String toDate) {
         List<GeneralRequest> generalRequestList = generalRequestPort.getAllByPendingAndActivationCode(fromDate,toDate);
@@ -270,5 +277,23 @@ public class SMVSAutomaticGeneratePolicy {
         g2d.dispose();
 
         return img;
+    }
+
+    public void testWhatsAppSender(String number, String message, long docId) {
+        senderService.setStrategy(whatsAppSenderService);
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setMessage(message);
+        messageDTO.setTo(number);
+//        senderService.sendMessage(messageDTO);
+        AttachmentDTO attachmentDTO = new AttachmentDTO();
+        attachmentDTO.setFileName(docId+"");
+        List<AttachmentDTO> attachmentDTOList = new ArrayList<>();
+        attachmentDTOList.add(attachmentDTO);
+        senderService.sendMessageWithAttachment(messageDTO, attachmentDTOList);
+    }
+
+    public FileDocument getDocument(long id) {
+        FileDocument fileDocument = this.fileDocumentPort.findById(id);
+        return fileDocument;
     }
 }

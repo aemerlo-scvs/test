@@ -27,22 +27,22 @@ public class SenderService implements SenderUseCase {
     @Override
     public boolean sendMessage(MessageDTO messageDTO) {
         long idAux = 0l;
-        MessageDTO msgEmail = messageToSendPort.saveOrUpdate(messageDTO);
+//        MessageDTO msgEmail = messageToSendPort.saveOrUpdate(messageDTO);
         boolean status = strategy.sendMessage(messageDTO);
         if (status) {
-            idAux = msgEmail.getId();
-            msgEmail.setId(0l);
-            messageSentPort.saveOrUpdate(msgEmail);
-            messageToSendPort.delete(idAux);
+//            idAux = msgEmail.getId();
+//            msgEmail.setId(0l);
+//            messageSentPort.saveOrUpdate(msgEmail);
+//            messageToSendPort.delete(idAux);
         } else {
-            if (msgEmail.getLastNumberOfAttempt() == null) {
-                msgEmail.setLastNumberOfAttempt(msgEmail.getNumberOfAttempt());
-            }
-            if ((msgEmail.getLastNumberOfAttempt() - msgEmail.getNumberOfAttempt()) <= 0) {
-                msgEmail.setNumberOfAttempt(msgEmail.getNumberOfAttempt() + 1);
-            }
-            msgEmail.setObservation("Error al enviar el mensaje");
-            messageToSendPort.saveOrUpdate(msgEmail);
+//            if (msgEmail.getLastNumberOfAttempt() == null) {
+//                msgEmail.setLastNumberOfAttempt(msgEmail.getNumberOfAttempt());
+//            }
+//            if ((msgEmail.getLastNumberOfAttempt() - msgEmail.getNumberOfAttempt()) <= 0) {
+//                msgEmail.setNumberOfAttempt(msgEmail.getNumberOfAttempt() + 1);
+//            }
+//            msgEmail.setObservation("Error al enviar el mensaje");
+//            messageToSendPort.saveOrUpdate(msgEmail);
         }
         return status;
     }
@@ -50,22 +50,22 @@ public class SenderService implements SenderUseCase {
     @Override
     public boolean sendMessageWithAttachment(MessageDTO messageDTO, List<AttachmentDTO> attachmentList) {
         long idAux = 0l;
-        MessageDTO msgEmail = messageToSendPort.saveOrUpdate(messageDTO);
+//        MessageDTO msgEmail = messageToSendPort.saveOrUpdate(messageDTO);
         boolean status = strategy.sendMessageWithAttachment(messageDTO,attachmentList);
         if (status) {
-            idAux = msgEmail.getId();
-            msgEmail.setId(0l);
-            messageSentPort.saveOrUpdate(msgEmail);
-            messageToSendPort.delete(idAux);
+//            idAux = msgEmail.getId();
+//            msgEmail.setId(0l);
+//            messageSentPort.saveOrUpdate(msgEmail);
+//            messageToSendPort.delete(idAux);
         } else {
-            if (msgEmail.getLastNumberOfAttempt() == null) {
-                msgEmail.setLastNumberOfAttempt(msgEmail.getNumberOfAttempt());
-            }
-            if ((msgEmail.getLastNumberOfAttempt() - msgEmail.getNumberOfAttempt()) <= 0) {
-                msgEmail.setNumberOfAttempt(msgEmail.getNumberOfAttempt() + 1);
-            }
-            msgEmail.setObservation("Error al enviar el mensaje");
-            messageToSendPort.saveOrUpdate(msgEmail);
+//            if (msgEmail.getLastNumberOfAttempt() == null) {
+//                msgEmail.setLastNumberOfAttempt(msgEmail.getNumberOfAttempt());
+//            }
+//            if ((msgEmail.getLastNumberOfAttempt() - msgEmail.getNumberOfAttempt()) <= 0) {
+//                msgEmail.setNumberOfAttempt(msgEmail.getNumberOfAttempt() + 1);
+//            }
+//            msgEmail.setObservation("Error al enviar el mensaje");
+//            messageToSendPort.saveOrUpdate(msgEmail);
         }
         return status;
     }
