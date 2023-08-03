@@ -43,11 +43,11 @@ public class NewPersonService implements NewPersonUseCase {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {OperationException.class, Exception.class})
-    @Override
-    public Boolean save(NewPerson newPerson) {
+    public Boolean saveOrUpdate(NewPerson newPerson) {
         try {
             NewPerson newPersonAux = newPersonPort.findById(newPerson.getId());
             long personId = 0L;
+
             //#region personas
             if (newPersonAux != null) {
                 newPersonAux.setDocumentTypeIdc(newPerson.getDocumentTypeIdc());
@@ -91,38 +91,44 @@ public class NewPersonService implements NewPersonUseCase {
                 personId = newPersonPort.saveOrUpdate(newPerson);
             }
 
-            //#final region personas
+            //#endregion personas
 
-            //#region registrar
+            //#region secciones del módulo de personas
             if (!newPerson.getTelephones().isEmpty()) {
                 List<Telephone> telephoneList = new ArrayList<>();
                 for (Telephone obj : newPerson.getTelephones()) {
-                    obj.setNewPersonId(personId  );
-                    obj.setPersonId(newPerson.getPersonId());
+                    obj.setNewPersonId(personId);
+                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
                     telephoneList.add(obj);
                 }
                 telephonePort.saveOrUpdateAll(telephoneList);
             }
 
+
             if (!newPerson.getDirections().isEmpty()) {
                 List<Direction> directionList = new ArrayList<>();
                 for (Direction obj : newPerson.getDirections()) {
                     obj.setNewPersonId(personId);
-                    obj.setPersonId(newPerson.getPersonId());
+                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
                     directionList.add(obj);
                 }
                 directionPort.saveAllDirection(directionList);
             }
 
+
             if (!newPerson.getAccounts().isEmpty()) {
                 List<Account> accountList = new ArrayList<>();
                 for (Account obj : newPerson.getAccounts()) {
                     obj.setNewPersonId(personId);
-                    obj.setPersonId(newPerson.getPersonId());
+                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
                     accountList.add(obj);
                 }
                 accountPort.saveOrUpdateAll(accountList);
             }
+
+            //#endregion
+
+            //#region validaciones
 
             if (newPerson.getDocumentTypeIdc() != ClassifierEnum.NIT_IdentificationType.getReferenceCode()) {
                 List<ReferencePerson> referencePersonList = new ArrayList<>();
@@ -138,9 +144,10 @@ public class NewPersonService implements NewPersonUseCase {
                     referencePersonList.add(newPerson.getSpouse());
                 }
                 referencePersonPort.saveOrUpdateAll(referencePersonList);
+
             } else {
-                List<PersonRole> personRoleList = new ArrayList<>();
                 if (!newPerson.getRelatedPersons().isEmpty()) {
+                    List<PersonRole> personRoleList = new ArrayList<>();
                     for (PersonRole obj : newPerson.getRelatedPersons()) {
                         obj.setPersonId((personId));
                         personRoleList.add(obj);
@@ -152,64 +159,7 @@ public class NewPersonService implements NewPersonUseCase {
                 }
 
             }
-            //#final region registrar
-
-            //#region editar
-
-            if (!newPerson.getTelephones().isEmpty()) {
-                List<Telephone> telephoneList = new ArrayList<>();
-                for (Telephone obj : newPerson.getTelephones()) {
-                    obj.setNewPersonId(newPerson.getId());
-                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                    telephoneList.add(obj);
-                }
-                telephonePort.saveOrUpdateAll(telephoneList);
-            }
-
-            if (!newPerson.getDirections().isEmpty()) {
-                List<Direction> directionList = new ArrayList<>();
-                for (Direction obj : newPerson.getDirections()) {
-                    obj.setNewPersonId(newPerson.getId());
-                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                    directionList.add(obj);
-                }
-                directionPort.saveAllDirection(directionList);
-
-            }
-
-            if (!newPerson.getAccounts().isEmpty()) {
-                newPersonAux.setAccounts(newPerson.getAccounts());
-                accountPort.saveOrUpdateAll(newPersonAux.getAccounts());
-            }
-            if (!newPerson.getAccounts().isEmpty()) {
-                List<Account> accountList = new ArrayList<>();
-                for (Account obj : newPerson.getAccounts()) {
-                    obj.setNewPersonId(personId);
-                    obj.setPersonId(newPerson.getPersonId());
-                    accountList.add(obj);
-                }
-                accountPort.saveOrUpdateAll(accountList);
-            }
-
-
-            if (newPerson.getDocumentTypeIdc() != ClassifierEnum.NIT_IdentificationType.getReferenceCode()) {
-                if (!newPerson.getReferencePersonInfo().isEmpty()) {
-                    newPersonAux.setReferencePersonInfo(newPerson.getReferencePersonInfo());
-                }
-                //Es mujer y casada
-                if (newPerson.getMaritalStatusIdc() == ClassifierEnum.MARRIED_STATUS.getReferenceCode() && newPerson.getGenderIdc() == ClassifierEnum.FEMALE.getReferenceCode()) {
-                    newPersonAux.getSpouse().setReferenceRelationshipIdc((int) ClassifierEnum.SPOUSE.getReferenceCode());
-                    newPersonAux.setSpouse(newPerson.getSpouse());
-                }
-            } else {
-                if (!newPerson.getRelatedPersons().isEmpty()) {
-                    newPersonAux.setRelatedPersons(newPerson.getRelatedPersons());
-                } else {
-                    throw new OperationException("Una persona jurídica debe tener al menos una persona relacionada");
-                }
-            }
-
-            //#finall region
+            //#endregion validaciones
 
             return personId > 0;
 

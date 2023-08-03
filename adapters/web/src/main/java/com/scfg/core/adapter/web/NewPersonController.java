@@ -24,7 +24,7 @@ public class NewPersonController {
     @ApiOperation(value = "Guarda una Persona")
     ResponseEntity save(@RequestBody NewPerson newPerson) {
         try {
-            Boolean saved = newPersonUseCase.save(newPerson);
+            Boolean saved = newPersonUseCase.saveOrUpdate(newPerson);
             return ok(saved);
         } catch (OperationException e){
             return CustomErrorType.badRequest("Bad Request", e.getMessage());
