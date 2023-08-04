@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     String[] whiteList = new String[]{
             "/include/**", "/css/**", "/icons/**", "img/**", "/js/**", "/vendor/**", "/swagger-ui/**", "/classifier/classifierType/**", "/notificationWebSocket/**",
-            "/product/plans/**", "/smvs/**", "/vin/cancelPolicy/**", "/vin/validateOperationDetail/**", "/proposalResponse/**", "/newPerson/**"
+            "/product/plans/**", "/smvs/**", "/vin/cancelPolicy/**", "/vin/validateOperationDetail/**", "/proposalResponse/**", "/newPerson/**","/virh/**"
     };
 
 

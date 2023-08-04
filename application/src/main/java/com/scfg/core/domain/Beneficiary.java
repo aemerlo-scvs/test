@@ -40,6 +40,7 @@ public class Beneficiary extends BaseDomain {
     private String legalIdentification;
     @Null
     private Integer legalExt;
+    private String telephone;
 
     public String getFullName(){
         String completeName = "";
