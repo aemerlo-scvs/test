@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import javax.validation.constraints.Null;
 import java.time.LocalDateTime;
 import java.util.List;
 @AllArgsConstructor
@@ -89,7 +90,9 @@ public class NewPerson extends BaseDomain {
     private List<Account> accounts;
     private List<PersonRole> relatedPersons;
 
+    @Null
     private List<FileDocumentDTO> documentList;
+    @Null
     private FileDocumentDTO documentFirm;
 
 }
