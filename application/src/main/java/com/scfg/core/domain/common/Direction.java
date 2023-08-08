@@ -32,4 +32,8 @@ public class Direction extends BaseDomain {
     private Integer cityIdc;
     @ApiModelProperty(notes = "Referencia de la dirección", example = "Al frente de una ventita")
     private String referenceDirection;
+
+    @ApiModelProperty(notes = "Cellphone", example = "76336529")
+    private String cellphone;
+
 }

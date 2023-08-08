@@ -30,6 +30,9 @@ public class TelephoneJpaEntity extends BaseJpaEntity {
     @Column(name = "telephoneTypeIdc")
     private Integer telephoneTypeIdc;
 
+    @Column(name = "DeviceTypeIdc")
+    private Integer DeviceTypeIdc;
+
     @Column(name = "internalNumber")
     private String internalNumber;
 

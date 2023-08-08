@@ -42,4 +42,7 @@ public class DirectionJpaEntity extends BaseJpaEntity {
 
     @Column(name = "newPersonId")
     private Long newPersonId;
+
+    @Column(name = "cellphone")
+    private String cellphone;
 }

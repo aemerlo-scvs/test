@@ -19,6 +19,8 @@ public class Telephone extends BaseDomain {
     private Long newPersonId;
     @ApiModelProperty(notes = "Número de teléfono", example = "76336529")
     private String number;
+    @ApiModelProperty(notes = "Tipo de Dispositivo (viene de: Classifier)", example = "1")
+    private Integer deviceTypeIdc;
     @ApiModelProperty(notes = "Tipo de teléfono (viene de: Classifier)", example = "1")
     private Integer telephoneTypeIdc;
     @ApiModelProperty(notes = "Número interno", example = "8238a")
