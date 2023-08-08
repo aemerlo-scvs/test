@@ -20,7 +20,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @Api(tags = "API REST VIRH")
 public class VIRHController {
     private final   VIRHProcessService service;
-    @GetMapping (value = "/informationPolicy")
+    @GetMapping (value = "/policyInformation")
     @ApiOperation(value = "Servicio para recuperar información (plan, asegurado, beneficiario)")
     ResponseEntity informationPolicy(@Param("param") String param) {
         try {
