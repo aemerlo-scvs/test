@@ -108,10 +108,8 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
 
             //#region Validación de calidad de información
 
-            Person personAux = personPort.findByIdentificationNumberAndType(processRequest.getPerson().getNaturalPerson()
-                                                                            .getIdentificationNumber(),
-                                                                            processRequest.getPerson().getNaturalPerson()
-                                                                            .getDocumentType());
+            Person personAux = personPort.findByIdentificationNumberAndType(processRequest.getPerson().getNaturalPerson().getIdentificationNumber(),
+                                                                            processRequest.getPerson().getNaturalPerson().getDocumentType());
 
             //#endregion
 
