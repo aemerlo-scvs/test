@@ -34,81 +34,138 @@ public class NewPersonService implements NewPersonUseCase {
         return newPersonPort.searchPerson(documentTypeIdc, identificationNumber, name);
     }
 
-    public boolean validateIdentificationNumber(String identificationNumber){
+    public boolean validateIdentificationNumber(String identificationNumber) {
         return newPersonPort.findByIdentificationNumber(identificationNumber);
     }
-    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {OperationException.class, Exception.class})
-    @Override
-    public Boolean save(NewPerson newPerson) {
-        try {
-            if(!validateIdentificationNumber(newPerson.getIdentificationNumber())){
-                Long personId = newPersonPort.saveOrUpdate(newPerson);
-                List<Account> accountList = new ArrayList<>();
-                List<Telephone> telephoneList = new ArrayList<>();
-                List<Direction> directionList = new ArrayList<>();
-                List<ReferencePerson> referencePersonList = new ArrayList<>();
-                List<PersonRole> personRoleList = new ArrayList<>();
 
+    public NewPerson getById(long newPersonId) {
+        return newPersonPort.findById(newPersonId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {OperationException.class, Exception.class})
+    public Boolean saveOrUpdate(NewPerson newPerson) {
+        try {
+            NewPerson newPersonAux = newPersonPort.findById(newPerson.getId());
+            long personId = 0L;
+
+            //#region personas
+            if (newPersonAux != null) {
+                newPersonAux.setDocumentTypeIdc(newPerson.getDocumentTypeIdc());
+                newPersonAux.setIdentificationNumber(newPerson.getIdentificationNumber());
+                newPersonAux.setName(newPerson.getName());
+                newPersonAux.setLastName(newPerson.getLastName());
+                newPersonAux.setMotherLastName(newPerson.getMotherLastName());
+                newPersonAux.setMarriedLastName(newPerson.getMarriedLastName());
+                newPersonAux.setGenderIdc(newPerson.getGenderIdc());
+                newPersonAux.setMaritalStatusIdc(newPerson.getMaritalStatusIdc());
+                newPersonAux.setSpouse(newPerson.getSpouse());
+                newPersonAux.setBirthDate(newPerson.getBirthDate());
+                newPersonAux.setBirthPlaceIdc(newPerson.getBirthPlaceIdc());
+                newPersonAux.setNationalityIdc(newPerson.getNationalityIdc());
+                newPersonAux.setResidencePlaceIdc(newPerson.getResidencePlaceIdc());
+                newPersonAux.setActivityIdc(newPerson.getActivityIdc());
+                newPersonAux.setProfessionIdc(newPerson.getProfessionIdc());
+                newPersonAux.setWorkerTypeIdc(newPerson.getWorkerTypeIdc());
+                newPersonAux.setWorkerCompany(newPerson.getWorkerCompany());
+                newPersonAux.setWorkEntryYear(newPerson.getWorkEntryYear());
+                newPersonAux.setWorkPosition(newPerson.getWorkPosition());
+                newPersonAux.setMonthlyIncomeRangeIdc(newPerson.getMonthlyIncomeRangeIdc());
+                newPersonAux.setYearlyIncomeRangeIdc(newPerson.getYearlyIncomeRangeIdc());
+                newPersonAux.setBusinessTypeIdc(newPerson.getBusinessTypeIdc());
+                newPersonAux.setBusinessRegistrationNumber(newPerson.getBusinessRegistrationNumber());
+                newPersonAux.setEmail(newPerson.getEmail());
+                newPersonAux.setEventualClient(newPerson.getEventualClient());
+                newPersonAux.setInternalClientCode(newPerson.getInternalClientCode());
+                newPersonAux.setInstitutionalClientCode(newPerson.getInstitutionalClientCode());
+                newPersonAux.setClientCode(newPerson.getClientCode());
+                newPersonAux.setClientType(newPerson.getClientType());
+
+                personId = newPersonPort.saveOrUpdate(newPersonAux);
+
+
+            } else {
+                if (validateIdentificationNumber(newPerson.getIdentificationNumber())) {
+                    throw new OperationException("El número de identificación ya existe");
+                }
+
+                personId = newPersonPort.saveOrUpdate(newPerson);
+            }
+
+            //#endregion personas
+
+            //#region secciones del módulo de personas
+            if (!newPerson.getTelephones().isEmpty()) {
+                List<Telephone> telephoneList = new ArrayList<>();
                 for (Telephone obj : newPerson.getTelephones()) {
                     obj.setNewPersonId(personId);
-                    obj.setPersonId(null);
+                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
                     telephoneList.add(obj);
                 }
                 telephonePort.saveOrUpdateAll(telephoneList);
+            }
 
+
+            if (!newPerson.getDirections().isEmpty()) {
+                List<Direction> directionList = new ArrayList<>();
                 for (Direction obj : newPerson.getDirections()) {
                     obj.setNewPersonId(personId);
-                    obj.setPersonId(null);
+                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
                     directionList.add(obj);
                 }
                 directionPort.saveAllDirection(directionList);
-
-                if (!newPerson.getAccounts().isEmpty()) {
-                    for (Account obj : newPerson.getAccounts()) {
-                        obj.setNewPersonId(personId);
-                        obj.setPersonId(null);
-                        accountList.add(obj);
-                    }
-                    accountPort.saveOrUpdateAll(accountList);
-                }
-
-                if (newPerson.getDocumentTypeIdc() != ClassifierEnum.NIT_IdentificationType.getReferenceCode()) {
-                    if (!newPerson.getReferencePersonInfo().isEmpty()) {
-                        for (ReferencePerson obj : newPerson.getReferencePersonInfo()) {
-                            obj.setPersonId(personId);
-                            referencePersonList.add(obj);
-                        }
-                    }
-                    if (newPerson.getMaritalStatusIdc() == ClassifierEnum.MARRIED_STATUS.getReferenceCode() && newPerson.getGenderIdc() == ClassifierEnum.FEMALE.getReferenceCode()) {
-                        newPerson.getSpouse().setReferenceRelationshipIdc((int) ClassifierEnum.SPOUSE.getReferenceCode());
-                        newPerson.getSpouse().setPersonId(personId);
-                        referencePersonList.add(newPerson.getSpouse());
-                    }
-                    referencePersonPort.saveOrUpdateAll(referencePersonList);
-                } else {
-                    if (!newPerson.getRelatedPersons().isEmpty()) {
-                        for (PersonRole obj : newPerson.getRelatedPersons()) {
-                            obj.setPersonId((personId));
-                            personRoleList.add(obj);
-                        }
-                        personRolePort.saveOrUpdateAll(personRoleList);
-
-                    } else {
-//                        Long personId = newPersonPort.saveOrUpdate(newPerson);
-                        throw new OperationException("Una persona jurídica debe tener al menos una persona relacionada");
-                    }
-
-                }
-                return personId > 0;
-            } else {
-                //obj que existe
-                throw new OperationException("El número de identificación ya existe");
             }
+
+
+            if (!newPerson.getAccounts().isEmpty()) {
+                List<Account> accountList = new ArrayList<>();
+                for (Account obj : newPerson.getAccounts()) {
+                    obj.setNewPersonId(personId);
+                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                    accountList.add(obj);
+                }
+                accountPort.saveOrUpdateAll(accountList);
+            }
+
+            //#endregion
+
+            //#region validaciones
+
+            if (newPerson.getDocumentTypeIdc() != ClassifierEnum.NIT_IdentificationType.getReferenceCode()) {
+                List<ReferencePerson> referencePersonList = new ArrayList<>();
+                if (!newPerson.getReferencePersonInfo().isEmpty()) {
+                    for (ReferencePerson obj : newPerson.getReferencePersonInfo()) {
+                        obj.setPersonId(personId);
+                        referencePersonList.add(obj);
+                    }
+                }
+                if (newPerson.getMaritalStatusIdc() == ClassifierEnum.MARRIED_STATUS.getReferenceCode() && newPerson.getGenderIdc() == ClassifierEnum.FEMALE.getReferenceCode()) {
+                    newPerson.getSpouse().setReferenceRelationshipIdc((int) ClassifierEnum.SPOUSE.getReferenceCode());
+                    newPerson.getSpouse().setPersonId(personId);
+                    referencePersonList.add(newPerson.getSpouse());
+                }
+                referencePersonPort.saveOrUpdateAll(referencePersonList);
+
+            } else {
+                if (!newPerson.getRelatedPersons().isEmpty()) {
+                    List<PersonRole> personRoleList = new ArrayList<>();
+                    for (PersonRole obj : newPerson.getRelatedPersons()) {
+                        obj.setPersonId((personId));
+                        personRoleList.add(obj);
+                    }
+                    personRolePort.saveOrUpdateAll(personRoleList);
+
+                } else {
+                    throw new OperationException("Una persona jurídica debe tener al menos una persona relacionada");
+                }
+
+            }
+            //#endregion validaciones
+
+            return personId > 0;
 
         } catch (OperationException e) {
             throw new OperationException(e.getMessage());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.getMessage();
             return false;
         }

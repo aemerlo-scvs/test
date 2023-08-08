@@ -17,14 +17,14 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping(path ="/newPerson")
-@Api(tags = "API REST Persona")
+@Api(tags = "API REST NewPerson")
 public class NewPersonController {
     private final NewPersonUseCase newPersonUseCase;
     @PostMapping
     @ApiOperation(value = "Guarda una Persona")
     ResponseEntity save(@RequestBody NewPerson newPerson) {
         try {
-            Boolean saved = newPersonUseCase.save(newPerson);
+            Boolean saved = newPersonUseCase.saveOrUpdate(newPerson);
             return ok(saved);
         } catch (OperationException e){
             return CustomErrorType.badRequest("Bad Request", e.getMessage());

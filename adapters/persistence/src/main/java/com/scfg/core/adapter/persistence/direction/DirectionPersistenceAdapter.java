@@ -1,10 +1,12 @@
 package com.scfg.core.adapter.persistence.direction;
 
+import com.scfg.core.adapter.persistence.newPerson.NewPersonJpaEntity;
 import com.scfg.core.application.port.out.DirectionPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.DirectionTypeEnum;
 import com.scfg.core.common.enums.PersistenceStatusEnum;
 import com.scfg.core.domain.common.Direction;
+import com.scfg.core.domain.person.NewPerson;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
@@ -58,23 +60,8 @@ public class DirectionPersistenceAdapter implements DirectionPort {
         directionRepository.deleteWorkAndPersonalDirectionByPersonId(PersistenceStatusEnum.DELETED.getValue(), personId, DirectionTypeEnum.PERSONAL.getValue(),DirectionTypeEnum.WORK.getValue());
     }
     //#region Mappers
-
     public static DirectionJpaEntity mapToJpaEntity(Direction direction) {
-        DirectionJpaEntity directionJpaEntity = DirectionJpaEntity.builder()
-                .id(direction.getId())
-                .cellPhone(direction.getCellPhone())
-                .description(direction.getDescription())
-                .directionTypeIdc(direction.getDirectionTypeIdc())
-                .personId(direction.getPersonId())
-                .newPersonId(direction.getNewPersonId())
-                .departmentIdc(direction.getDepartmentIdc())
-                .cityIdc(direction.getCityIdc())
-                .referenceDirection(direction.getReferenceDirection())
-                .createdAt(direction.getCreatedAt())
-                .lastModifiedAt(direction.getLastModifiedAt())
-                .build();
-
-        return directionJpaEntity;
+        return new ModelMapper().map(direction,DirectionJpaEntity.class);
     }
 
     //#endregion
