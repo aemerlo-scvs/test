@@ -94,26 +94,111 @@ public class NewPersonService implements NewPersonUseCase {
             //#endregion personas
 
             //#region secciones del módulo de personas
+//            if (!newPerson.getTelephones().isEmpty()) {
+//                    List<Telephone> telephoneList = new ArrayList<>();
+//                    for (Telephone obj : newPerson.getTelephones()) {
+//                        obj.setNewPersonId(personId);
+//                        obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+//                        telephoneList.add(obj);
+//                    }
+//                    telephonePort.saveOrUpdateAll(telephoneList);
+//            }
+
+            // Si la lista de teléfonos no está vacía
             if (!newPerson.getTelephones().isEmpty()) {
-                List<Telephone> telephoneList = new ArrayList<>();
-                for (Telephone obj : newPerson.getTelephones()) {
-                    obj.setNewPersonId(personId);
-                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                    telephoneList.add(obj);
+                List<Telephone> actTelephoneList =  telephonePort.getAllByPersonId(personId);
+
+                // Listas para nuevos teléfonos y teléfonos a actualizar
+                List<Telephone> telephonesToUpdate = new ArrayList<>();
+                List<Telephone> newTelephones = new ArrayList<>();
+
+                // Si hay teléfonos ya asociados
+                if (actTelephoneList != null) {
+                    for (Telephone obj : newPerson.getTelephones()) {
+                        if (actTelephoneList.contains(obj)) {
+                            // Aquí puedes agregar validaciones adicionales si lo necesitas
+                            telephonesToUpdate.add(obj);
+                        } else {
+                            obj.setNewPersonId(personId);
+                            obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                            newTelephones.add(obj);
+                        }
+                    }
+                    // Guarda o actualiza los teléfonos ya existentes
+                    if (!telephonesToUpdate.isEmpty()) {
+                        telephonePort.saveOrUpdateAll(telephonesToUpdate);
+                    }
+                } else {
+                    // Si no hay teléfonos asociados, todos los teléfonos son nuevos
+                    newTelephones.addAll(newPerson.getTelephones());
                 }
-                telephonePort.saveOrUpdateAll(telephoneList);
+
+                // Guarda los nuevos teléfonos
+                if (!newTelephones.isEmpty()) {
+                    telephonePort.saveOrUpdateAll(newTelephones);
+                }
             }
 
 
+
+//            if (!newPerson.getDirections().isEmpty()) {
+//                List<Direction> directionList = new ArrayList<>();
+//                for (Direction obj : newPerson.getDirections()) {
+//                    obj.setNewPersonId(personId);
+//                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+//                    directionList.add(obj);
+//                }
+//                directionPort.saveAllDirection(directionList);
+//            }
+
+
+            // Si la lista de teléfonos no está vacía
             if (!newPerson.getDirections().isEmpty()) {
-                List<Direction> directionList = new ArrayList<>();
-                for (Direction obj : newPerson.getDirections()) {
-                    obj.setNewPersonId(personId);
-                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                    directionList.add(obj);
+                List<Direction> actDirectionList =  directionPort.findAllByNewPersonId(personId);
+
+                // Listas para nuevas direcciones y direcciones a actualizar
+                List<Direction> directionsToUpdate = new ArrayList<>();
+                List<Direction> newDirections = new ArrayList<>();
+
+                // Si hay teléfonos ya asociados
+                if (actDirectionList != null) {
+                    for (Direction obj : newPerson.getDirections()) {
+                        Direction obj2 = obj;
+//                        if (actDirectionList.contains(obj.getDescription())) {
+                        if (actDirectionList.stream().map(o -> o.getDescription().equals(obj2.getDescription())).findAny().isPresent()) {
+                            directionsToUpdate.add(obj);
+                        } else {
+                            obj.setNewPersonId(personId);
+                            //todo validar que personId sea null
+                            obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                            newDirections.add(obj);
+                        }
+                    }
+                    // Guarda o actualiza los teléfonos ya existentes
+                    if (!directionsToUpdate.isEmpty()) {
+                        directionPort.saveAllDirection(directionsToUpdate);
+                    }
+                } else {
+                    // Si no hay teléfonos asociados, todos los teléfonos son nuevos
+                    newDirections.addAll(newPerson.getDirections());
                 }
-                directionPort.saveAllDirection(directionList);
+
+                // Guarda los nuevos teléfonos
+//                if (!newDirections.isEmpty()) {
+//                    directionPort.saveAllDirection(newPerson.getDirections());
+//                }
             }
+
+//            if (!newPerson.getDirections().isEmpty()) {
+//                List<Direction> directionList = new ArrayList<>();
+//                for (Direction obj : newPerson.getDirections()) {
+//                    obj.setNewPersonId(personId);
+//                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+//                    directionList.add(obj);
+//                }
+//                directionPort.saveAllDirection(directionList);
+//            }
+
 
 
             if (!newPerson.getAccounts().isEmpty()) {
@@ -171,3 +256,4 @@ public class NewPersonService implements NewPersonUseCase {
         }
     }
 }
+

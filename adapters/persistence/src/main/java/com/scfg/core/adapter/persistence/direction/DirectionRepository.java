@@ -10,6 +10,7 @@ import java.util.List;
 public interface DirectionRepository extends JpaRepository<DirectionJpaEntity, Long> {
 
     List<DirectionJpaEntity> findAllByPersonId(long personId);
+    List<DirectionJpaEntity> findAllByNewPersonId(long newPersonId);
 
     List<DirectionJpaEntity> findAllByPersonIdIn(List<Long> personIdList);
 

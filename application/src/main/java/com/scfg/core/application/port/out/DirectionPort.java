@@ -7,6 +7,7 @@ import java.util.List;
 public interface DirectionPort {
 
     List<Direction> findAllByPersonId(long personId);
+    List<Direction> findAllByNewPersonId(long newPersonId);
 
     List<Direction> findAllByListOfPersonId(List<Long> personListId);
 

@@ -26,6 +26,11 @@ public class DirectionPersistenceAdapter implements DirectionPort {
         return list.stream().map(x -> new ModelMapper().map(x, Direction.class)).collect(Collectors.toList());
     }
 
+    public List<Direction> findAllByNewPersonId(long newPersonId) {
+        List<DirectionJpaEntity> list = directionRepository.findAllByNewPersonId(newPersonId);
+        return list.stream().map(x -> new ModelMapper().map(x, Direction.class)).collect(Collectors.toList());
+    }
+
     @Override
     public List<Direction> findAllByListOfPersonId(List<Long> personListId) {
         List<DirectionJpaEntity> list = directionRepository.findAllByPersonIdIn(personListId);
