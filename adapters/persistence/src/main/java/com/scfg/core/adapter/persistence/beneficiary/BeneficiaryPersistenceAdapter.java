@@ -119,7 +119,8 @@ public class BeneficiaryPersistenceAdapter implements BeneficiaryPort {
                 .legalIdentification(o.getLegalIdentification())
                 .representativeLegalName(o.getRepresentativeLegalName())
                 .isUnderAge(o.getIsUnderAge() == 2 ? true : false)
-                .telephone(o.getTelephone())
+                .cellphoneNumber(o.getCellphoneNumber())
+                .legalTelephone(o.getLegalTelephone())
                 .build();
         return beneficiaryJpaEntity;
     }
@@ -143,7 +144,8 @@ public class BeneficiaryPersistenceAdapter implements BeneficiaryPort {
                 .legalIdentification(o.getLegalIdentification())
                 .representativeLegalName(o.getRepresentativeLegalName())
                 .isUnderAge(o.getIsUnderAge() == 2 ? true : false)
-                .telephone(o.getTelephone())
+                .cellphoneNumber(o.getCellphoneNumber())
+                .legalTelephone(o.getLegalTelephone())
                 .build();
         return beneficiaryJpaEntity;
     }
@@ -167,7 +169,8 @@ public class BeneficiaryPersistenceAdapter implements BeneficiaryPort {
                 .legalIdentification(o.getLegalIdentification())
                 .representativeLegalName(o.getRepresentativeLegalName())
                 .isUnderAge(o.isUnderAge() ? 2 : 1)
-                .telephone(o.getTelephone())
+                .cellphoneNumber(o.getCellphoneNumber())
+                .legalTelephone(o.getLegalTelephone())
                 .build();
         return beneficiary;
     }
