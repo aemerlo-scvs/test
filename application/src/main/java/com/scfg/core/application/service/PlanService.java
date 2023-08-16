@@ -100,6 +100,11 @@ public class PlanService implements PlanUseCase {
     }
 
     @Override
+    public Object getALlPlansVirh(String apsCode) {
+        return planPort.getPlanVirh(apsCode);
+    }
+
+    @Override
     public List<Plan> findPlanByProductID(Long productId) {
         return planPort.getPlanByProductId(productId);
     }

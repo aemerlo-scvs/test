@@ -1,6 +1,7 @@
 package com.scfg.core.adapter.web;
 
 import com.scfg.core.adapter.web.util.CustomErrorType;
+import com.scfg.core.application.port.in.PlanUseCase;
 import com.scfg.core.application.service.VIRHProcessService;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.domain.FileDocument;
@@ -20,6 +21,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -30,6 +32,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @Api(tags = "API REST VIRH")
 public class VIRHController {
     private final   VIRHProcessService service;
+    private final PlanUseCase planUseCase;
     @GetMapping (value = "/policyInformation")
     @ApiOperation(value = "Servicio para recuperar información (plan, asegurado, beneficiario)")
     ResponseEntity informationPolicy(@Param("param") String param) {
@@ -58,6 +61,17 @@ public class VIRHController {
                     .body(resource);
         } catch (Exception e) {
             log.error("Error al queres descargar el documento de formato", e);
+            return CustomErrorType.serverError("Server Error", e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/virh-plans")
+    @ApiOperation(value = "Retorna una lista de planes para VIRH")
+    ResponseEntity getAllPlansVIRH(@RequestParam String apsCode) {
+        try {
+            Object list = planUseCase.getALlPlansVirh(apsCode);
+            return ok(list);
+        } catch (Exception e) {
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
