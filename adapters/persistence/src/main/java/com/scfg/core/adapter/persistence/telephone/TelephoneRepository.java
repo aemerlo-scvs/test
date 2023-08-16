@@ -11,4 +11,9 @@ public interface TelephoneRepository extends JpaRepository<TelephoneJpaEntity,Lo
     @Query("SELECT t FROM TelephoneJpaEntity t " +
             "WHERE t.personId = :personId AND t.status = :status")
     List<TelephoneJpaEntity> findAllByPersonId(@Param("personId") Long personId, @Param("status") Integer status);
+    @Query("SELECT t FROM TelephoneJpaEntity t " +
+            "WHERE t.newPersonId = :newPersonId AND t.status = :status")
+    List<TelephoneJpaEntity> findAllByNewPersonId(@Param("newPersonId") Long personId, @Param("status") Integer status);
+
+
 }

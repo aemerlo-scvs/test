@@ -46,6 +46,19 @@ public class TelephonePersistenceAdapter implements TelephonePort {
         return telephoneList;
     }
 
+    @Override
+    public List<Telephone> getAllByNewPersonId(Long newPersonId) {
+        List<TelephoneJpaEntity> telephoneJpaEntityList = telephoneRepository
+                .findAllByNewPersonId(newPersonId,
+                        PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        List<Telephone> telephoneList = new ArrayList<>();
+        telephoneJpaEntityList.forEach(x -> {
+            Telephone t = mapToDomain(x);
+            telephoneList.add(t);
+        });
+        return telephoneList;
+    }
+
     //#region Mappers
     public static TelephoneJpaEntity mapToJpaEntity(Telephone telephone) {
         return new ModelMapper().map(telephone,TelephoneJpaEntity.class);
