@@ -32,6 +32,7 @@ public class Beneficiary extends BaseDomain {
     private Integer relationshipIdc;
     private Long policyId;
     private Long policyItemId;
+    private String cellphoneNumber;
     @Null
     private Integer isUnderAge;
     @Null
@@ -40,7 +41,8 @@ public class Beneficiary extends BaseDomain {
     private String legalIdentification;
     @Null
     private Integer legalExt;
-    private String telephone;
+    @Null
+    private String legalTelephone;
 
     public String getFullName(){
         String completeName = "";
