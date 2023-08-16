@@ -2,6 +2,7 @@ package com.scfg.core.domain.person;
 import com.scfg.core.domain.Telephone;
 import com.scfg.core.domain.common.BaseDomain;
 import com.scfg.core.domain.common.Direction;
+import com.scfg.core.domain.dto.FileDocumentDTO;
 import com.scfg.core.domain.dto.vin.Account;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import javax.validation.constraints.Null;
 import java.time.LocalDateTime;
 import java.util.List;
 @AllArgsConstructor
@@ -122,5 +124,10 @@ public class NewPerson extends BaseDomain {
     private List<Direction> directions;
     private List<Account> accounts;
     private List<PersonRole> relatedPersons;
+
+    @Null
+    private List<FileDocumentDTO> documentList;
+    @Null
+    private FileDocumentDTO documentFirm;
 
 }

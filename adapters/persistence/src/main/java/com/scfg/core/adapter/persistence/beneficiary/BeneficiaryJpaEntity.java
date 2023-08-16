@@ -65,4 +65,9 @@ public class BeneficiaryJpaEntity extends BaseJpaEntity {
     @Column(name = "policyItemId")
     private Long policyItemId;
 
+    @Column(name = "cellphoneNumber")
+    private String cellphoneNumber;
+
+    @Column(name = "legalTelephone")
+    private String legalTelephone;
 }

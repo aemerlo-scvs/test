@@ -14,6 +14,7 @@ import com.scfg.core.domain.dto.credicasas.PlanInformation;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.List;
 public class PlanPersistenceAdapter implements PlanPort {
 
     private final PlanRepository planRepository;
+    private final EntityManager em;
 
     @Override
     public List<Plan> getList() {
@@ -113,6 +115,29 @@ public class PlanPersistenceAdapter implements PlanPort {
     @Override
     public List<Plan> getfilterParamenters(FilterParamenter paramenter) {
         return null;
+    }
+
+    @Override
+    public Object getPlanVirh(String apsCode) {
+       String query ="select pl.id, pl.name, pl.description, " +
+                "pl.totalPremium as price, " +
+                "(select * from (select cv.name, cvp.insuredCapital as amount from [Plan] pla" +
+                " join Product pr on pr.id = pla.productId " +
+                "join CoveragePlan cvp on cvp.planId = pla.id " +
+                "join Coverage cv on cv.id = cvp.coverageId " +
+                "where pr.apsCode = '"+ apsCode + "' and cvp.planId = pl.id) as x" +
+                " for JSON PATH) as 'coverageList' " +
+                "from [Plan] pl " +
+                "join Product pr on pr.id = pl.productId " +
+                "where pr.apsCode = '" + apsCode +
+                "' for JSON PATH";
+       List<Object> obj = em.createNativeQuery(query).getResultList();
+        em.close();
+        String aux = "";
+        for (Object o: obj) {
+            aux += o.toString();
+        }
+        return aux;
     }
 
 

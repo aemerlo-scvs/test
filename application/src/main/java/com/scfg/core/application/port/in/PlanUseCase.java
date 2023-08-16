@@ -22,5 +22,6 @@ public interface PlanUseCase {
 
     PersistenceResponse delete(Long id);
     List<Plan> getfilterParamenter(FilterParamenter paramenter);
+    Object getALlPlansVirh(String apsCode);
 
 }
