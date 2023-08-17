@@ -1,11 +1,16 @@
 package com.scfg.core.adapter.persistence.documentTemplate;
 
+import com.scfg.core.adapter.persistence.document.DocumentJpaEntity;
+import com.scfg.core.adapter.persistence.observedCase.ObservedCaseJpaEntity;
 import com.scfg.core.application.port.out.DocumentTemplatePort;
 import com.scfg.core.common.PersistenceAdapter;
+import com.scfg.core.common.util.ObjectMapperUtils;
 import com.scfg.core.domain.common.DocumentTemplate;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ui.ModelMap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,16 +39,21 @@ public class DocumentTemplateAdapter implements DocumentTemplatePort {
 
     }
 
+    @Override
+    public List<DocumentTemplate> getDocumentByProductId(Long productId) {
+        List< DocumentTemplateJpaEntity>  documentJpaEntity=documentTemplateRepository.findByProductId(productId);
+        return  ObjectMapperUtils.mapAll(documentJpaEntity,DocumentTemplate.class);
+    }
+
+    @Override
+    public boolean save(DocumentTemplate documentTemplate) {
+        DocumentTemplateJpaEntity documentTemplateJpaEntity= ObjectMapperUtils.map(documentTemplate, DocumentTemplateJpaEntity.class);
+                documentTemplateJpaEntity =documentTemplateRepository.save(documentTemplateJpaEntity);
+        return documentTemplateJpaEntity.getId()!=null;
+    }
+
     private DocumentTemplate mapToDomain(DocumentTemplateJpaEntity documentTemplateJpaEntity) {
-        DocumentTemplate documentTemplate = DocumentTemplate.builder()
-                .id(documentTemplateJpaEntity.getId())
-                .createdAt(documentTemplateJpaEntity.getCreatedAt())
-                .lastModifiedAt(documentTemplateJpaEntity.getLastModifiedAt())
-                .documentUrl(documentTemplateJpaEntity.getDocumentUrl())
-                .idDocumentTemplate(documentTemplateJpaEntity.getIdDocumentTemplate())
-                .description(documentTemplateJpaEntity.getDescription())
-                .documentTypeIdc(documentTemplateJpaEntity.getDocumentTypeIdc())
-                .build();
+        DocumentTemplate documentTemplate = ObjectMapperUtils.map(documentTemplateJpaEntity, DocumentTemplate.class);
         return documentTemplate;
     }
 }

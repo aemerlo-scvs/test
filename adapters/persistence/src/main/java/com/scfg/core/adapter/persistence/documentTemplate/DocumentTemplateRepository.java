@@ -15,5 +15,7 @@ public interface DocumentTemplateRepository extends JpaRepository<DocumentTempla
     List<DocumentTemplateJpaEntity> findOptionalDocumentTemplateJpaEntityAll();
 
     List<DocumentTemplateJpaEntity> findAll();
+    List<DocumentTemplateJpaEntity> findByProductId(Long productId);
+
 
 }
