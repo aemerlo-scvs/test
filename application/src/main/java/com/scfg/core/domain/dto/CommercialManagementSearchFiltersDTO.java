@@ -14,7 +14,8 @@ import java.util.Date;
 @Getter
 @SuperBuilder
 public class CommercialManagementSearchFiltersDTO {
-    private Date policyFromDate;
-    private Date policyToDate;
-    private String stateRenewal;
+    private Date fromDate;
+    private Date toDate;
+    private String state;
+    private String subState;
 }

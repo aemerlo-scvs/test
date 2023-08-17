@@ -38,9 +38,10 @@ public class CommercialManagementService implements CommercialManagementUseCase 
         StoredProcedureQuery query = em.createStoredProcedureQuery("sp_commercial_management_all");
         query.registerStoredProcedureParameter("policyId", Long.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("data", Long.class, ParameterMode.OUT);
-        query.setParameter("fromDate", commercialManagementSearchFiltersDto.getPolicyFromDate());
-        query.setParameter("toDate", commercialManagementSearchFiltersDto.getPolicyToDate());
-        query.setParameter("stateRenewal", commercialManagementSearchFiltersDto.getStateRenewal());
+        query.setParameter("fromDate", commercialManagementSearchFiltersDto.getFromDate());
+        query.setParameter("toDate", commercialManagementSearchFiltersDto.getToDate());
+        query.setParameter("state", commercialManagementSearchFiltersDto.getState());
+        query.setParameter("subState", commercialManagementSearchFiltersDto.getSubState());
         query.execute();
         List<Object>  result = query.getResultList();
         em.close();
