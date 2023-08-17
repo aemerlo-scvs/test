@@ -9,7 +9,6 @@ import org.hibernate.annotations.Where;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.validation.constraints.Null;
 
 @Entity
 @Table(name = "DocumentTemplate")
@@ -29,4 +28,13 @@ public class DocumentTemplateJpaEntity extends BaseJpaEntity {
     private String documentUrl;
     @Column(name = "idDocumentTemplate")
     private Long idDocumentTemplate;
+    @Column(name = "productId")
+    private Long productId;
+    @Column(name = "typeDocumentPdfIdc")
+    private Integer typeDocumentPdfIdc;
+    @Column(name = "content")
+    private String content;
+    @Column(name = "isDynamic")
+    private Boolean isDynamic;
+
 }

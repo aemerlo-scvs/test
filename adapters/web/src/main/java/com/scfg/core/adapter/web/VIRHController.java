@@ -5,6 +5,7 @@ import com.scfg.core.application.port.in.PlanUseCase;
 import com.scfg.core.application.service.VIRHProcessService;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.domain.FileDocument;
+import com.scfg.core.domain.dto.FileDocumentDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,20 @@ public class VIRHController {
     ResponseEntity informationPolicy(@Param("param") String param) {
         try {
            String data= this.service.getDataInformationPolicy(param);
+            return ok(data);
+        } catch (OperationException e) {
+            log.error("Ocurrió un error recuperar la información: [{}]", e.toString());
+            return CustomErrorType.badRequest("Bad Request", e.getMessage());
+        } catch (Exception e) {
+            log.error("Ocurrió un error recuperar la información: [{}]", e.toString());
+            return CustomErrorType.serverError("Server Error", "No se pudo realizar la operación, " + e.getMessage());
+        }
+    }
+    @GetMapping (value = "/test")
+    @ApiOperation(value = "Servicio de prueba")
+    ResponseEntity generate() {
+        try {
+            FileDocumentDTO data= this.service.generate();
             return ok(data);
         } catch (OperationException e) {
             log.error("Ocurrió un error recuperar la información: [{}]", e.toString());

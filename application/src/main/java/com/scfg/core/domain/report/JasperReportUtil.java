@@ -2,6 +2,8 @@ package com.scfg.core.domain.report;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import com.scfg.core.common.exception.NotFileWriteReadException;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
@@ -26,6 +28,7 @@ public class JasperReportUtil {
         JasperReport jr = JasperCompileManager.compileReport(new ByteArrayInputStream(content));
         reportsCompiled.put(key.trim(), jr);
     }
+
 
     public static ByteArrayOutputStream generate(Map<String, JasperReport> reportsCompiled, List<SubReportDTO> subReportsDto) throws Exception {
         ByteArrayOutputStream outputStream;

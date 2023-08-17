@@ -54,4 +54,11 @@ public abstract class BaseJpaEntity {
     @Column(name = "lastModifiedBy")
     private Long lastModifiedBy;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }
