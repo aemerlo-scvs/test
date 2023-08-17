@@ -4,7 +4,6 @@ import com.scfg.core.application.port.in.DocumentTemplateUse;
 import com.scfg.core.application.port.in.ReportServiceUseGeneric;
 import com.scfg.core.common.exception.NotFileWriteReadException;
 
-import com.scfg.core.common.util.CustomForeach;
 import com.scfg.core.common.util.HelpersConstants;
 import com.scfg.core.domain.common.DocumentTemplate;
 import com.scfg.core.domain.dto.FileDocumentDTO;
@@ -16,9 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.engine.util.FileBufferedOutputStream;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.DumperOptions;
 
 import java.io.*;
 import java.util.*;
@@ -136,7 +133,37 @@ public class ReportServiceGeneric implements ReportServiceUseGeneric {
             throw new NotFileWriteReadException("Error al leer la plantilla para generar el pdf", ex);
         }
     }
+    public  byte[] generatePdfByte(String mainReport, Boolean subreports, List<Object> beans, Map<String, Object> reportParameters,Map<String, JasperReport>reportsCompiled) throws NotFileWriteReadException {
+        if (beans == null) {
+            beans = new ArrayList();
+            ((List) beans).add(new EmptyReportBean());
+        }
 
+        ByteArrayOutputStream reportOutputStream = new ByteArrayOutputStream();
+        JRDataSource ds = new JRBeanCollectionDataSource((Collection) beans);
+        if (subreports) {
+            if (reportParameters == null) {
+                reportParameters = new HashMap();
+            }
+
+            Iterator var7 = reportsCompiled.keySet().iterator();
+
+            while (var7.hasNext()) {
+                String keySubr = (String) var7.next();
+                if (!keySubr.equals(mainReport))
+                    ((Map) reportParameters).put(keySubr, reportsCompiled.get(keySubr));
+            }
+        }
+
+        try {
+            JasperReportUtil.generatePdf(reportsCompiled, mainReport, (Map) reportParameters, ds, reportOutputStream);
+            Base64.getEncoder().encodeToString(reportOutputStream.toByteArray());
+            return reportOutputStream.toByteArray();
+
+        } catch (Exception ex) {
+            throw new NotFileWriteReadException(ex.getMessage());
+        }
+    }
 
     private void loadReports(String mainReport) throws NotFileWriteReadException {
         try {

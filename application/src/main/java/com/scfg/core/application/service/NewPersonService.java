@@ -95,24 +95,45 @@ public class NewPersonService implements NewPersonUseCase {
 
             //#region secciones del módulo de personas
             if (!newPerson.getTelephones().isEmpty()) {
-                List<Telephone> telephoneList = new ArrayList<>();
-                for (Telephone obj : newPerson.getTelephones()) {
-                    obj.setNewPersonId(personId);
-                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                    telephoneList.add(obj);
+                List<Telephone> actTelephoneList = telephonePort.getAllByNewPersonId(personId);
+                List<Telephone> newTelephones = new ArrayList<>();
+                if (actTelephoneList != null) {
+                    for (Telephone obj : newPerson.getTelephones()) {
+                        if ((!actTelephoneList.stream().map(o -> o.getNumber().equals(obj.getNumber())).findAny().isPresent()) &&
+                                (!actTelephoneList.stream().map(o -> o.getDeviceTypeIdc().equals(obj.getDeviceTypeIdc())).findAny().isPresent()) &&
+                                (!actTelephoneList.stream().map(o -> o.getTelephoneTypeIdc().equals(obj.getTelephoneTypeIdc())).findAny().isPresent())) {
+                            obj.setNewPersonId(personId);
+                            obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                            newTelephones.add(obj);
+                        }
+                    }
+                } else {
+                    newTelephones.addAll(newPerson.getTelephones());
                 }
-                telephonePort.saveOrUpdateAll(telephoneList);
+
+                if (!newTelephones.isEmpty()) {
+                    telephonePort.saveOrUpdateAll(newTelephones);
+                }
             }
 
-
             if (!newPerson.getDirections().isEmpty()) {
-                List<Direction> directionList = new ArrayList<>();
-                for (Direction obj : newPerson.getDirections()) {
-                    obj.setNewPersonId(personId);
-                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                    directionList.add(obj);
+                List<Direction> actDirectionList = directionPort.findAllByNewPersonId(personId);
+                List<Direction> newDirections = new ArrayList<>();
+                if (actDirectionList != null) {
+                    for (Direction obj : newPerson.getDirections()) {
+                        if ((!actDirectionList.stream().map(o -> o.getDescription().equals(obj.getDescription())).findAny().isPresent()) &&
+                                (!actDirectionList.stream().map(o -> o.getDirectionTypeIdc().equals(obj.getDirectionTypeIdc())).findAny().isPresent())) {
+                            obj.setNewPersonId(personId);
+                            obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                            newDirections.add(obj);
+                        }
+                    }
+                } else {
+                    newDirections.addAll(newPerson.getDirections());
                 }
-                directionPort.saveAllDirection(directionList);
+                if (!newDirections.isEmpty()) {
+                    directionPort.saveAllDirection(newDirections);
+                }
             }
 
 
@@ -171,3 +192,4 @@ public class NewPersonService implements NewPersonUseCase {
         }
     }
 }
+

@@ -10,6 +10,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.tomcat.embed/tomcat-embed-core
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '9.0.41'
 
+
     compile group: 'org.json', name: 'json', version: '20180813'
     implementation group: 'com.github.ulisesbocchio', name: 'jasypt-spring-boot-starter', version: '2.1.2'
     implementation group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.69'
@@ -17,8 +18,13 @@ dependencies {
     implementation group: 'com.github.librepdf', name: 'openpdf', version: '1.3.26'
     implementation 'org.modelmapper:modelmapper:3.1.0'
 
+    // https://mvnrepository.com/artifact/com.itextpdf/html2pdf
+    implementation group: 'com.itextpdf', name: 'html2pdf', version: '5.0.1'
+
 
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+
 
     implementation 'javax.validation:validation-api'
     implementation ('org.springframework.boot:spring-boot-starter-security')

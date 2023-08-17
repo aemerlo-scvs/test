@@ -33,4 +33,5 @@ public interface PlanPort {
 
 
     List<Plan> getfilterParamenters(FilterParamenter paramenter);
+    Object getPlanVirh(String apsCode);
 }
