@@ -11,6 +11,8 @@ import com.scfg.core.domain.person.NewPerson;
 import com.scfg.core.domain.person.PersonRole;
 import com.scfg.core.domain.person.ReferencePerson;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,151 +47,173 @@ public class NewPersonService implements NewPersonUseCase {
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {OperationException.class, Exception.class})
     public Boolean saveOrUpdate(NewPerson newPerson) {
         try {
-            NewPerson newPersonAux = newPersonPort.findById(newPerson.getId());
-            long personId = 0L;
+            long personId = saveOrUpdatePerson(newPerson);
 
-            //#region personas
-            if (newPersonAux != null) {
-                newPersonAux.setDocumentTypeIdc(newPerson.getDocumentTypeIdc());
-                newPersonAux.setIdentificationNumber(newPerson.getIdentificationNumber());
-                newPersonAux.setName(newPerson.getName());
-                newPersonAux.setLastName(newPerson.getLastName());
-                newPersonAux.setMotherLastName(newPerson.getMotherLastName());
-                newPersonAux.setMarriedLastName(newPerson.getMarriedLastName());
-                newPersonAux.setGenderIdc(newPerson.getGenderIdc());
-                newPersonAux.setMaritalStatusIdc(newPerson.getMaritalStatusIdc());
-                newPersonAux.setSpouse(newPerson.getSpouse());
-                newPersonAux.setBirthDate(newPerson.getBirthDate());
-                newPersonAux.setBirthPlaceIdc(newPerson.getBirthPlaceIdc());
-                newPersonAux.setNationalityIdc(newPerson.getNationalityIdc());
-                newPersonAux.setResidencePlaceIdc(newPerson.getResidencePlaceIdc());
-                newPersonAux.setActivityIdc(newPerson.getActivityIdc());
-                newPersonAux.setProfessionIdc(newPerson.getProfessionIdc());
-                newPersonAux.setWorkerTypeIdc(newPerson.getWorkerTypeIdc());
-                newPersonAux.setWorkerCompany(newPerson.getWorkerCompany());
-                newPersonAux.setWorkEntryYear(newPerson.getWorkEntryYear());
-                newPersonAux.setWorkPosition(newPerson.getWorkPosition());
-                newPersonAux.setMonthlyIncomeRangeIdc(newPerson.getMonthlyIncomeRangeIdc());
-                newPersonAux.setYearlyIncomeRangeIdc(newPerson.getYearlyIncomeRangeIdc());
-                newPersonAux.setBusinessTypeIdc(newPerson.getBusinessTypeIdc());
-                newPersonAux.setBusinessRegistrationNumber(newPerson.getBusinessRegistrationNumber());
-                newPersonAux.setEmail(newPerson.getEmail());
-                newPersonAux.setEventualClient(newPerson.getEventualClient());
-                newPersonAux.setInternalClientCode(newPerson.getInternalClientCode());
-                newPersonAux.setInstitutionalClientCode(newPerson.getInstitutionalClientCode());
-                newPersonAux.setClientCode(newPerson.getClientCode());
-                newPersonAux.setClientType(newPerson.getClientType());
+            saveOrUpdateTelephones(newPerson, personId);
+            saveOrUpdateDirections(newPerson, personId);
+            saveOrUpdateAccounts(newPerson, personId);
+            handleReferencePersonOrRole(newPerson, personId);
 
-                personId = newPersonPort.saveOrUpdate(newPersonAux);
+            return personId > 0;
+
+        } catch (OperationException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new OperationException("Unexpected error occurred: " + e.getMessage(), e);
+        }
+    }
+
+    private long saveOrUpdatePerson(NewPerson newPerson) {
+
+        NewPerson newPersonAux = newPersonPort.findById(newPerson.getId());
+        long personId = 0L;
+
+        if (newPersonAux != null) {
+            newPersonAux.setDocumentTypeIdc(newPerson.getDocumentTypeIdc());
+            newPersonAux.setIdentificationNumber(newPerson.getIdentificationNumber());
+            newPersonAux.setName(newPerson.getName());
+            newPersonAux.setLastName(newPerson.getLastName());
+            newPersonAux.setMotherLastName(newPerson.getMotherLastName());
+            newPersonAux.setMarriedLastName(newPerson.getMarriedLastName());
+            newPersonAux.setGenderIdc(newPerson.getGenderIdc());
+            newPersonAux.setMaritalStatusIdc(newPerson.getMaritalStatusIdc());
+            newPersonAux.setSpouse(newPerson.getSpouse());
+            newPersonAux.setBirthDate(newPerson.getBirthDate());
+            newPersonAux.setBirthPlaceIdc(newPerson.getBirthPlaceIdc());
+            newPersonAux.setNationalityIdc(newPerson.getNationalityIdc());
+            newPersonAux.setResidencePlaceIdc(newPerson.getResidencePlaceIdc());
+            newPersonAux.setActivityIdc(newPerson.getActivityIdc());
+            newPersonAux.setProfessionIdc(newPerson.getProfessionIdc());
+            newPersonAux.setWorkerTypeIdc(newPerson.getWorkerTypeIdc());
+            newPersonAux.setWorkerCompany(newPerson.getWorkerCompany());
+            newPersonAux.setWorkEntryYear(newPerson.getWorkEntryYear());
+            newPersonAux.setWorkPosition(newPerson.getWorkPosition());
+            newPersonAux.setMonthlyIncomeRangeIdc(newPerson.getMonthlyIncomeRangeIdc());
+            newPersonAux.setYearlyIncomeRangeIdc(newPerson.getYearlyIncomeRangeIdc());
+            newPersonAux.setBusinessTypeIdc(newPerson.getBusinessTypeIdc());
+            newPersonAux.setBusinessRegistrationNumber(newPerson.getBusinessRegistrationNumber());
+            newPersonAux.setEmail(newPerson.getEmail());
+            newPersonAux.setEventualClient(newPerson.getEventualClient());
+            newPersonAux.setInternalClientCode(newPerson.getInternalClientCode());
+            newPersonAux.setInstitutionalClientCode(newPerson.getInstitutionalClientCode());
+            newPersonAux.setClientCode(newPerson.getClientCode());
+            newPersonAux.setClientType(newPerson.getClientType());
+
+            personId = newPersonPort.saveOrUpdate(newPersonAux);
 
 
+        } else {
+            if (validateIdentificationNumber(newPerson.getIdentificationNumber())) {
+                throw new OperationException("El número de identificación ya existe");
+            }
+            personId = newPersonPort.saveOrUpdate(newPerson);
+        }
+        return personId;
+    }
+
+    private void saveOrUpdateTelephones(NewPerson newPerson, long personId) {
+
+        if (!newPerson.getTelephones().isEmpty()) {
+            List<Telephone> actTelephoneList = telephonePort.getAllByNewPersonId(personId);
+            List<Telephone> newTelephones = new ArrayList<>();
+            if (actTelephoneList != null) {
+                for (Telephone obj : newPerson.getTelephones()) {
+                    if ((!actTelephoneList.stream().map(o -> o.getNumber().equals(obj.getNumber())).findAny().isPresent())) {
+                        obj.setNewPersonId(personId);
+                        obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                        newTelephones.add(obj);
+                    }
+                }
             } else {
-                if (validateIdentificationNumber(newPerson.getIdentificationNumber())) {
-                    throw new OperationException("El número de identificación ya existe");
-                }
-
-                personId = newPersonPort.saveOrUpdate(newPerson);
+                newTelephones.addAll(newPerson.getTelephones());
             }
 
-            //#endregion personas
+            if (!newTelephones.isEmpty()) {
+                telephonePort.saveOrUpdateAll(newTelephones);
+            }
+        }
+    }
 
-            //#region secciones del módulo de personas
-            if (!newPerson.getTelephones().isEmpty()) {
-                List<Telephone> actTelephoneList = telephonePort.getAllByNewPersonId(personId);
-                List<Telephone> newTelephones = new ArrayList<>();
-                if (actTelephoneList != null) {
-                    for (Telephone obj : newPerson.getTelephones()) {
-                        if ((!actTelephoneList.stream().map(o -> o.getNumber().equals(obj.getNumber())).findAny().isPresent()) &&
-                                (!actTelephoneList.stream().map(o -> o.getDeviceTypeIdc().equals(obj.getDeviceTypeIdc())).findAny().isPresent()) &&
-                                (!actTelephoneList.stream().map(o -> o.getTelephoneTypeIdc().equals(obj.getTelephoneTypeIdc())).findAny().isPresent())) {
-                            obj.setNewPersonId(personId);
-                            obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                            newTelephones.add(obj);
-                        }
+    private void saveOrUpdateDirections(NewPerson newPerson, long personId) {
+        if (!newPerson.getDirections().isEmpty()) {
+            List<Direction> actDirectionList = directionPort.findAllByNewPersonId(personId);
+            List<Direction> newDirections = new ArrayList<>();
+            if (actDirectionList != null) {
+                for (Direction obj : newPerson.getDirections()) {
+                    if ((!actDirectionList.stream().map(o -> o.getDescription().equals(obj.getDescription())).findAny().isPresent()) &&
+                            (!actDirectionList.stream().map(o -> o.getDirectionTypeIdc().equals(obj.getDirectionTypeIdc())).findAny().isPresent())) {
+                        obj.setNewPersonId(personId);
+                        obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                        newDirections.add(obj);
                     }
-                } else {
-                    newTelephones.addAll(newPerson.getTelephones());
                 }
-
-                if (!newTelephones.isEmpty()) {
-                    telephonePort.saveOrUpdateAll(newTelephones);
-                }
+            } else {
+                newDirections.addAll(newPerson.getDirections());
             }
-
-            if (!newPerson.getDirections().isEmpty()) {
-                List<Direction> actDirectionList = directionPort.findAllByNewPersonId(personId);
-                List<Direction> newDirections = new ArrayList<>();
-                if (actDirectionList != null) {
-                    for (Direction obj : newPerson.getDirections()) {
-                        if ((!actDirectionList.stream().map(o -> o.getDescription().equals(obj.getDescription())).findAny().isPresent()) &&
-                                (!actDirectionList.stream().map(o -> o.getDirectionTypeIdc().equals(obj.getDirectionTypeIdc())).findAny().isPresent())) {
-                            obj.setNewPersonId(personId);
-                            obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                            newDirections.add(obj);
-                        }
-                    }
-                } else {
-                    newDirections.addAll(newPerson.getDirections());
-                }
-                if (!newDirections.isEmpty()) {
-                    directionPort.saveAllDirection(newDirections);
-                }
+            if (!newDirections.isEmpty()) {
+                directionPort.saveAllDirection(newDirections);
             }
+        }
+    }
 
-
-            if (!newPerson.getAccounts().isEmpty()) {
-                List<Account> accountList = new ArrayList<>();
+    private void saveOrUpdateAccounts(NewPerson newPerson, long personId) {
+        if (!newPerson.getAccounts().isEmpty()) {
+            List<Account> actAccountList = accountPort.findAllByNewPersonId(personId);
+            List<Account> newAccounts = new ArrayList<>();
+            if (actAccountList != null) {
                 for (Account obj : newPerson.getAccounts()) {
-                    obj.setNewPersonId(personId);
-                    obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                    accountList.add(obj);
+                    if (!actAccountList.stream().map(o -> o.getAccountNumber().equals(obj.getAccountNumber())).findAny().isPresent()) {
+                        obj.setNewPersonId(personId);
+                        obj.setNewPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                        newAccounts.add(obj);
+                    }
                 }
-                accountPort.saveOrUpdateAll(accountList);
+            } else {
+                newAccounts.addAll(newPerson.getAccounts());
             }
+            if (!newAccounts.isEmpty()) {
+                accountPort.saveOrUpdateAll(newAccounts);
+            }
+        }
+    }
 
-            //#endregion
-
-            //#region validaciones
+    private void handleReferencePersonOrRole(NewPerson newPerson, long personId) {
 
             if (newPerson.getDocumentTypeIdc() != ClassifierEnum.NIT_IdentificationType.getReferenceCode()) {
-                List<ReferencePerson> referencePersonList = new ArrayList<>();
-                if (!newPerson.getReferencePersonInfo().isEmpty()) {
-                    for (ReferencePerson obj : newPerson.getReferencePersonInfo()) {
-                        obj.setPersonId(personId);
-                        referencePersonList.add(obj);
+                List<ReferencePerson> newReferencePerson = new ArrayList<>();
+                if(!newPerson.getReferencePersonInfo().isEmpty()){
+                    if (!newPerson.getReferencePersonInfo().isEmpty()) {
+                        for (ReferencePerson obj : newPerson.getReferencePersonInfo()) {
+                            obj.setPersonId(personId);
+                            newReferencePerson.add(obj);
+                        }
                     }
                 }
                 if (newPerson.getMaritalStatusIdc() == ClassifierEnum.MARRIED_STATUS.getReferenceCode() && newPerson.getGenderIdc() == ClassifierEnum.FEMALE.getReferenceCode()) {
                     newPerson.getSpouse().setReferenceRelationshipIdc((int) ClassifierEnum.SPOUSE.getReferenceCode());
                     newPerson.getSpouse().setPersonId(personId);
-                    referencePersonList.add(newPerson.getSpouse());
+                    newReferencePerson.add(newPerson.getSpouse());
                 }
-                referencePersonPort.saveOrUpdateAll(referencePersonList);
+                if (!newReferencePerson.isEmpty()) {
+                    referencePersonPort.saveOrUpdateAll(newReferencePerson);
+                }
 
             } else {
                 if (!newPerson.getRelatedPersons().isEmpty()) {
-                    List<PersonRole> personRoleList = new ArrayList<>();
+                    List<PersonRole> newPersonRole = new ArrayList<>();
                     for (PersonRole obj : newPerson.getRelatedPersons()) {
                         obj.setPersonId((personId));
-                        personRoleList.add(obj);
+                        newPersonRole.add(obj);
                     }
-                    personRolePort.saveOrUpdateAll(personRoleList);
+                    if (!newPersonRole.isEmpty()) {
+                        personRolePort.saveOrUpdateAll(newPersonRole);
+                    }
 
                 } else {
                     throw new OperationException("Una persona jurídica debe tener al menos una persona relacionada");
                 }
 
             }
-            //#endregion validaciones
-
-            return personId > 0;
-
-        } catch (OperationException e) {
-            throw new OperationException(e.getMessage());
-        } catch (Exception e) {
-            e.getMessage();
-            return false;
-        }
     }
 }
 
