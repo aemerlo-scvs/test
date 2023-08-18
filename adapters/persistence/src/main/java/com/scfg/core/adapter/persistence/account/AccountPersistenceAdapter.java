@@ -27,6 +27,15 @@ public class AccountPersistenceAdapter implements AccountPort {
     }
 
     @Override
+    public List<Account> findAllByNewPersonId(Long personId) {
+        List<AccountJpaEntity> list = accountRepository.findAllByPersonId(personId,
+                PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+
+        return list.stream().map(o -> new ModelMapperConfig().getStrictModelMapper().map(o, Account.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Account findLastByPersonId(Long personId) {
         List<AccountJpaEntity> list = accountRepository.findAllByPersonId(personId,
                 PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());

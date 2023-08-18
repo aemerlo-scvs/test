@@ -3,6 +3,7 @@ import com.scfg.core.adapter.web.util.CustomErrorType;
 import com.scfg.core.application.port.in.NewPersonUseCase;
 import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.exception.OperationException;
+import com.scfg.core.common.exception.ResponseMessage;
 import com.scfg.core.domain.person.NewPerson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -10,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -20,15 +23,25 @@ import static org.springframework.http.ResponseEntity.ok;
 @Api(tags = "API REST NewPerson")
 public class NewPersonController {
     private final NewPersonUseCase newPersonUseCase;
+    private static final Logger logger = LoggerFactory.getLogger(NewPersonController.class);
     @PostMapping
     @ApiOperation(value = "Guarda una Persona")
     ResponseEntity save(@RequestBody NewPerson newPerson) {
         try {
             Boolean saved = newPersonUseCase.saveOrUpdate(newPerson);
-            return ok(saved);
+            ResponseMessage res = new ResponseMessage();
+            res.setResponseStatus(saved);
+            if (saved) {
+                res.setResponse("Guardado exitoso");
+            } else {
+                res.setResponse("Error al guardar");
+            }
+            return ok(res);
         } catch (OperationException e){
+            logger.error("Bad Request Error: ", e);
             return CustomErrorType.badRequest("Bad Request", e.getMessage());
         } catch (Exception e){
+            logger.error("Server Error", e);
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
