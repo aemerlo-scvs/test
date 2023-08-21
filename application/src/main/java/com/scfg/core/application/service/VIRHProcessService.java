@@ -58,7 +58,7 @@ public class VIRHProcessService implements VIRHUseCase {
 
     @Override
     public String getDataInformationPolicy(String param) {
-        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_view_data_policy_propose");
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_view_virh_report_policy");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
         query.setParameter("param", param);
@@ -104,25 +104,27 @@ public class VIRHProcessService implements VIRHUseCase {
 
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
                         String mainReport = "DJS";
-                        Map<String, String> subreports = (Map) map.get("subreports");
-                        List<Object> beans = new ArrayList<>(map.entrySet());
-                        Map reportParameters = (Map) map.get("reportParameters");
+//                        Map<String, String> subreports = (Map) map.get("subreports");
+//                        List<Object> beans = new ArrayList<>(map.entrySet());
+//                        Map reportParameters = (Map) map.get("reportParameters");
                         List<DocumentTemplate> templateList = listReportAndSubReport(sw.getId(), list);
                         Map<String, JasperReport> jasperReportMap = loadReports(templateList);
-                        byte[] pdc =  useGeneric.generatePdfByte(mainReport, false, beans, reportParameters, jasperReportMap);
+                        byte[] pdc =  useGeneric.generatePdfByte(mainReport, false, null, map, jasperReportMap);
                         sw.setContent(Base64.getEncoder().encodeToString(pdc));
+                        break;
                     }
                     case 4: {
                         String json = ""; //faltaria construir las consultas para generar los pdf dinamicos
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
                         String mainReport = (String) map.get("mainReport");
-                        Map<String, String> subreports = (Map) map.get("subreports");
-                        List<Object> beans = (List) map.get("reportBeansParams");
-                        Map reportParameters = (Map) map.get("reportParameters");
+//                        Map<String, String> subreports = (Map) map.get("subreports");
+//                        List<Object> beans = (List) map.get("reportBeansParams");
+//                        Map reportParameters = (Map) map.get("reportParameters");
                         List<DocumentTemplate> templateList = listReportAndSubReport(sw.getId(), list);
                         Map<String, JasperReport> jasperReportMap = loadReports(templateList);
-                        byte[] pdc = useGeneric.generatePdfByte(mainReport, false, beans, reportParameters, jasperReportMap);
+                        byte[] pdc = useGeneric.generatePdfByte(mainReport, false, null, map, jasperReportMap);
                         sw.setContent(Base64.getEncoder().encodeToString(pdc));
+                        break;
                     }
                     default: {
 
@@ -149,8 +151,8 @@ public class VIRHProcessService implements VIRHUseCase {
         fd.setContent(Base64.getEncoder().encodeToString(pdf));
         fd.setMime(HelpersConstants.PDF);
         fd.setName(filename);
-        FileDocument fileDocument= saveFileDocument(numberPolicy,pdf);
-        PolicyFileDocument policyFileDocument= savePolicyDocument(fileDocument.getId(),policyItem);
+        //FileDocument fileDocument= saveFileDocument(numberPolicy,pdf);
+        //PolicyFileDocument policyFileDocument= savePolicyDocument(fileDocument.getId(),policyItem);
         return fd;
     }
 
