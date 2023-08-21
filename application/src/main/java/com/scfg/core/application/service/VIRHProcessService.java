@@ -191,7 +191,7 @@ public class VIRHProcessService implements VIRHUseCase {
         return reportsCompiled;
     }
     private  String getDjs(String numberPolicy){
-        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_vrih_report_policy");
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_vrih_report_data_djs");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
         query.setParameter("param", numberPolicy);
