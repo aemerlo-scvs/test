@@ -34,9 +34,9 @@ import static org.springframework.http.ResponseEntity.ok;
 public class VIRHController {
     private final   VIRHProcessService service;
     private final PlanUseCase planUseCase;
-    @GetMapping (value = "/policyInformation")
+    @GetMapping (value = "/policyInformation/{unique}")
     @ApiOperation(value = "Servicio para recuperar información (plan, asegurado, beneficiario)")
-    ResponseEntity informationPolicy(@Param("param") String param) {
+    ResponseEntity informationPolicy(@PathVariable("unique") String param) {
         try {
            String data= this.service.getDataInformationPolicy(param);
             return ok(data);
