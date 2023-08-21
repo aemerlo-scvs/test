@@ -8,4 +8,5 @@ public interface AlertPort {
     Alert findByAlert(Integer id);
 
     List<Alert> loadAllAlerts();
+    List<Alert> findByIdList(List<Integer> idList);
 }

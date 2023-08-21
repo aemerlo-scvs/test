@@ -35,7 +35,12 @@ public enum AlertEnum {
     VIN_REQUESTANNEXE_OBSERVED(31), //Rechazo de propuesta - VIN
     VIN_REQUESTANNEXE_REJECTED(32), //Rechazo de propuesta - VIN
     VIN_ANNEXE_CONFIRM_PAYMENT_VOUCHER(33), //Rechazo de propuesta - VIN
-    VIN_REQUESTANNEXE_ACEPTED_ACCOUTING(34); //Rechazo de propuesta - VIN
+    VIN_REQUESTANNEXE_ACEPTED_ACCOUTING(34), //Rechazo de propuesta - VIN
+    VIRH_SCH_1(35), //Primer envio de recordatorio - VIRH
+    VIRH_SCH_2(36), //Segundo envio de recordatorio - VIRH
+    VIRH_SCH_3(37), //Tercer envio de recordatorio - VIRH
+    VIRH_SCH_4(38), //Recordatorio rev. pol vencida - VIRH
+    VIRH_WELCOME(39); //Mensaje bienvenida - VIRH
 
     private int value;
 

@@ -9,6 +9,7 @@ import com.scfg.core.application.port.out.FileDocumentPort;
 import com.scfg.core.application.port.out.PolicyFileDocumentPort;
 import com.scfg.core.common.util.HelpersConstants;
 import com.scfg.core.common.util.PDFMerger;
+import com.scfg.core.domain.Alert;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.PolicyFileDocument;
 import com.scfg.core.domain.common.DocumentTemplate;
@@ -46,6 +47,7 @@ public class VIRHProcessService implements VIRHUseCase {
     private final FileDocumentPort fileDocumentPort;
     private final PolicyFileDocumentPort policyFileDocumentPort;
     private final ReportServiceUseGeneric useGeneric;
+    private final AlertService alertService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -215,30 +217,14 @@ public class VIRHProcessService implements VIRHUseCase {
     @Override
     public Boolean sendWhatsApp(String number, String message, Long requestId) {
         this.senderService.setStrategy(this.whatsAppSenderService);
-        MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setTo(number);
-        messageDTO.setMessage(message);
-        messageDTO.setSubject("Envío notificación por WhatsApp");
-        messageDTO.setMessageTypeIdc(MessageTypeEnum.WHATSAPP.getValue());
-        messageDTO.setReferenceId(requestId);
-        messageDTO.setReferenceTableIdc((int) ClassifierEnum.REFERENCE_TABLE_GENERALREQUEST.getReferenceCode());
-        messageDTO.setNumberOfAttempt(0);
-        messageDTO.setLastNumberOfAttempt(0);
+        MessageDTO messageDTO = getMessageDTO(number, message, "Envío notificación por WhatsApp", requestId);
         return this.senderService.sendMessage(messageDTO);
     }
 
     @Override
     public Boolean sendWhatsAppWithAttachment(String number, String message, Long requestId, Long docId) {
         this.senderService.setStrategy(this.whatsAppSenderService);
-        MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setTo(number);
-        messageDTO.setMessage(message);
-        messageDTO.setSubject("Envío notificación por WhatsApp con adjunto");
-        messageDTO.setMessageTypeIdc(MessageTypeEnum.WHATSAPP.getValue());
-        messageDTO.setReferenceId(requestId);
-        messageDTO.setReferenceTableIdc((int) ClassifierEnum.REFERENCE_TABLE_GENERALREQUEST.getReferenceCode());
-        messageDTO.setNumberOfAttempt(0);
-        messageDTO.setLastNumberOfAttempt(0);
+        MessageDTO messageDTO = getMessageDTO(number, message, "Envío notificación por WhatsApp con adjunto", requestId);
 
         AttachmentDTO attachmentDTO = new AttachmentDTO();
         attachmentDTO.setFileName(docId+"");
@@ -247,5 +233,18 @@ public class VIRHProcessService implements VIRHUseCase {
         list.add(attachmentDTO);
 
         return this.senderService.sendMessageWithAttachment(messageDTO, list);
+    }
+
+    private static MessageDTO getMessageDTO(String number, String message, String subject, Long requestId) {
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setTo(number);
+        messageDTO.setMessage(message);
+        messageDTO.setSubject(subject);
+        messageDTO.setMessageTypeIdc(MessageTypeEnum.WHATSAPP.getValue());
+        messageDTO.setReferenceId(requestId);
+        messageDTO.setReferenceTableIdc((int) ClassifierEnum.REFERENCE_TABLE_GENERALREQUEST.getReferenceCode());
+        messageDTO.setNumberOfAttempt(0);
+        messageDTO.setLastNumberOfAttempt(0);
+        return messageDTO;
     }
 }
