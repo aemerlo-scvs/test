@@ -13,12 +13,10 @@ import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.PolicyFileDocument;
 import com.scfg.core.domain.common.DocumentTemplate;
 import com.scfg.core.domain.dto.FileDocumentDTO;
-import com.scfg.core.application.port.out.FileDocumentPort;
 import com.scfg.core.application.service.sender.SenderService;
 import com.scfg.core.application.service.sender.WhatsAppSenderService;
 import com.scfg.core.common.enums.ClassifierEnum;
 import com.scfg.core.common.enums.MessageTypeEnum;
-import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.dto.AttachmentDTO;
 import com.scfg.core.domain.dto.MessageDTO;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +44,7 @@ public class VIRHProcessService implements VIRHUseCase {
     private final FileDocumentPort fileDocumentPort;
     private final PolicyFileDocumentPort policyFileDocumentPort;
     private final ReportServiceUseGeneric useGeneric;
+    private final AlertService alertService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -56,7 +55,7 @@ public class VIRHProcessService implements VIRHUseCase {
 
     @Override
     public String getDataInformationPolicy(String param) {
-        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_view_data_policy_propose");
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_view_virh_report_policy");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
         query.setParameter("param", param);
@@ -102,25 +101,27 @@ public class VIRHProcessService implements VIRHUseCase {
 
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
                         String mainReport = "DJS";
-                        Map<String, String> subreports = (Map) map.get("subreports");
-                        List<Object> beans = new ArrayList<>(map.entrySet());
-                        Map reportParameters = (Map) map.get("reportParameters");
+//                        Map<String, String> subreports = (Map) map.get("subreports");
+//                        List<Object> beans = new ArrayList<>(map.entrySet());
+//                        Map reportParameters = (Map) map.get("reportParameters");
                         List<DocumentTemplate> templateList = listReportAndSubReport(sw.getId(), list);
                         Map<String, JasperReport> jasperReportMap = loadReports(templateList);
-                        byte[] pdc =  useGeneric.generatePdfByte(mainReport, false, beans, reportParameters, jasperReportMap);
+                        byte[] pdc =  useGeneric.generatePdfByte(mainReport, false, null, map, jasperReportMap);
                         sw.setContent(Base64.getEncoder().encodeToString(pdc));
+                        break;
                     }
                     case 4: {
-                        String json = ""; //faltaria construir las consultas para generar los pdf dinamicos
+                        String json = getConditionParticular(numberPolicy); //faltaria construir las consultas para generar los pdf dinamicos
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
-                        String mainReport = (String) map.get("mainReport");
-                        Map<String, String> subreports = (Map) map.get("subreports");
-                        List<Object> beans = (List) map.get("reportBeansParams");
-                        Map reportParameters = (Map) map.get("reportParameters");
+                        String mainReport = "CONDICIONES_PARTICULARES";//(String) map.get("mainReport");
+//                        Map<String, String> subreports = (Map) map.get("subreports");
+//                        List<Object> beans = (List) map.get("reportBeansParams");
+//                        Map reportParameters = (Map) map.get("reportParameters");
                         List<DocumentTemplate> templateList = listReportAndSubReport(sw.getId(), list);
                         Map<String, JasperReport> jasperReportMap = loadReports(templateList);
-                        byte[] pdc = useGeneric.generatePdfByte(mainReport, false, beans, reportParameters, jasperReportMap);
+                        byte[] pdc = useGeneric.generatePdfByte(mainReport, false, null, map, jasperReportMap);
                         sw.setContent(Base64.getEncoder().encodeToString(pdc));
+                        break;
                     }
                     default: {
 
@@ -147,8 +148,8 @@ public class VIRHProcessService implements VIRHUseCase {
         fd.setContent(Base64.getEncoder().encodeToString(pdf));
         fd.setMime(HelpersConstants.PDF);
         fd.setName(filename);
-        FileDocument fileDocument= saveFileDocument(numberPolicy,pdf);
-        PolicyFileDocument policyFileDocument= savePolicyDocument(fileDocument.getId(),policyItem);
+        //FileDocument fileDocument= saveFileDocument(numberPolicy,pdf);
+        //PolicyFileDocument policyFileDocument= savePolicyDocument(fileDocument.getId(),policyItem);
         return fd;
     }
 
@@ -191,7 +192,17 @@ public class VIRHProcessService implements VIRHUseCase {
         return reportsCompiled;
     }
     private  String getDjs(String numberPolicy){
-        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_vrih_report_policy");
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_vrih_report_data_djs");
+        query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
+        query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
+        query.setParameter("param", numberPolicy);
+        query.execute();
+        String result = (String) query.getOutputParameterValue("result");
+
+        return result;
+    }
+    private  String getConditionParticular(String numberPolicy){
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_vrih_report_data_condition_particular");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
         query.setParameter("param", numberPolicy);
@@ -215,30 +226,14 @@ public class VIRHProcessService implements VIRHUseCase {
     @Override
     public Boolean sendWhatsApp(String number, String message, Long requestId) {
         this.senderService.setStrategy(this.whatsAppSenderService);
-        MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setTo(number);
-        messageDTO.setMessage(message);
-        messageDTO.setSubject("Envío notificación por WhatsApp");
-        messageDTO.setMessageTypeIdc(MessageTypeEnum.WHATSAPP.getValue());
-        messageDTO.setReferenceId(requestId);
-        messageDTO.setReferenceTableIdc((int) ClassifierEnum.REFERENCE_TABLE_GENERALREQUEST.getReferenceCode());
-        messageDTO.setNumberOfAttempt(0);
-        messageDTO.setLastNumberOfAttempt(0);
+        MessageDTO messageDTO = getMessageDTO(number, message, "Envío notificación por WhatsApp", requestId);
         return this.senderService.sendMessage(messageDTO);
     }
 
     @Override
     public Boolean sendWhatsAppWithAttachment(String number, String message, Long requestId, Long docId) {
         this.senderService.setStrategy(this.whatsAppSenderService);
-        MessageDTO messageDTO = new MessageDTO();
-        messageDTO.setTo(number);
-        messageDTO.setMessage(message);
-        messageDTO.setSubject("Envío notificación por WhatsApp con adjunto");
-        messageDTO.setMessageTypeIdc(MessageTypeEnum.WHATSAPP.getValue());
-        messageDTO.setReferenceId(requestId);
-        messageDTO.setReferenceTableIdc((int) ClassifierEnum.REFERENCE_TABLE_GENERALREQUEST.getReferenceCode());
-        messageDTO.setNumberOfAttempt(0);
-        messageDTO.setLastNumberOfAttempt(0);
+        MessageDTO messageDTO = getMessageDTO(number, message, "Envío notificación por WhatsApp con adjunto", requestId);
 
         AttachmentDTO attachmentDTO = new AttachmentDTO();
         attachmentDTO.setFileName(docId+"");
@@ -247,5 +242,18 @@ public class VIRHProcessService implements VIRHUseCase {
         list.add(attachmentDTO);
 
         return this.senderService.sendMessageWithAttachment(messageDTO, list);
+    }
+
+    private static MessageDTO getMessageDTO(String number, String message, String subject, Long requestId) {
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setTo(number);
+        messageDTO.setMessage(message);
+        messageDTO.setSubject(subject);
+        messageDTO.setMessageTypeIdc(MessageTypeEnum.WHATSAPP.getValue());
+        messageDTO.setReferenceId(requestId);
+        messageDTO.setReferenceTableIdc((int) ClassifierEnum.REFERENCE_TABLE_GENERALREQUEST.getReferenceCode());
+        messageDTO.setNumberOfAttempt(0);
+        messageDTO.setLastNumberOfAttempt(0);
+        return messageDTO;
     }
 }

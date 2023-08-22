@@ -38,6 +38,16 @@ public class AlertService {
         return alert;
     }
 
+    public List<Alert> getAlertsByListId(List<Integer> idList) {
+        return alertPort.findByIdList(idList);
+    }
+
+    public Alert getAlertByEnumReplacingContent(AlertEnum alertEnum, Alert alertData, List<String> valuesToReplace) {
+        Alert alert = alertData;
+        alert.setMail_body(getContent(alertEnum, alert.getMail_body(), valuesToReplace));
+        return alert;
+    }
+
     public String getContent(AlertEnum alertEnum, String content, List<String> valuesToReplace) {
 
         String contentReplaced = content;
@@ -94,6 +104,32 @@ public class AlertService {
                 contentReplaced = contentReplaced.replace("{observation}",valuesToReplace.get(1));
             case VIN_ANNEXE_CONFIRM_PAYMENT_VOUCHER:
                 contentReplaced = contentReplaced.replace("{policyNumber}", valuesToReplace.get(0));
+            case VIRH_SCH_1:
+                contentReplaced = contentReplaced.replace("#sr",valuesToReplace.get(0));
+                contentReplaced = contentReplaced.replace("#apellido",valuesToReplace.get(1));
+                contentReplaced = contentReplaced.replace("#fecha",valuesToReplace.get(2));
+                contentReplaced = contentReplaced.replace("#seguro",valuesToReplace.get(3));
+                contentReplaced = contentReplaced.replace("#poliza",valuesToReplace.get(4));
+                contentReplaced = contentReplaced.replace("#link",valuesToReplace.get(5));
+            case VIRH_SCH_2:
+                contentReplaced = contentReplaced.replace("#sr",valuesToReplace.get(0));
+                contentReplaced = contentReplaced.replace("#apellido",valuesToReplace.get(1));
+                contentReplaced = contentReplaced.replace("#fecha",valuesToReplace.get(2));
+                contentReplaced = contentReplaced.replace("#seguro",valuesToReplace.get(3));
+                contentReplaced = contentReplaced.replace("#poliza",valuesToReplace.get(4));
+                contentReplaced = contentReplaced.replace("#link",valuesToReplace.get(5));
+            case VIRH_SCH_3:
+                contentReplaced = contentReplaced.replace("#seguro",valuesToReplace.get(0));
+                contentReplaced = contentReplaced.replace("#link",valuesToReplace.get(1));
+            case VIRH_SCH_4:
+                contentReplaced = contentReplaced.replace("#sr",valuesToReplace.get(0));
+                contentReplaced = contentReplaced.replace("#apellido",valuesToReplace.get(1));
+                contentReplaced = contentReplaced.replace("#seguro",valuesToReplace.get(2));
+                contentReplaced = contentReplaced.replace("#poliza",valuesToReplace.get(3));
+                contentReplaced = contentReplaced.replace("#link",valuesToReplace.get(4));
+            case VIRH_WELCOME:
+                contentReplaced = contentReplaced.replace("#name",valuesToReplace.get(0));
+                contentReplaced = contentReplaced.replace("#seguro",valuesToReplace.get(1));
         }
         return contentReplaced;
     }
