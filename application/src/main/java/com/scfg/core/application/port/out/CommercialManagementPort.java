@@ -7,4 +7,7 @@ public interface CommercialManagementPort {
     PersistenceResponse save(CommercialManagement obj, boolean returnEntity);
 
     PersistenceResponse update(CommercialManagement obj);
+
+
+
 }

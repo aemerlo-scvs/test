@@ -2,9 +2,11 @@ package com.scfg.core.application.service;
 
 import com.scfg.core.application.port.in.CommercialManagementUseCase;
 import com.scfg.core.application.port.out.CommercialManagementPort;
+import com.scfg.core.application.port.out.CommercialManagementViewPort;
 import com.scfg.core.common.enums.ActionRequestEnum;
 import com.scfg.core.common.util.PersistenceResponse;
 import com.scfg.core.domain.CommercialManagement;
+import com.scfg.core.domain.dto.CommercialManagementDTO;
 import com.scfg.core.domain.dto.CommercialManagementSearchFiltersDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,6 +22,7 @@ import java.util.List;
 public class CommercialManagementService implements CommercialManagementUseCase {
     private final EntityManager em;
     private final CommercialManagementPort port;
+    private final CommercialManagementViewPort portView;
 
     @Override
     public PersistenceResponse save(CommercialManagement obj) {
@@ -35,55 +39,48 @@ public class CommercialManagementService implements CommercialManagementUseCase 
 
 
     @Override
-    public PersistenceResponse getAll() {
-        StoredProcedureQuery query = em.createStoredProcedureQuery("sp_commercial_management_all")
-                .registerStoredProcedureParameter("data", String.class, ParameterMode.OUT);
-        query.execute();
-        List<Object> result = query.getResultList();
-        em.close();
-        PersistenceResponse persistenceResponse = new PersistenceResponse(
-                CommercialManagement.class.getSimpleName(),
-                ActionRequestEnum.OBSERVATION,
-                result
-        );
-        return persistenceResponse;
+    public List<CommercialManagementDTO> search(CommercialManagementSearchFiltersDTO filtersDTO) {
+
+        if (!filtersDTO.getStatus().isEmpty()
+                && !filtersDTO.getSubStatus().isEmpty()
+                && (filtersDTO.getFromDate() != null && filtersDTO.getToDate() != null)
+        ) {
+            return portView.search(filtersDTO.getStatus(), filtersDTO.getSubStatus(), filtersDTO.getFromDate(), filtersDTO.getToDate());
+
+        }
+        if (!filtersDTO.getStatus().isEmpty()
+                && (filtersDTO.getFromDate() != null && filtersDTO.getToDate() != null)
+        ) {
+            return portView.search(filtersDTO.getStatus(), filtersDTO.getFromDate(), filtersDTO.getToDate());
+        }
+        if (filtersDTO.getStatus().isEmpty()
+                && filtersDTO.getSubStatus().isEmpty()
+                && (filtersDTO.getFromDate() != null && filtersDTO.getToDate() != null)
+        ) {
+            return portView.search(filtersDTO.getFromDate(), filtersDTO.getToDate());
+        }
+        if (!filtersDTO.getStatus().isEmpty()
+                && !filtersDTO.getSubStatus().isEmpty()
+                && (filtersDTO.getFromDate() == null || filtersDTO.getToDate() == null)
+        ) {
+            return portView.search(filtersDTO.getStatus(), filtersDTO.getSubStatus());
+        }
+        if (!filtersDTO.getStatus().isEmpty()
+                && filtersDTO.getSubStatus().isEmpty()
+                && filtersDTO.getFromDate() == null
+        ) {
+//            long startTime = System.currentTimeMillis();
+//            List<CommercialManagementDTO> list = portView.search(filtersDTO.getStatus());
+//            System.out.println(System.currentTimeMillis() - startTime);
+//            long startTime2 = System.currentTimeMillis();
+//            List<CommercialManagementDTO> list2 = portView.search2(filtersDTO.getStatus());
+//            System.out.println(System.currentTimeMillis() - startTime2);
+
+//            return null;
+            return portView.search(filtersDTO.getStatus());
+        }
+        return new ArrayList<>();
     }
 
-    @Override
-    public PersistenceResponse getAllByFilters(CommercialManagementSearchFiltersDTO commercialManagementSearchFiltersDto) {
-        StoredProcedureQuery query = em.createStoredProcedureQuery("sp_commercial_management_all");
-        query.registerStoredProcedureParameter("policyId", Long.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("data", Long.class, ParameterMode.OUT);
-        query.setParameter("fromDate", commercialManagementSearchFiltersDto.getFromDate());
-        query.setParameter("toDate", commercialManagementSearchFiltersDto.getToDate());
-        query.setParameter("state", commercialManagementSearchFiltersDto.getState());
-        query.setParameter("subState", commercialManagementSearchFiltersDto.getSubState());
-        query.execute();
-        List<Object> result = query.getResultList();
-        em.close();
-        PersistenceResponse persistenceResponse = new PersistenceResponse(
-                CommercialManagement.class.getSimpleName(),
-                ActionRequestEnum.OBSERVATION,
-                result
-        );
-        return persistenceResponse;
-    }
 
-    @Override
-    public PersistenceResponse findByPolicyId(Long policyId) {
-        StoredProcedureQuery query = em.createStoredProcedureQuery("sp_commercial_management_detail");
-        query.registerStoredProcedureParameter("policyId", Long.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("data", Long.class, ParameterMode.OUT);
-        query.setParameter("policyId", policyId);
-        query.execute();
-        String commercialManagementInfo = (String) query.getOutputParameterValue("data");
-        em.close();
-
-        PersistenceResponse persistenceResponse = new PersistenceResponse(
-                CommercialManagement.class.getSimpleName(),
-                ActionRequestEnum.OBSERVATION,
-                commercialManagementInfo
-        );
-        return persistenceResponse;
-    }
 }

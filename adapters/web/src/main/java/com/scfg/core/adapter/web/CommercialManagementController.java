@@ -5,6 +5,7 @@ import com.scfg.core.application.port.in.CommercialManagementUseCase;
 import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.common.util.PersistenceResponse;
+import com.scfg.core.domain.Branch;
 import com.scfg.core.domain.CommercialManagement;
 import com.scfg.core.domain.dto.*;
 import io.swagger.annotations.Api;
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -34,7 +37,7 @@ public class CommercialManagementController {
             PersistenceResponse response = commercialManagementUseCase.save(obj);
             return ok(response);
         } catch (NotDataFoundException | OperationException e) {
-            return CustomErrorType.badRequest("CommercialManagementDTO", e.getMessage());
+            return CustomErrorType.badRequest("CommercialManagement", e.getMessage());
         } catch (Exception ex) {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
@@ -47,25 +50,18 @@ public class CommercialManagementController {
             PersistenceResponse response = commercialManagementUseCase.update(obj);
             return ok(response);
         } catch (NotDataFoundException | OperationException e) {
-            return CustomErrorType.badRequest("CommercialManagementDTO", e.getMessage());
+            return CustomErrorType.badRequest("CommercialManagement", e.getMessage());
         } catch (Exception ex) {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
 
-
-
-
-
-
-
-
     @PostMapping(value = "/search")
     @ApiOperation(value = "Retorna una lista de polizas a renovar por filtros dinamicos")
     ResponseEntity getAllByFilters(@RequestBody @Nullable CommercialManagementSearchFiltersDTO commercialManagementSearchFiltersDto) {
         try {
-            PersistenceResponse response = commercialManagementUseCase.getAllByFilters(commercialManagementSearchFiltersDto);
-            return ok(response);
+            List<CommercialManagementDTO> list = commercialManagementUseCase.search(commercialManagementSearchFiltersDto);
+            return ok(list);
         } catch (OperationException e) {
             log.error("Ocurrio un error al obtener la lista: [{}]", e.toString());
             return CustomErrorType.badRequest("Bad Request", e.getMessage());
@@ -75,24 +71,5 @@ public class CommercialManagementController {
         }
     }
 
-    @GetMapping(value = "/all")
-    @ApiOperation(value = "Listado de polizas a renovar")
-    public ResponseEntity getAll() {
-        PersistenceResponse response = commercialManagementUseCase.getAll();
-//        if (response.isEmpty()) {
-//            return CustomErrorType.notContent("Get Policies to renew", "No data");
-//        }
-        return ok(response);
-    }
-
-    @GetMapping(value = "/getDetail/:policyId")
-    @ApiOperation(value = "Informacion de la poliza a renovar")
-    public ResponseEntity findByPolicyId(@PathVariable Long policyId) {
-        PersistenceResponse response = commercialManagementUseCase.findByPolicyId(policyId);
-//        if (data == null) {
-//            return CustomErrorType.notContent("Get Policy to renew", "No data");
-//        }
-        return ok(response);
-    }
 
 }
