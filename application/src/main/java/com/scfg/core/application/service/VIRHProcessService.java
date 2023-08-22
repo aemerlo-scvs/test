@@ -9,17 +9,14 @@ import com.scfg.core.application.port.out.FileDocumentPort;
 import com.scfg.core.application.port.out.PolicyFileDocumentPort;
 import com.scfg.core.common.util.HelpersConstants;
 import com.scfg.core.common.util.PDFMerger;
-import com.scfg.core.domain.Alert;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.PolicyFileDocument;
 import com.scfg.core.domain.common.DocumentTemplate;
 import com.scfg.core.domain.dto.FileDocumentDTO;
-import com.scfg.core.application.port.out.FileDocumentPort;
 import com.scfg.core.application.service.sender.SenderService;
 import com.scfg.core.application.service.sender.WhatsAppSenderService;
 import com.scfg.core.common.enums.ClassifierEnum;
 import com.scfg.core.common.enums.MessageTypeEnum;
-import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.dto.AttachmentDTO;
 import com.scfg.core.domain.dto.MessageDTO;
 import lombok.RequiredArgsConstructor;
@@ -114,9 +111,9 @@ public class VIRHProcessService implements VIRHUseCase {
                         break;
                     }
                     case 4: {
-                        String json = ""; //faltaria construir las consultas para generar los pdf dinamicos
+                        String json = getConditionParticular(numberPolicy); //faltaria construir las consultas para generar los pdf dinamicos
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
-                        String mainReport = (String) map.get("mainReport");
+                        String mainReport = "CONDICIONES_PARTICULARES";//(String) map.get("mainReport");
 //                        Map<String, String> subreports = (Map) map.get("subreports");
 //                        List<Object> beans = (List) map.get("reportBeansParams");
 //                        Map reportParameters = (Map) map.get("reportParameters");
@@ -196,6 +193,16 @@ public class VIRHProcessService implements VIRHUseCase {
     }
     private  String getDjs(String numberPolicy){
         StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_vrih_report_data_djs");
+        query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
+        query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
+        query.setParameter("param", numberPolicy);
+        query.execute();
+        String result = (String) query.getOutputParameterValue("result");
+
+        return result;
+    }
+    private  String getConditionParticular(String numberPolicy){
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_vrih_report_data_condition_particular");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
         query.setParameter("param", numberPolicy);
