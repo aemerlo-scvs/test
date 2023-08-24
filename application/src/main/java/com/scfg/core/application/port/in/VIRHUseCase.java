@@ -12,4 +12,5 @@ public interface VIRHUseCase {
     Boolean sendWhatsApp(String number, String message, Long requestId);
     Boolean sendWhatsAppWithAttachment(String number, String message, Long requestId, Long docId);
     FileDocumentDTO generate() throws IOException;
+    String saveInformationPolicy(String data);
 }
