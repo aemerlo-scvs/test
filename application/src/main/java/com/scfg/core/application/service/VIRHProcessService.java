@@ -81,6 +81,18 @@ public class VIRHProcessService implements VIRHUseCase {
         return  file;
     }
 
+    @Override
+    public String saveInformationPolicy(String data) {
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_virh_save_information_policy");
+        query.registerStoredProcedureParameter("data", String.class, ParameterMode.IN);
+        query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
+        query.setParameter("data", data);
+        query.execute();
+        String result = (String) query.getOutputParameterValue("result");
+        return result;
+
+    }
+
     private FileDocumentDTO generateAndSavePolicyPdf(String numberPolicy, Long productId, List<String> exclusionPdf) throws IOException, JRException {
         Long policyItem=0L;
 
