@@ -63,6 +63,21 @@ public class VIRHController {
         }
     }
 
+    @PostMapping(value = "/saveInformationPolicy")
+    @ApiOperation(value = "Servicio  que guarda informacion principal")
+    ResponseEntity saveInformationPolicy(@RequestBody String data ) {
+        try {
+            String result= this.service.saveInformationPolicy(data);
+            return ok(data);
+        } catch (OperationException e) {
+            log.error("Ocurrió un error recuperar la información: [{}]", e.toString());
+            return CustomErrorType.badRequest("Bad Request", e.getMessage());
+        } catch (Exception e) {
+            log.error("Ocurrió un error recuperar la información: [{}]", e.toString());
+            return CustomErrorType.serverError("Server Error", "No se pudo realizar la operación, " + e.getMessage());
+        }
+    }
+
     @GetMapping(value = "/download-doc")
     @ApiOperation(value = "Api para descargar un archivo desde sistema")
     ResponseEntity<Resource> downloadDoc(@RequestParam Long id) {
