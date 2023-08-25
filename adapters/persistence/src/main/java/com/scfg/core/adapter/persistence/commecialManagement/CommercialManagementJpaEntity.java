@@ -22,7 +22,7 @@ import java.util.UUID;
 @SuperBuilder
 
 public class CommercialManagementJpaEntity extends BaseJpaEntity {
-    @Column(name = "commercialManagementId")
+    @Column(name = "comercialManagementId")
     private UUID commercialManagementId;
 
     @Column(name = "policyId")

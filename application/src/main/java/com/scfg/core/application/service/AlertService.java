@@ -122,11 +122,10 @@ public class AlertService {
                 contentReplaced = contentReplaced.replace("#seguro",valuesToReplace.get(0));
                 contentReplaced = contentReplaced.replace("#link",valuesToReplace.get(1));
             case VIRH_SCH_4:
-                contentReplaced = contentReplaced.replace("#sr",valuesToReplace.get(0));
-                contentReplaced = contentReplaced.replace("#apellido",valuesToReplace.get(1));
-                contentReplaced = contentReplaced.replace("#seguro",valuesToReplace.get(2));
-                contentReplaced = contentReplaced.replace("#poliza",valuesToReplace.get(3));
-                contentReplaced = contentReplaced.replace("#link",valuesToReplace.get(4));
+                contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0));
+                contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1));
+                contentReplaced = contentReplaced.replace("{{3}}",valuesToReplace.get(2));
+                contentReplaced = contentReplaced.replace("{{4}}",valuesToReplace.get(3));
             case VIRH_WELCOME:
                 contentReplaced = contentReplaced.replace("#name",valuesToReplace.get(0));
                 contentReplaced = contentReplaced.replace("#seguro",valuesToReplace.get(1));
