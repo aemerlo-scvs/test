@@ -5,7 +5,6 @@ import com.scfg.core.application.port.in.CommercialManagementUseCase;
 import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.common.util.PersistenceResponse;
-import com.scfg.core.domain.Branch;
 import com.scfg.core.domain.CommercialManagement;
 import com.scfg.core.domain.dto.*;
 import io.swagger.annotations.Api;
@@ -55,7 +54,17 @@ public class CommercialManagementController {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
+    @GetMapping(value = "/getById/{id}")
+    @ApiOperation(value = "Obtener detalle")
+    public ResponseEntity getById(@PathVariable Long id) {
+        try {
+            CommercialManagement obj = commercialManagementUseCase.getById(id);
+            return ok(obj);
+        }catch (Exception ex){
+            return CustomErrorType.notContent("Commercial management object",ex.getMessage());
+        }
 
+    }
     @PostMapping(value = "/search")
     @ApiOperation(value = "Retorna una lista de polizas a renovar por filtros dinamicos")
     ResponseEntity getAllByFilters(@RequestBody @Nullable CommercialManagementSearchFiltersDTO commercialManagementSearchFiltersDto) {

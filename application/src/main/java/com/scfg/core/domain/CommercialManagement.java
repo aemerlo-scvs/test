@@ -1,5 +1,6 @@
 package com.scfg.core.domain;
 
+import com.scfg.core.domain.common.BaseDomain;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,9 +15,9 @@ import java.util.UUID;
 @Setter
 @Getter
 @SuperBuilder
-public class CommercialManagement {
+public class CommercialManagement extends BaseDomain {
     private Long id;
-    private UUID commercialManagementId;
+    private String commercialManagementId;
     private Long policyId;
     private Date endOfCoverage;
     private Integer managementStatusIdc;
@@ -26,5 +27,6 @@ public class CommercialManagement {
     private Integer linkEntries;
     private Date firstEntryDate;
     private Date lastEntryDate;
+    private Integer renewalPlanId;
 
 }

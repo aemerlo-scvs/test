@@ -9,6 +9,8 @@ import com.scfg.core.domain.CommercialManagement;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
+import java.util.Optional;
+
 
 @PersistenceAdapter
 @RequiredArgsConstructor
@@ -38,6 +40,12 @@ public class CommercialManagementPersistenceAdapter implements CommercialManagem
                 ActionRequestEnum.UPDATE,
                 obj
         );
+    }
+
+    @Override
+    public CommercialManagement findById(Long id) {
+        Optional<CommercialManagementJpaEntity> commercialManagementJpaEntity = repository.findById(id);
+        return mapToDomain(commercialManagementJpaEntity.get());
     }
 
     private CommercialManagementJpaEntity mapToJpaEntity(CommercialManagement obj) {

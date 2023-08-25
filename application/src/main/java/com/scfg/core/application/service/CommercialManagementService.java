@@ -20,7 +20,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CommercialManagementService implements CommercialManagementUseCase {
-    private final EntityManager em;
     private final CommercialManagementPort port;
     private final CommercialManagementViewPort portView;
 
@@ -34,6 +33,12 @@ public class CommercialManagementService implements CommercialManagementUseCase 
     @Override
     public PersistenceResponse update(CommercialManagement obj) {
         PersistenceResponse response = port.update(obj);
+        return response;
+    }
+
+    @Override
+    public CommercialManagement getById(Long id) {
+        CommercialManagement response = port.findById(id);
         return response;
     }
 
@@ -69,14 +74,6 @@ public class CommercialManagementService implements CommercialManagementUseCase 
                 && filtersDTO.getSubStatus().isEmpty()
                 && filtersDTO.getFromDate() == null
         ) {
-//            long startTime = System.currentTimeMillis();
-//            List<CommercialManagementDTO> list = portView.search(filtersDTO.getStatus());
-//            System.out.println(System.currentTimeMillis() - startTime);
-//            long startTime2 = System.currentTimeMillis();
-//            List<CommercialManagementDTO> list2 = portView.search2(filtersDTO.getStatus());
-//            System.out.println(System.currentTimeMillis() - startTime2);
-
-//            return null;
             return portView.search(filtersDTO.getStatus());
         }
         return new ArrayList<>();
