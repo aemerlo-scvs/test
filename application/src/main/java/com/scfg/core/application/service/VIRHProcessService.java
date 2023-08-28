@@ -285,7 +285,21 @@ public class VIRHProcessService implements VIRHUseCase {
     }
 
     public void automaticSenderNotificationToRenew() {
-
+        List<CommercialManagementViewWppSenderDTO> senders = this.cmWppPort.findAll();
+        List<CommercialManagement> commercialManagementList = new ArrayList<>();
+        int countSender = 0;
+        for (CommercialManagementViewWppSenderDTO obj: senders) {
+            if (countSender < this.limitSenderPerDay) {
+                CommercialManagement cms = sendNotification(obj);
+                if (cms != null) {
+                    commercialManagementList.add(cms);
+                }
+                countSender++;
+            } else {
+                break;
+            }
+        }
+        this.commercialManagementService.saveAll(commercialManagementList);
     }
 
     public void testWhatsAppSender(String number, String message, long docId) {
@@ -299,7 +313,7 @@ public class VIRHProcessService implements VIRHUseCase {
             List<Alert> auxAlertList = new ArrayList<>();
             if (countSender < this.limitSenderPerDay && obj.getPrioritySender() == 1) {
                 auxAlertList.addAll(alertList);
-                CommercialManagement cms = sendNotification(obj,auxAlertList);
+                CommercialManagement cms = sendNotification(obj);
                 if (cms != null) {
                     commercialManagementList.add(cms);
                 }
@@ -308,7 +322,6 @@ public class VIRHProcessService implements VIRHUseCase {
                 break;
             }
         }
-        System.out.println(senders);
         this.commercialManagementService.saveAll(commercialManagementList);
 //        senderService.setStrategy(whatsAppSenderService);
 //        MessageDTO messageDTO = new MessageDTO();
@@ -322,9 +335,11 @@ public class VIRHProcessService implements VIRHUseCase {
 //        senderService.sendMessageWithAttachment(messageDTO, attachmentDTOList);
     }
 
-    private CommercialManagement sendNotification(CommercialManagementViewWppSenderDTO sender, List<Alert> alerts) {
+    private CommercialManagement sendNotification(CommercialManagementViewWppSenderDTO sender) {
+        String bank = "Banco Fassil";
         CommercialManagement commercialManagement = null;
         String urlBase = "";
+        String differenceDay = sender.getDateDifference() > 0 ? sender.getDateDifference() + "" : (sender.getDateDifference() * -1) + "";
         int changeStatus = 0;
         int changeSubStatus = 0;
 
@@ -341,10 +356,11 @@ public class VIRHProcessService implements VIRHUseCase {
         if (sender.getPrioritySender() == PrioritySenderEnum.FIRST.getValue()) {
             //replace here
             valuesToReplace.add(sender.getInsured());
-            valuesToReplace.add(HelpersMethods.formatStringOnlyDate(sender.getEndOfCoverage()));
+            valuesToReplace.add(HelpersMethods.formatStringOnlyDate(sender.getStartOfCoverage()));
             valuesToReplace.add(sender.getProductName());
             valuesToReplace.add(sender.getNumberPolicy());
-            valuesToReplace.add(sender.getDateDifference()+"");
+            valuesToReplace.add(bank);
+            valuesToReplace.add(differenceDay);
             valuesToReplace.add(urlBase);
             //alert here
             alert = this.alertService.getAlertByEnumReplacingContent(
@@ -354,10 +370,8 @@ public class VIRHProcessService implements VIRHUseCase {
             changeSubStatus = (int) ClassifierEnum.CM_AUTO_CAMPAIGN_C1_M2_1.getReferenceCode();
         } else if (sender.getPrioritySender() == PrioritySenderEnum.SECOND.getValue()) {
             valuesToReplace.add(sender.getInsured());
-            valuesToReplace.add(HelpersMethods.formatStringOnlyDate(sender.getEndOfCoverage()));
             valuesToReplace.add(sender.getProductName());
             valuesToReplace.add(sender.getNumberPolicy());
-            valuesToReplace.add(sender.getDateDifference()+"");
             valuesToReplace.add(urlBase);
 
             alert = this.alertService.getAlertByEnumReplacingContent(
@@ -366,9 +380,8 @@ public class VIRHProcessService implements VIRHUseCase {
             changeStatus = (int) ClassifierEnum.CM_S_AUTOMATIC_CAMPAIGN.getReferenceCode();
             changeSubStatus = (int) ClassifierEnum.CM_AUTO_CAMPAIGN_C1_M3_10.getReferenceCode();
         } else if (sender.getPrioritySender() == PrioritySenderEnum.THIRD.getValue()) {
-            valuesToReplace.add(sender.getInsured());
             valuesToReplace.add(sender.getProductName());
-            valuesToReplace.add(sender.getNumberPolicy());
+            valuesToReplace.add(differenceDay);
             valuesToReplace.add(urlBase);
 
             alert = this.alertService.getAlertByEnumReplacingContent(
@@ -380,6 +393,7 @@ public class VIRHProcessService implements VIRHUseCase {
             valuesToReplace.add(sender.getInsured());
             valuesToReplace.add(sender.getProductName());
             valuesToReplace.add(sender.getNumberPolicy());
+            valuesToReplace.add(bank);
             valuesToReplace.add(urlBase);
 
             alert = this.alertService.getAlertByEnumReplacingContent(

@@ -17,7 +17,7 @@ import java.util.UUID;
 @SuperBuilder
 public class CommercialManagement extends BaseDomain {
     private Long id;
-    private String commercialManagementId;
+    private UUID commercialManagementId;
     private Long policyId;
     private Date endOfCoverage;
     private Integer managementStatusIdc;

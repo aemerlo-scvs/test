@@ -36,6 +36,9 @@ public class CommercialManagementViewWppSenderJpaEntity {
     @Column(name = "endOfCoverage")
     private Date endOfCoverage;
 
+    @Column(name = "startOfCoverage")
+    private Date startOfCoverage;
+
     @Column(name = "prioritySender")
     private Integer prioritySender;
 

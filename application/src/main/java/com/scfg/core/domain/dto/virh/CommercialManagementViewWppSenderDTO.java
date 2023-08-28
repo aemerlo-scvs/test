@@ -23,6 +23,7 @@ public class CommercialManagementViewWppSenderDTO {
     private Integer dateDifference;
 
     private Date endOfCoverage;
+    private Date startOfCoverage;
 
     private Integer prioritySender;
 
