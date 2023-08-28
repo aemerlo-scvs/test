@@ -24,6 +24,8 @@ public class CommercialManagementDTO {
     private String policyStatus;
     private String managementStatus;
     private String managementSubStatus;
+    private Integer managementStatusIdc;
+    private Integer managementSubStatusIdc;
     private String userName;
     private Long userId;
     private String coverages;

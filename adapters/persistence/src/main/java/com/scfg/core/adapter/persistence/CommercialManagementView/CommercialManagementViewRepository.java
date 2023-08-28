@@ -13,8 +13,8 @@ import java.util.List;
 public interface CommercialManagementViewRepository extends JpaRepository<CommercialManagementJpaEntity, Long> {
 
     @Query("SELECT DISTINCT new com.scfg.core.domain.dto.CommercialManagementDTO(c.policyId, c.numberPolicy, c.productName, " +
-            "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.userName, c.userId, c.coverages, " +
-            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId ) "+
+            "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
+            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)" +
             "FROM CommercialManagementViewJpaEntity c "+
             "WHERE c.managementStatus LIKE :status " +
             "AND c.managementSubStatus LIKE :subStatus " +
@@ -22,16 +22,16 @@ public interface CommercialManagementViewRepository extends JpaRepository<Commer
     List<CommercialManagementDTO> getAllByStatusAndSubStatus(@Param("status") String status, @Param("subStatus") String subStatus);
 
     @Query("SELECT DISTINCT new com.scfg.core.domain.dto.CommercialManagementDTO(c.policyId, c.numberPolicy, c.productName, " +
-            "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.userName, c.userId, c.coverages, " +
-            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId ) "+
+            "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
+            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)" +
             "FROM CommercialManagementViewJpaEntity c "+
             "WHERE c.endOfCoverage BETWEEN  :fromDate AND :toDate " +
             "ORDER BY c.endOfCoverage")
     List<CommercialManagementDTO> getAllByDates(@Param("fromDate") Date fromDate, @Param("toDate") Date toDate);
 
     @Query("SELECT DISTINCT new com.scfg.core.domain.dto.CommercialManagementDTO(c.policyId, c.numberPolicy, c.productName, " +
-            "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.userName, c.userId, c.coverages, " +
-            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId ) "+
+            "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
+            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)" +
             "FROM CommercialManagementViewJpaEntity c "+
             "WHERE c.managementStatus LIKE :status " +
             "AND c.endOfCoverage BETWEEN  :fromDate AND :toDate " +
@@ -45,8 +45,8 @@ public interface CommercialManagementViewRepository extends JpaRepository<Commer
 
 
     @Query("SELECT DISTINCT new com.scfg.core.domain.dto.CommercialManagementDTO(c.policyId, c.numberPolicy, c.productName, " +
-            "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.userName, c.userId, c.coverages, " +
-            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId ) "+
+            "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
+            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)" +
             "FROM CommercialManagementViewJpaEntity c "+
             "WHERE c.managementStatus LIKE :status " +
             "AND c.managementSubStatus LIKE :subStatus " +
@@ -60,8 +60,8 @@ public interface CommercialManagementViewRepository extends JpaRepository<Commer
     );
 
     @Query("SELECT DISTINCT new com.scfg.core.domain.dto.CommercialManagementDTO(c.policyId, c.numberPolicy, c.productName, " +
-            "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.userName, c.userId, c.coverages, " +
-            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId ) "+
+            "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
+            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)" +
             "FROM CommercialManagementViewJpaEntity c "+
             "WHERE c.managementStatus LIKE :status " +
             "ORDER BY c.endOfCoverage")

@@ -47,6 +47,12 @@ public class CommercialManagementViewJpaEntity {
     @Column(name = "managementSubStatus")
     private String managementSubStatus;
 
+    @Column(name = "managementStatusIdc")
+    private Integer managementStatusIdc;
+
+    @Column(name = "managementSubStatusIdc")
+    private Integer managementSubStatusIdc;
+
     @Column(name = "userName")
     private String userName;
 
