@@ -15,5 +15,8 @@ public interface CommercialManagementUseCase {
     PersistenceResponse update(CommercialManagement obj);
     CommercialManagement getById(Long id);
     List<CommercialManagementDTO> search(CommercialManagementSearchFiltersDTO commercialManagementSearchFiltersDto);
+    CommercialManagement findById(Long id);
+
+    Boolean saveAll(List<CommercialManagement> commercialManagementList);
 
 }

@@ -4,26 +4,32 @@ import com.google.gson.Gson;
 import com.lowagie.text.DocumentException;
 import com.scfg.core.application.port.in.ReportServiceUseGeneric;
 import com.scfg.core.application.port.in.VIRHUseCase;
+import com.scfg.core.application.port.out.CommercialManagementViewWppSenderPort;
 import com.scfg.core.application.port.out.DocumentTemplatePort;
 import com.scfg.core.application.port.out.FileDocumentPort;
 import com.scfg.core.application.port.out.PolicyFileDocumentPort;
+import com.scfg.core.common.enums.*;
 import com.scfg.core.common.util.HelpersConstants;
+import com.scfg.core.common.util.HelpersMethods;
 import com.scfg.core.common.util.PDFMerger;
+import com.scfg.core.domain.Alert;
+import com.scfg.core.domain.CommercialManagement;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.PolicyFileDocument;
+import com.scfg.core.domain.common.Classifier;
 import com.scfg.core.domain.common.DocumentTemplate;
 import com.scfg.core.domain.dto.FileDocumentDTO;
 import com.scfg.core.application.service.sender.SenderService;
 import com.scfg.core.application.service.sender.WhatsAppSenderService;
-import com.scfg.core.common.enums.ClassifierEnum;
-import com.scfg.core.common.enums.MessageTypeEnum;
 import com.scfg.core.domain.dto.AttachmentDTO;
 import com.scfg.core.domain.dto.MessageDTO;
+import com.scfg.core.domain.dto.virh.CommercialManagementViewWppSenderDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperReport;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import java.util.Base64;
 import javax.persistence.EntityManager;
@@ -45,6 +51,8 @@ public class VIRHProcessService implements VIRHUseCase {
     private final PolicyFileDocumentPort policyFileDocumentPort;
     private final ReportServiceUseGeneric useGeneric;
     private final AlertService alertService;
+    private final CommercialManagementViewWppSenderPort cmWppPort;
+    private final CommercialManagementService commercialManagementService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -52,6 +60,13 @@ public class VIRHProcessService implements VIRHUseCase {
 
     private final SenderService senderService;
     private final WhatsAppSenderService whatsAppSenderService;
+    private final Environment environment;
+
+    private final String[] urls = new String[]{"https://www.santacruzvidaysalud.com.bo",
+            "http://10.170.222.75:8081",
+            "https://www.santacruzvidaysalud.com.bo"};
+
+    private final Integer limitSenderPerDay = 10; // Limite diario de envios por WhatsApp - Default: 5000
 
     @Override
     public String getDataInformationPolicy(String param) {
@@ -267,5 +282,119 @@ public class VIRHProcessService implements VIRHUseCase {
         messageDTO.setNumberOfAttempt(0);
         messageDTO.setLastNumberOfAttempt(0);
         return messageDTO;
+    }
+
+    public void automaticSenderNotificationToRenew() {
+
+    }
+
+    public void testWhatsAppSender(String number, String message, long docId) {
+        List<Alert> alertList = alertService.getAlertsByListId(
+                Arrays.asList(AlertEnum.VIRH_SCH_1.getValue(),AlertEnum.VIRH_SCH_2.getValue(),AlertEnum.VIRH_SCH_3.getValue(),
+                        AlertEnum.VIRH_SCH_4.getValue(),AlertEnum.VIRH_WELCOME.getValue()));
+        List<CommercialManagementViewWppSenderDTO> senders = this.cmWppPort.findAll();
+        List<CommercialManagement> commercialManagementList = new ArrayList<>();
+        int countSender = 0;
+        for (CommercialManagementViewWppSenderDTO obj: senders) {
+            List<Alert> auxAlertList = new ArrayList<>();
+            if (countSender < this.limitSenderPerDay && obj.getPrioritySender() == 1) {
+                auxAlertList.addAll(alertList);
+                CommercialManagement cms = sendNotification(obj,auxAlertList);
+                if (cms != null) {
+                    commercialManagementList.add(cms);
+                }
+                countSender++;
+            } else {
+                break;
+            }
+        }
+        System.out.println(senders);
+        this.commercialManagementService.saveAll(commercialManagementList);
+//        senderService.setStrategy(whatsAppSenderService);
+//        MessageDTO messageDTO = new MessageDTO();
+//        messageDTO.setMessage(message);
+//        messageDTO.setTo(number);
+//        senderService.sendMessage(messageDTO);
+//        AttachmentDTO attachmentDTO = new AttachmentDTO();
+//        attachmentDTO.setFileName(docId+"");
+//        List<AttachmentDTO> attachmentDTOList = new ArrayList<>();
+//        attachmentDTOList.add(attachmentDTO);
+//        senderService.sendMessageWithAttachment(messageDTO, attachmentDTOList);
+    }
+
+    private CommercialManagement sendNotification(CommercialManagementViewWppSenderDTO sender, List<Alert> alerts) {
+        CommercialManagement commercialManagement = null;
+        String urlBase = "";
+        int changeStatus = 0;
+        int changeSubStatus = 0;
+
+        if (Arrays.asList(environment.getActiveProfiles()).contains("prod")) {
+            urlBase = urls[0];
+        } else if (Arrays.asList(environment.getActiveProfiles()).contains("pre-prod")) {
+            urlBase = urls[1];
+        } else {
+            urlBase = urls[2];
+        }
+        urlBase = urlBase + "/virh/" + sender.getUniqueCode();
+        Alert alert = new Alert();
+        List<String> valuesToReplace = new ArrayList<>();
+        if (sender.getPrioritySender() == PrioritySenderEnum.FIRST.getValue()) {
+            //replace here
+            valuesToReplace.add(sender.getInsured());
+            valuesToReplace.add(HelpersMethods.formatStringOnlyDate(sender.getEndOfCoverage()));
+            valuesToReplace.add(sender.getProductName());
+            valuesToReplace.add(sender.getNumberPolicy());
+            valuesToReplace.add(sender.getDateDifference()+"");
+            valuesToReplace.add(urlBase);
+            //alert here
+            alert = this.alertService.getAlertByEnumReplacingContent(
+                    AlertEnum.VIRH_SCH_1,valuesToReplace);
+            //Set Classifier to move to another
+            changeStatus = (int) ClassifierEnum.CM_S_AUTOMATIC_CAMPAIGN.getReferenceCode();
+            changeSubStatus = (int) ClassifierEnum.CM_AUTO_CAMPAIGN_C1_M2_1.getReferenceCode();
+        } else if (sender.getPrioritySender() == PrioritySenderEnum.SECOND.getValue()) {
+            valuesToReplace.add(sender.getInsured());
+            valuesToReplace.add(HelpersMethods.formatStringOnlyDate(sender.getEndOfCoverage()));
+            valuesToReplace.add(sender.getProductName());
+            valuesToReplace.add(sender.getNumberPolicy());
+            valuesToReplace.add(sender.getDateDifference()+"");
+            valuesToReplace.add(urlBase);
+
+            alert = this.alertService.getAlertByEnumReplacingContent(
+                    AlertEnum.VIRH_SCH_2,valuesToReplace);
+
+            changeStatus = (int) ClassifierEnum.CM_S_AUTOMATIC_CAMPAIGN.getReferenceCode();
+            changeSubStatus = (int) ClassifierEnum.CM_AUTO_CAMPAIGN_C1_M3_10.getReferenceCode();
+        } else if (sender.getPrioritySender() == PrioritySenderEnum.THIRD.getValue()) {
+            valuesToReplace.add(sender.getInsured());
+            valuesToReplace.add(sender.getProductName());
+            valuesToReplace.add(sender.getNumberPolicy());
+            valuesToReplace.add(urlBase);
+
+            alert = this.alertService.getAlertByEnumReplacingContent(
+                    AlertEnum.VIRH_SCH_3,valuesToReplace);
+
+            changeStatus = (int) ClassifierEnum.CM_S_IN_COMMERCIAL_MANAGEMENT.getReferenceCode();
+            changeSubStatus = (int) ClassifierEnum.CM_EGM_PENDING.getReferenceCode();
+        } else if (sender.getPrioritySender() == PrioritySenderEnum.FOUR.getValue()) {
+            valuesToReplace.add(sender.getInsured());
+            valuesToReplace.add(sender.getProductName());
+            valuesToReplace.add(sender.getNumberPolicy());
+            valuesToReplace.add(urlBase);
+
+            alert = this.alertService.getAlertByEnumReplacingContent(
+                    AlertEnum.VIRH_SCH_4,valuesToReplace);
+            changeStatus = (int) ClassifierEnum.CM_S_IN_COMMERCIAL_MANAGEMENT.getReferenceCode();
+            changeSubStatus = (int) ClassifierEnum.CM_EGM_PENDING.getReferenceCode();
+        }
+        senderService.setStrategy(whatsAppSenderService);
+        MessageDTO messageDTO = getMessageDTO("79855300",alert.getMail_body(),alert.getMail_subject(),sender.getGeneralRequestId());
+        boolean canSend = senderService.sendMessage(messageDTO);
+        if (canSend) {
+            commercialManagement = this.commercialManagementService.findById(sender.getCommercialManagementId());
+            commercialManagement.setManagementStatusIdc(changeStatus);
+            commercialManagement.setManagementSubStatusIdc(changeSubStatus);
+        }
+        return commercialManagement;
     }
 }

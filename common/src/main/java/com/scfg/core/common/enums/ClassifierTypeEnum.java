@@ -38,7 +38,8 @@ public enum ClassifierTypeEnum {
     businessGroups(41, "Lista de grupos empresariales"),
     citeType(49, "Cite"),
     rejectType(51, "Motivo Rechazo"),
-    acceptType(52, "Motivo Aceptacion");
+    acceptType(52, "Motivo Aceptacion"),
+    commercialManagementType(52, "Subestado de Gestión Comercial"); //Tipo de clasificador - Proyecto VIRH
 
 
     private long referenceId;

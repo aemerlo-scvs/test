@@ -105,4 +105,12 @@ public class VIRHController {
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
+
+    @GetMapping(value = "/send-whatsapp-test")
+    @ApiOperation(value = "WhatsApp prueba")
+    ResponseEntity WppTest(@RequestParam String message,@RequestParam String number, @RequestParam long docId) {
+        service.testWhatsAppSender(number, message, docId);
+        boolean res = false;
+        return ok("HOla mundo");
+    }
 }

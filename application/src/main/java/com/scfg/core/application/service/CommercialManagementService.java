@@ -79,5 +79,15 @@ public class CommercialManagementService implements CommercialManagementUseCase 
         return new ArrayList<>();
     }
 
+    @Override
+    public CommercialManagement findById(Long id) {
+        return port.findById(id);
+    }
+
+    @Override
+    public Boolean saveAll(List<CommercialManagement> commercialManagementList) {
+        return port.saveAll(commercialManagementList);
+    }
+
 
 }

@@ -3,6 +3,7 @@ package com.scfg.core.adapter.persistence.commecialManagement;
 import com.scfg.core.application.port.out.CommercialManagementPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.ActionRequestEnum;
+import com.scfg.core.common.enums.PersistenceStatusEnum;
 import com.scfg.core.common.util.ModelMapperConfig;
 import com.scfg.core.common.util.PersistenceResponse;
 import com.scfg.core.domain.CommercialManagement;
@@ -10,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
 import java.util.Optional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @PersistenceAdapter
@@ -46,6 +50,23 @@ public class CommercialManagementPersistenceAdapter implements CommercialManagem
     public CommercialManagement findById(Long id) {
         Optional<CommercialManagementJpaEntity> commercialManagementJpaEntity = repository.findById(id);
         return mapToDomain(commercialManagementJpaEntity.get());
+    }
+
+    @Override
+    public CommercialManagement findById(Long id) {
+        CommercialManagementJpaEntity cms = this.repository.findById(id, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return mapToDomain(cms);
+    }
+
+    @Override
+    public Boolean saveAll(List<CommercialManagement> commercialManagementList) {
+        List<CommercialManagementJpaEntity> commercialManagementJpaEntities = new ArrayList<>();
+        commercialManagementList.forEach(e -> {
+            CommercialManagementJpaEntity cm = mapToJpaEntity(e);
+            commercialManagementJpaEntities.add(cm);
+        });
+        repository.saveAll(commercialManagementJpaEntities);
+        return true;
     }
 
     private CommercialManagementJpaEntity mapToJpaEntity(CommercialManagement obj) {
