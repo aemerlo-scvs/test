@@ -9,7 +9,6 @@ public interface CommercialManagementPort {
     PersistenceResponse save(CommercialManagement obj, boolean returnEntity);
 
     PersistenceResponse update(CommercialManagement obj);
-    CommercialManagement findById(Long commercialManagementId);
 
     CommercialManagement findById(Long id);
 

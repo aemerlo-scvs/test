@@ -58,7 +58,7 @@ public class CommercialManagementController {
     @ApiOperation(value = "Obtener detalle")
     public ResponseEntity getById(@PathVariable Long id) {
         try {
-            CommercialManagement obj = commercialManagementUseCase.getById(id);
+            CommercialManagement obj = commercialManagementUseCase.findById(id);
             return ok(obj);
         }catch (Exception ex){
             return CustomErrorType.notContent("Commercial management object",ex.getMessage());

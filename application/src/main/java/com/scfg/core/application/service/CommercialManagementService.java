@@ -36,12 +36,6 @@ public class CommercialManagementService implements CommercialManagementUseCase 
         return response;
     }
 
-    @Override
-    public CommercialManagement getById(Long id) {
-        CommercialManagement response = port.findById(id);
-        return response;
-    }
-
 
     @Override
     public List<CommercialManagementDTO> search(CommercialManagementSearchFiltersDTO filtersDTO) {
