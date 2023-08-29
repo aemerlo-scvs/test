@@ -35,6 +35,15 @@ public class CommercialManagementService implements CommercialManagementUseCase 
         PersistenceResponse response = port.update(obj);
         return response;
     }
+    @Override
+    public PersistenceResponse updateSomeFields(CommercialManagement obj) {
+        CommercialManagement cm = port.findById(obj.getId());
+        cm.setAssignedUserId(obj.getAssignedUserId());
+        cm.setManagementStatusIdc(obj.getManagementStatusIdc());
+        cm.setManagementSubStatusIdc(obj.getManagementSubStatusIdc());
+        PersistenceResponse response = port.update(cm);
+        return response;
+    }
 
 
     @Override

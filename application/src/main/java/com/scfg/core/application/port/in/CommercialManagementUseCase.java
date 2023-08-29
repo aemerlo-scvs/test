@@ -13,6 +13,7 @@ public interface CommercialManagementUseCase {
 
     PersistenceResponse save(CommercialManagement obj);
     PersistenceResponse update(CommercialManagement obj);
+    PersistenceResponse updateSomeFields(CommercialManagement obj);
     List<CommercialManagementDTO> search(CommercialManagementSearchFiltersDTO commercialManagementSearchFiltersDto);
     CommercialManagement findById(Long id);
 

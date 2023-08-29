@@ -54,6 +54,18 @@ public class CommercialManagementController {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
     }
+    @PostMapping(value ="/updateSomeFields")
+    @ApiOperation(value = "Actualiza la gestion comercial")
+    public ResponseEntity<PersistenceResponse> updateSomeFields(@RequestBody CommercialManagement obj) {
+        try {
+            PersistenceResponse response = commercialManagementUseCase.updateSomeFields(obj);
+            return ok(response);
+        } catch (NotDataFoundException | OperationException e) {
+            return CustomErrorType.badRequest("CommercialManagement", e.getMessage());
+        } catch (Exception ex) {
+            return CustomErrorType.serverError("Server Error", ex.getMessage());
+        }
+    }
     @GetMapping(value = "/getById/{id}")
     @ApiOperation(value = "Obtener detalle")
     public ResponseEntity getById(@PathVariable Long id) {
