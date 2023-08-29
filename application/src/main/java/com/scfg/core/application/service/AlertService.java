@@ -97,13 +97,17 @@ public class AlertService {
             case VIN_REQUESTANNEXE_ACEPTED:
                 contentReplaced = contentReplaced.replace("{name}",valuesToReplace.get(0));
                 contentReplaced = contentReplaced.replace("{observation}",valuesToReplace.get(1));
+                break;
             case VIN_REQUESTANNEXE_OBSERVED:
                 contentReplaced = contentReplaced.replace("{name}",valuesToReplace.get(0));
+                break;
             case VIN_REQUESTANNEXE_REJECTED:
                 contentReplaced = contentReplaced.replace("{name}",valuesToReplace.get(0));
                 contentReplaced = contentReplaced.replace("{observation}",valuesToReplace.get(1));
+                break;
             case VIN_ANNEXE_CONFIRM_PAYMENT_VOUCHER:
                 contentReplaced = contentReplaced.replace("{policyNumber}", valuesToReplace.get(0));
+                break;
             case VIRH_SCH_1:
                 contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); //Insured name
                 contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Coverage Start date
@@ -112,24 +116,29 @@ public class AlertService {
                 contentReplaced = contentReplaced.replace("{{5}}",valuesToReplace.get(4)); // Bank (Banco Fassil)
                 contentReplaced = contentReplaced.replace("{{6}}",valuesToReplace.get(5)); // Days to remove policy
                 contentReplaced = contentReplaced.replace("{{7}}",valuesToReplace.get(6)); // Link
+                break;
             case VIRH_SCH_2:
                 contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); //Insured name
                 contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Product
                 contentReplaced = contentReplaced.replace("{{3}}",valuesToReplace.get(2)); // Policy number
                 contentReplaced = contentReplaced.replace("{{4}}",valuesToReplace.get(3)); // Link
+                break;
             case VIRH_SCH_3:
                 contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); // Product
                 contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Days remove policy
                 contentReplaced = contentReplaced.replace("{{3}}",valuesToReplace.get(2)); // Link
+                break;
             case VIRH_SCH_4:
                 contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); // Insured name
                 contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Product
                 contentReplaced = contentReplaced.replace("{{3}}",valuesToReplace.get(2)); // Policy number
                 contentReplaced = contentReplaced.replace("{{4}}",valuesToReplace.get(3)); // Bank (Banco Fassil)
                 contentReplaced = contentReplaced.replace("{{5}}",valuesToReplace.get(4)); // Link
+                break;
             case VIRH_WELCOME:
                 contentReplaced = contentReplaced.replace("#name",valuesToReplace.get(0));
                 contentReplaced = contentReplaced.replace("#seguro",valuesToReplace.get(1));
+                break;
         }
         return contentReplaced;
     }

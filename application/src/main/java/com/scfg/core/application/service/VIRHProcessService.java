@@ -302,6 +302,25 @@ public class VIRHProcessService implements VIRHUseCase {
         this.commercialManagementService.saveAll(commercialManagementList);
     }
 
+    public Boolean manualSenderNotificationToRenew(Integer priority, Integer limitMessage) {
+        List<CommercialManagementViewWppSenderDTO> senders = this.cmWppPort.findAll();
+        List<CommercialManagementViewWppSenderDTO> sendersFilter = senders.stream().filter(x -> x.getPrioritySender() == priority).collect(Collectors.toList());
+        List<CommercialManagement> commercialManagementList = new ArrayList<>();
+        int countSender = 0;
+        for (CommercialManagementViewWppSenderDTO obj: sendersFilter) {
+            if (countSender < limitMessage) {
+                CommercialManagement cms = sendNotification(obj);
+                if (cms != null) {
+                    commercialManagementList.add(cms);
+                }
+                countSender++;
+            } else {
+                break;
+            }
+        }
+        return this.commercialManagementService.saveAll(commercialManagementList);
+    }
+
     public void testWhatsAppSender(String number, String message, long docId) {
         List<Alert> alertList = alertService.getAlertsByListId(
                 Arrays.asList(AlertEnum.VIRH_SCH_1.getValue(),AlertEnum.VIRH_SCH_2.getValue(),AlertEnum.VIRH_SCH_3.getValue(),
