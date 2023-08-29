@@ -65,15 +65,20 @@ public class VIRHController {
 
     @GetMapping(value = "/download-doc")
     @ApiOperation(value = "Api para descargar un archivo desde sistema")
-    ResponseEntity<Resource> downloadDoc(@RequestParam Long id) {
+    ResponseEntity downloadDoc(@RequestParam Long id,@RequestParam Integer enviroment) {
         try {
             FileDocument file = this.service.getDocument(id);
-            byte[] attachment = Base64.getDecoder().decode(file.getContent().getBytes(StandardCharsets.UTF_8));
-            InputStream stream = new ByteArrayInputStream(attachment);
-            InputStreamResource resource = new InputStreamResource(stream);
-            return ResponseEntity.ok().contentType(MediaType.parseMediaType(file.getMime()))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getDescription() + "\"")
-                    .body(resource);
+            if(enviroment==1){
+                byte[] attachment = Base64.getDecoder().decode(file.getContent().getBytes(StandardCharsets.UTF_8));
+                InputStream stream = new ByteArrayInputStream(attachment);
+                InputStreamResource resource = new InputStreamResource(stream);
+                return ResponseEntity.ok().contentType(MediaType.parseMediaType(file.getMime()))
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getDescription() + "\"")
+                        .body(resource);
+            }
+            else {
+                return  ok(file);
+            }
         } catch (Exception e) {
             log.error("Error al queres descargar el documento de formato", e);
             return CustomErrorType.serverError("Server Error", e.getMessage());
