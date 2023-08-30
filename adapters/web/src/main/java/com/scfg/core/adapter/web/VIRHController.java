@@ -1,6 +1,7 @@
 package com.scfg.core.adapter.web;
 
 import com.scfg.core.adapter.web.util.CustomErrorType;
+import com.scfg.core.application.port.in.CommercialManagementUseCase;
 import com.scfg.core.application.port.in.PlanUseCase;
 import com.scfg.core.application.service.VIRHProcessService;
 import com.scfg.core.common.exception.OperationException;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,12 +36,19 @@ import static org.springframework.http.ResponseEntity.ok;
 public class VIRHController {
     private final   VIRHProcessService service;
     private final PlanUseCase planUseCase;
+    private  final CommercialManagementUseCase commercialManagementUseCase;
     @GetMapping (value = "/policyInformation/{unique}")
     @ApiOperation(value = "Servicio para recuperar información (plan, asegurado, beneficiario)")
     ResponseEntity informationPolicy(@PathVariable("unique") String param) {
         try {
-           String data= this.service.getDataInformationPolicy(param);
-            return ok(data);
+            boolean sw = commercialManagementUseCase.existsComercialManagementId(param);
+            if (sw){
+                String data= this.service.getDataInformationPolicy(param);
+                return ok(data);
+            }else {
+                return new ResponseEntity<>("Codigo no valido", HttpStatus.NOT_FOUND);
+            }
+
         } catch (OperationException e) {
             log.error("Ocurrió un error recuperar la información: [{}]", e.toString());
             return CustomErrorType.badRequest("Bad Request", e.getMessage());

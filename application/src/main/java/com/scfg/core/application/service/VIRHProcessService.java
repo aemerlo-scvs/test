@@ -54,6 +54,7 @@ public class VIRHProcessService implements VIRHUseCase {
     private final CommercialManagementViewWppSenderPort cmWppPort;
     private final CommercialManagementService commercialManagementService;
 
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -70,6 +71,7 @@ public class VIRHProcessService implements VIRHUseCase {
 
     @Override
     public String getDataInformationPolicy(String param) {
+
         StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_view_virh_report_policy");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
