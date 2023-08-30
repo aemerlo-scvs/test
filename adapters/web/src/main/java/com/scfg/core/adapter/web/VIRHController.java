@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.List;
+
 
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -69,7 +68,7 @@ public class VIRHController {
     ResponseEntity saveInformationPolicy(@RequestBody String data ) {
         try {
             String result= this.service.saveInformationPolicy(data);
-            return ok(data);
+            return ok(result);
         } catch (OperationException e) {
             log.error("Ocurrió un error recuperar la información: [{}]", e.toString());
             return CustomErrorType.badRequest("Bad Request", e.getMessage());
