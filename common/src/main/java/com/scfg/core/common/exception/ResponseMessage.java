@@ -1,37 +1,31 @@
 package com.scfg.core.common.exception;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import java.io.Serializable;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
 public class ResponseMessage {
-    private String response;
-    private boolean responseStatus;
+    private String responseMessage;
+    private boolean success;
 
 
-    public String getResponse() {
-        return response;
+    public String getResponseMessage() {
+        return responseMessage;
     }
 
-    public void setResponse(String response) {
-        this.response = response;
+    public void setResponseMessage(String responseMessage) {
+        this.responseMessage = responseMessage;
     }
 
-    public boolean getResponseStatus() {
-        return responseStatus;
+    public boolean getSuccess() {
+        return success;
     }
 
-    public void setResponseStatus(boolean responseStatus) {
-        this.responseStatus = responseStatus;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 }
 

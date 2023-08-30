@@ -30,11 +30,11 @@ public class NewPersonController {
         try {
             Boolean saved = newPersonUseCase.saveOrUpdate(newPerson);
             ResponseMessage res = new ResponseMessage();
-            res.setResponseStatus(saved);
+            res.setSuccess(saved);
             if (saved) {
-                res.setResponse("Guardado exitoso");
+                res.setResponseMessage("Guardado exitoso");
             } else {
-                res.setResponse("Error al guardar");
+                res.setResponseMessage("Error al guardar");
             }
             return ok(res);
         } catch (OperationException e){

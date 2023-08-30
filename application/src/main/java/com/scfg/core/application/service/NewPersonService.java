@@ -11,8 +11,6 @@ import com.scfg.core.domain.person.NewPerson;
 import com.scfg.core.domain.person.PersonRole;
 import com.scfg.core.domain.person.ReferencePerson;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +62,6 @@ public class NewPersonService implements NewPersonUseCase {
     }
 
     private long saveOrUpdatePerson(NewPerson newPerson) {
-
         NewPerson newPersonAux = newPersonPort.findById(newPerson.getId());
         long personId = 0L;
 
@@ -112,87 +109,93 @@ public class NewPersonService implements NewPersonUseCase {
     }
 
     private void saveOrUpdateTelephones(NewPerson newPerson, long personId) {
-
-        if (!newPerson.getTelephones().isEmpty()) {
-            List<Telephone> actTelephoneList = telephonePort.getAllByNewPersonId(personId);
-            List<Telephone> newTelephones = new ArrayList<>();
-            if (actTelephoneList != null) {
-                for (Telephone obj : newPerson.getTelephones()) {
-                    if ((!actTelephoneList.stream().map(o -> o.getNumber().equals(obj.getNumber())).findAny().isPresent())) {
-                        obj.setNewPersonId(personId);
-                        obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                        newTelephones.add(obj);
+        if (newPerson != null && personId > 0) {
+            if (newPerson.getTelephones() != null && !newPerson.getTelephones().isEmpty()) {
+                List<Telephone> actTelephoneList = telephonePort.getAllByNewPersonId(personId);
+                List<Telephone> newTelephones = new ArrayList<>();
+                if (actTelephoneList != null) {
+                    for (Telephone obj : newPerson.getTelephones()) {
+                        if ((!actTelephoneList.stream().map(o -> o.getNumber().equals(obj.getNumber())).findAny().isPresent())) {
+                            obj.setNewPersonId(personId);
+                            obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                            newTelephones.add(obj);
+                        }
                     }
+                } else {
+                    newTelephones.addAll(newPerson.getTelephones());
                 }
-            } else {
-                newTelephones.addAll(newPerson.getTelephones());
-            }
 
-            if (!newTelephones.isEmpty()) {
-                telephonePort.saveOrUpdateAll(newTelephones);
+                if (!newTelephones.isEmpty()) {
+                    telephonePort.saveOrUpdateAll(newTelephones);
+                }
             }
         }
     }
 
     private void saveOrUpdateDirections(NewPerson newPerson, long personId) {
-        if (!newPerson.getDirections().isEmpty()) {
-            List<Direction> actDirectionList = directionPort.findAllByNewPersonId(personId);
-            List<Direction> newDirections = new ArrayList<>();
-            if (actDirectionList != null) {
-                for (Direction obj : newPerson.getDirections()) {
-                    if ((!actDirectionList.stream().map(o -> o.getDescription().equals(obj.getDescription())).findAny().isPresent()) &&
-                            (!actDirectionList.stream().map(o -> o.getDirectionTypeIdc().equals(obj.getDirectionTypeIdc())).findAny().isPresent())) {
-                        obj.setNewPersonId(personId);
-                        obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                        newDirections.add(obj);
+        if (newPerson != null && personId > 0) {
+            if (!newPerson.getDirections().isEmpty()) {
+                List<Direction> actDirectionList = directionPort.findAllByNewPersonId(personId);
+                List<Direction> newDirections = new ArrayList<>();
+                if (actDirectionList != null) {
+                    for (Direction obj : newPerson.getDirections()) {
+                        if ((!actDirectionList.stream().map(o -> o.getDescription().equals(obj.getDescription())).findAny().isPresent()) &&
+                                (!actDirectionList.stream().map(o -> o.getDirectionTypeIdc().equals(obj.getDirectionTypeIdc())).findAny().isPresent())) {
+                            obj.setNewPersonId(personId);
+                            obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                            newDirections.add(obj);
+                        }
                     }
+                } else {
+                    newDirections.addAll(newPerson.getDirections());
                 }
-            } else {
-                newDirections.addAll(newPerson.getDirections());
-            }
-            if (!newDirections.isEmpty()) {
-                directionPort.saveAllDirection(newDirections);
+                if (!newDirections.isEmpty()) {
+                    directionPort.saveAllDirection(newDirections);
+                }
             }
         }
     }
 
     private void saveOrUpdateAccounts(NewPerson newPerson, long personId) {
-        if (!newPerson.getAccounts().isEmpty()) {
-            List<Account> actAccountList = accountPort.findAllByNewPersonId(personId);
-            List<Account> newAccounts = new ArrayList<>();
-            if (actAccountList != null) {
-                for (Account obj : newPerson.getAccounts()) {
-                    if (!actAccountList.stream().map(o -> o.getAccountNumber().equals(obj.getAccountNumber())).findAny().isPresent()) {
-                        obj.setNewPersonId(personId);
-                        obj.setNewPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
-                        newAccounts.add(obj);
+        if (newPerson != null && personId > 0) {
+            if (newPerson.getAccounts() != null && !newPerson.getAccounts().isEmpty()) {
+                List<Account> actAccountList = accountPort.findAllByNewPersonId(personId);
+                List<Account> newAccounts = new ArrayList<>();
+                if (actAccountList != null) {
+                    for (Account obj : newPerson.getAccounts()) {
+                        if (!actAccountList.stream().map(o -> o.getAccountNumber().equals(obj.getAccountNumber())).findAny().isPresent()) {
+                            obj.setNewPersonId(personId);
+                            obj.setNewPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                            newAccounts.add(obj);
+                        }
                     }
+                } else {
+                    newAccounts.addAll(newPerson.getAccounts());
                 }
-            } else {
-                newAccounts.addAll(newPerson.getAccounts());
-            }
-            if (!newAccounts.isEmpty()) {
-                accountPort.saveOrUpdateAll(newAccounts);
+                if (!newAccounts.isEmpty()) {
+                    accountPort.saveOrUpdateAll(newAccounts);
+                }
             }
         }
     }
 
     private void handleReferencePersonOrRole(NewPerson newPerson, long personId) {
-
+        if (newPerson != null && personId > 0) {
             if (newPerson.getDocumentTypeIdc() != ClassifierEnum.NIT_IdentificationType.getReferenceCode()) {
                 List<ReferencePerson> newReferencePerson = new ArrayList<>();
-                if(!newPerson.getReferencePersonInfo().isEmpty()){
-                    if (!newPerson.getReferencePersonInfo().isEmpty()) {
-                        for (ReferencePerson obj : newPerson.getReferencePersonInfo()) {
-                            obj.setPersonId(personId);
-                            newReferencePerson.add(obj);
-                        }
+                if (newPerson.getReferencePersonInfo() != null && !newPerson.getReferencePersonInfo().isEmpty()) {
+                    for (ReferencePerson obj : newPerson.getReferencePersonInfo()) {
+                        obj.setPersonId(personId);
+                        newReferencePerson.add(obj);
                     }
+
                 }
                 if (newPerson.getMaritalStatusIdc() == ClassifierEnum.MARRIED_STATUS.getReferenceCode() && newPerson.getGenderIdc() == ClassifierEnum.FEMALE.getReferenceCode()) {
-                    newPerson.getSpouse().setReferenceRelationshipIdc((int) ClassifierEnum.SPOUSE.getReferenceCode());
-                    newPerson.getSpouse().setPersonId(personId);
-                    newReferencePerson.add(newPerson.getSpouse());
+                    if (newPerson.getSpouse() != null) {
+                        newPerson.getSpouse().setReferenceRelationshipIdc((int) ClassifierEnum.SPOUSE.getReferenceCode());
+                        newPerson.getSpouse().setPersonId(personId);
+                        newReferencePerson.add(newPerson.getSpouse());
+                    }
                 }
                 if (!newReferencePerson.isEmpty()) {
                     referencePersonPort.saveOrUpdateAll(newReferencePerson);
@@ -214,6 +217,8 @@ public class NewPersonService implements NewPersonUseCase {
                 }
 
             }
+        }
+
     }
 }
 
