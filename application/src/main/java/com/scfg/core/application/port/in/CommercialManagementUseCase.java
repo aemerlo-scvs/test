@@ -17,5 +17,6 @@ public interface CommercialManagementUseCase {
     CommercialManagement findById(Long id);
 
     Boolean saveAll(List<CommercialManagement> commercialManagementList);
+    Boolean existsComercialManagementId(String comercialManagementId);
 
 }
