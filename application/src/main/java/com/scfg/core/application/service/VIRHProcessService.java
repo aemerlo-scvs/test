@@ -54,6 +54,7 @@ public class VIRHProcessService implements VIRHUseCase {
     private final CommercialManagementViewWppSenderPort cmWppPort;
     private final CommercialManagementService commercialManagementService;
 
+
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -70,6 +71,7 @@ public class VIRHProcessService implements VIRHUseCase {
 
     @Override
     public String getDataInformationPolicy(String param) {
+
         StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_view_virh_report_policy");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
@@ -99,9 +101,9 @@ public class VIRHProcessService implements VIRHUseCase {
     @Override
     public String saveInformationPolicy(String data) {
         StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_virh_save_information_policy");
-        query.registerStoredProcedureParameter("data", String.class, ParameterMode.IN);
+        query.registerStoredProcedureParameter("json_data", String.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
-        query.setParameter("data", data);
+        query.setParameter("json_data", data);
         query.execute();
         String result = (String) query.getOutputParameterValue("result");
         return result;

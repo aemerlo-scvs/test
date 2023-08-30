@@ -16,6 +16,7 @@ import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -90,6 +91,14 @@ public class CommercialManagementService implements CommercialManagementUseCase 
     @Override
     public Boolean saveAll(List<CommercialManagement> commercialManagementList) {
         return port.saveAll(commercialManagementList);
+    }
+
+    @Override
+    public Boolean existsComercialManagementId(String comercialManagementId) {
+        if (!comercialManagementId.isEmpty() && comercialManagementId.length()==36){
+
+        return port.existsComercialManagementId(comercialManagementId);}
+        else return false;
     }
 
 
