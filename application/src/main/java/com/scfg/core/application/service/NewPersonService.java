@@ -62,8 +62,8 @@ public class NewPersonService implements NewPersonUseCase {
     }
 
     private long saveOrUpdatePerson(NewPerson newPerson) {
-        NewPerson newPersonAux = newPersonPort.findById(newPerson.getId());
         long personId = 0L;
+        NewPerson newPersonAux = newPersonPort.findById(newPerson.getId());
 
         if (newPersonAux != null) {
             newPersonAux.setDocumentTypeIdc(newPerson.getDocumentTypeIdc());
@@ -115,9 +115,10 @@ public class NewPersonService implements NewPersonUseCase {
                 List<Telephone> newTelephones = new ArrayList<>();
                 if (actTelephoneList != null) {
                     for (Telephone obj : newPerson.getTelephones()) {
-                        if ((!actTelephoneList.stream().map(o -> o.getNumber().equals(obj.getNumber())).findAny().isPresent())) {
+                        if (actTelephoneList.stream().noneMatch(o -> o.getNumber().equals(obj.getNumber()))) {
                             obj.setNewPersonId(personId);
-                            obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                            obj.setPersonId((newPerson.getPersonId() != null && newPerson.getPersonId() > 0) ?
+                                    newPerson.getPersonId() : null);
                             newTelephones.add(obj);
                         }
                     }
@@ -139,10 +140,12 @@ public class NewPersonService implements NewPersonUseCase {
                 List<Direction> newDirections = new ArrayList<>();
                 if (actDirectionList != null) {
                     for (Direction obj : newPerson.getDirections()) {
-                        if ((!actDirectionList.stream().map(o -> o.getDescription().equals(obj.getDescription())).findAny().isPresent()) &&
-                                (!actDirectionList.stream().map(o -> o.getDirectionTypeIdc().equals(obj.getDirectionTypeIdc())).findAny().isPresent())) {
+                        if (actDirectionList.stream().noneMatch(o ->
+                                (o.getDescription().equals(obj.getDescription()) &&
+                                 o.getDirectionTypeIdc().equals(obj.getDirectionTypeIdc())))) {
                             obj.setNewPersonId(personId);
-                            obj.setPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                            obj.setPersonId((newPerson.getPersonId() != null && newPerson.getPersonId() > 0) ?
+                                    newPerson.getPersonId() : null);
                             newDirections.add(obj);
                         }
                     }
@@ -163,9 +166,10 @@ public class NewPersonService implements NewPersonUseCase {
                 List<Account> newAccounts = new ArrayList<>();
                 if (actAccountList != null) {
                     for (Account obj : newPerson.getAccounts()) {
-                        if (!actAccountList.stream().map(o -> o.getAccountNumber().equals(obj.getAccountNumber())).findAny().isPresent()) {
+                        if (actAccountList.stream().noneMatch(o -> o.getAccountNumber().equals(obj.getAccountNumber()))) {
                             obj.setNewPersonId(personId);
-                            obj.setNewPersonId((newPerson.getPersonId() != 0) ? newPerson.getPersonId() : null);
+                            obj.setNewPersonId((newPerson.getPersonId() != null && newPerson.getPersonId() != 0) ?
+                                    newPerson.getPersonId() : null);
                             newAccounts.add(obj);
                         }
                     }

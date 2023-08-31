@@ -37,5 +37,5 @@ public class TelephoneJpaEntity extends BaseJpaEntity {
     private String internalNumber;
 
     @Column(name = "number")
-    private Integer number;
+    private String number;
 }
