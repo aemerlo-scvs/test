@@ -13,4 +13,5 @@ public interface CommercialManagementPort {
     CommercialManagement findById(Long id);
 
     Boolean saveAll(List<CommercialManagement> commercialManagementList);
+    boolean existsComercialManagementId(String comercialManagementId);
 }

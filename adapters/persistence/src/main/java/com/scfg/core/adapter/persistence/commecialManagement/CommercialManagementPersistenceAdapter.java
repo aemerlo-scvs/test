@@ -61,6 +61,13 @@ public class CommercialManagementPersistenceAdapter implements CommercialManagem
         return true;
     }
 
+    @Override
+    public boolean existsComercialManagementId(String comercialManagementId) {
+
+        Integer p= repository.existsByComercialManagementId(comercialManagementId);
+        return p==1?true:false;
+    }
+
     private CommercialManagementJpaEntity mapToJpaEntity(CommercialManagement obj) {
         return new ModelMapperConfig().getStrictModelMapper().map(obj, CommercialManagementJpaEntity.class);
     }
