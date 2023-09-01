@@ -133,11 +133,11 @@ public class VIRHController {
     ResponseEntity WppSenderManually(@RequestParam Integer priority,@RequestParam Integer limitMessage) {
         boolean res = service.manualSenderNotificationToRenew(priority, limitMessage);
         ResponseMessage message = new ResponseMessage();
-        message.setResponseStatus(res);
+        message.setSuccess(res);
         if (res) {
-            message.setResponse("Finalizado con exito");
+            message.setResponseMessage("Finalizado con exito");
         } else {
-            message.setResponse("Fallo en el proceso");
+            message.setResponseMessage("Fallo en el proceso");
         }
         return ok(message);
     }
