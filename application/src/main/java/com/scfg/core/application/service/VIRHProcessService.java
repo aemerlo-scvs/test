@@ -253,16 +253,16 @@ public class VIRHProcessService implements VIRHUseCase {
     }
 
     @Override
-    public Boolean sendWhatsApp(String number, String message, Long requestId) {
+    public Boolean sendWhatsApp(String number, String message, Long requestId, Integer referecenteTableIdc) {
         this.senderService.setStrategy(this.whatsAppSenderService);
-        MessageDTO messageDTO = getMessageDTO(number, message, "Envío notificación por WhatsApp", requestId);
+        MessageDTO messageDTO = getMessageDTO(number, message, "Envío notificación por WhatsApp", requestId, referecenteTableIdc);
         return this.senderService.sendMessage(messageDTO);
     }
 
     @Override
-    public Boolean sendWhatsAppWithAttachment(String number, String message, Long requestId, Long docId) {
+    public Boolean sendWhatsAppWithAttachment(String number, String message, Long requestId, Long docId, Integer referenceTableIdc) {
         this.senderService.setStrategy(this.whatsAppSenderService);
-        MessageDTO messageDTO = getMessageDTO(number, message, "Envío notificación por WhatsApp con adjunto", requestId);
+        MessageDTO messageDTO = getMessageDTO(number, message, "Envío notificación por WhatsApp con adjunto", requestId, referenceTableIdc);
 
         AttachmentDTO attachmentDTO = new AttachmentDTO();
         attachmentDTO.setFileName(docId+"");
@@ -273,14 +273,14 @@ public class VIRHProcessService implements VIRHUseCase {
         return this.senderService.sendMessageWithAttachment(messageDTO, list);
     }
 
-    private static MessageDTO getMessageDTO(String number, String message, String subject, Long requestId) {
+    private static MessageDTO getMessageDTO(String number, String message, String subject, Long requestId, Integer referenceTableIdc) {
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setTo(number);
         messageDTO.setMessage(message);
         messageDTO.setSubject(subject);
         messageDTO.setMessageTypeIdc(MessageTypeEnum.WHATSAPP.getValue());
         messageDTO.setReferenceId(requestId);
-        messageDTO.setReferenceTableIdc((int) ClassifierEnum.REFERENCE_TABLE_GENERALREQUEST.getReferenceCode());
+        messageDTO.setReferenceTableIdc(referenceTableIdc);
         messageDTO.setNumberOfAttempt(0);
         messageDTO.setLastNumberOfAttempt(0);
         return messageDTO;
@@ -324,36 +324,42 @@ public class VIRHProcessService implements VIRHUseCase {
     }
 
     public void testWhatsAppSender(String number, String message, long docId) {
-        List<Alert> alertList = alertService.getAlertsByListId(
-                Arrays.asList(AlertEnum.VIRH_SCH_1.getValue(),AlertEnum.VIRH_SCH_2.getValue(),AlertEnum.VIRH_SCH_3.getValue(),
-                        AlertEnum.VIRH_SCH_4.getValue(),AlertEnum.VIRH_WELCOME.getValue()));
-        List<CommercialManagementViewWppSenderDTO> senders = this.cmWppPort.findAll();
-        List<CommercialManagement> commercialManagementList = new ArrayList<>();
-        int countSender = 0;
-        for (CommercialManagementViewWppSenderDTO obj: senders) {
-            List<Alert> auxAlertList = new ArrayList<>();
-            if (countSender < this.limitSenderPerDay && obj.getPrioritySender() == 1) {
-                auxAlertList.addAll(alertList);
-                CommercialManagement cms = sendNotification(obj);
-                if (cms != null) {
-                    commercialManagementList.add(cms);
-                }
-                countSender++;
-            } else {
-                break;
-            }
-        }
-        this.commercialManagementService.saveAll(commercialManagementList);
-//        senderService.setStrategy(whatsAppSenderService);
-//        MessageDTO messageDTO = new MessageDTO();
-//        messageDTO.setMessage(message);
-//        messageDTO.setTo(number);
+//        List<Alert> alertList = alertService.getAlertsByListId(
+//                Arrays.asList(AlertEnum.VIRH_SCH_1.getValue(),AlertEnum.VIRH_SCH_2.getValue(),AlertEnum.VIRH_SCH_3.getValue(),
+//                        AlertEnum.VIRH_SCH_4.getValue(),AlertEnum.VIRH_WELCOME.getValue()));
+//        List<CommercialManagementViewWppSenderDTO> senders = this.cmWppPort.findAll();
+//        List<CommercialManagement> commercialManagementList = new ArrayList<>();
+//        int countSender = 0;
+//        for (CommercialManagementViewWppSenderDTO obj: senders) {
+//            List<Alert> auxAlertList = new ArrayList<>();
+//            if (countSender < this.limitSenderPerDay && obj.getPrioritySender() == 1) {
+//                auxAlertList.addAll(alertList);
+//                CommercialManagement cms = sendNotification(obj);
+//                if (cms != null) {
+//                    commercialManagementList.add(cms);
+//                }
+//                countSender++;
+//            } else {
+//                break;
+//            }
+//        }
+//        this.commercialManagementService.saveAll(commercialManagementList);
+        List<String> arr = new ArrayList<>();
+        arr.add("JUAN PABLO SUAREZ");
+        arr.add("SEPELIO");
+        arr.add("62177077");
+        Alert alert = alertService.getAlertByEnumReplacingContent(
+                AlertEnum.VIRH_WELCOME,arr);
+        senderService.setStrategy(whatsAppSenderService);
+        MessageDTO messageDTO = new MessageDTO();
+        messageDTO.setMessage(alert.getMail_body());
+        messageDTO.setTo(number);
 //        senderService.sendMessage(messageDTO);
-//        AttachmentDTO attachmentDTO = new AttachmentDTO();
-//        attachmentDTO.setFileName(docId+"");
-//        List<AttachmentDTO> attachmentDTOList = new ArrayList<>();
-//        attachmentDTOList.add(attachmentDTO);
-//        senderService.sendMessageWithAttachment(messageDTO, attachmentDTOList);
+        AttachmentDTO attachmentDTO = new AttachmentDTO();
+        attachmentDTO.setFileName(docId+"");
+        List<AttachmentDTO> attachmentDTOList = new ArrayList<>();
+        attachmentDTOList.add(attachmentDTO);
+        senderService.sendMessageWithAttachment(messageDTO, attachmentDTOList);
     }
 
     private CommercialManagement sendNotification(CommercialManagementViewWppSenderDTO sender) {
@@ -374,24 +380,25 @@ public class VIRHProcessService implements VIRHUseCase {
         urlBase = urlBase + "/virh/" + sender.getUniqueCode();
         Alert alert = new Alert();
         List<String> valuesToReplace = new ArrayList<>();
+        String productName = sender.getNumberPolicy().contains("SMVS") ? "Sepelio" : "Vida + Cáncer";
         if (sender.getPrioritySender() == PrioritySenderEnum.FIRST.getValue()) {
-            //replace here
+
             valuesToReplace.add(sender.getInsured());
             valuesToReplace.add(HelpersMethods.formatStringOnlyDate(sender.getStartOfCoverage()));
-            valuesToReplace.add(sender.getProductName());
+            valuesToReplace.add(productName);
             valuesToReplace.add(sender.getNumberPolicy());
             valuesToReplace.add(bank);
             valuesToReplace.add(differenceDay);
             valuesToReplace.add(urlBase);
-            //alert here
+
             alert = this.alertService.getAlertByEnumReplacingContent(
                     AlertEnum.VIRH_SCH_1,valuesToReplace);
-            //Set Classifier to move to another
+
             changeStatus = (int) ClassifierEnum.CM_S_AUTOMATIC_CAMPAIGN.getReferenceCode();
             changeSubStatus = (int) ClassifierEnum.CM_AUTO_CAMPAIGN_C1_M2_1.getReferenceCode();
         } else if (sender.getPrioritySender() == PrioritySenderEnum.SECOND.getValue()) {
             valuesToReplace.add(sender.getInsured());
-            valuesToReplace.add(sender.getProductName());
+            valuesToReplace.add(productName);
             valuesToReplace.add(sender.getNumberPolicy());
             valuesToReplace.add(urlBase);
 
@@ -401,8 +408,7 @@ public class VIRHProcessService implements VIRHUseCase {
             changeStatus = (int) ClassifierEnum.CM_S_AUTOMATIC_CAMPAIGN.getReferenceCode();
             changeSubStatus = (int) ClassifierEnum.CM_AUTO_CAMPAIGN_C1_M3_10.getReferenceCode();
         } else if (sender.getPrioritySender() == PrioritySenderEnum.THIRD.getValue()) {
-            valuesToReplace.add(sender.getProductName());
-            valuesToReplace.add(differenceDay);
+            valuesToReplace.add(productName);
             valuesToReplace.add(urlBase);
 
             alert = this.alertService.getAlertByEnumReplacingContent(
@@ -410,25 +416,35 @@ public class VIRHProcessService implements VIRHUseCase {
 
             changeStatus = (int) ClassifierEnum.CM_S_IN_COMMERCIAL_MANAGEMENT.getReferenceCode();
             changeSubStatus = (int) ClassifierEnum.CM_EGM_PENDING.getReferenceCode();
-        } else if (sender.getPrioritySender() == PrioritySenderEnum.FOUR.getValue()) {
+        } else if (sender.getPrioritySender() == PrioritySenderEnum.FOUR.getValue()) { //TODO Solo se tiene programado hasta prioridad de envio 4, en caso de existir otra prioridad adicional, esta debe de agregarse en la condicional
             valuesToReplace.add(sender.getInsured());
-            valuesToReplace.add(sender.getProductName());
+            valuesToReplace.add(productName);
             valuesToReplace.add(sender.getNumberPolicy());
             valuesToReplace.add(bank);
             valuesToReplace.add(urlBase);
 
             alert = this.alertService.getAlertByEnumReplacingContent(
                     AlertEnum.VIRH_SCH_4,valuesToReplace);
+            changeStatus = (int) ClassifierEnum.CM_S_AUTOMATIC_CAMPAIGN.getReferenceCode();
+            changeSubStatus = (int) ClassifierEnum.CM_AUTO_CAMPAIGN_C2_M2_10.getReferenceCode();
+        } else if (sender.getPrioritySender() == PrioritySenderEnum.FIFTH.getValue()) {
+            valuesToReplace.add(sender.getInsured());
+            valuesToReplace.add(productName);
+            valuesToReplace.add(urlBase);
+
+            alert = this.alertService.getAlertByEnumReplacingContent(
+                    AlertEnum.VIRH_SCH_5,valuesToReplace);
             changeStatus = (int) ClassifierEnum.CM_S_IN_COMMERCIAL_MANAGEMENT.getReferenceCode();
             changeSubStatus = (int) ClassifierEnum.CM_EGM_PENDING.getReferenceCode();
         }
         senderService.setStrategy(whatsAppSenderService);
-        MessageDTO messageDTO = getMessageDTO("79855300",alert.getMail_body(),alert.getMail_subject(),sender.getGeneralRequestId());
+        MessageDTO messageDTO = getMessageDTO("79855300",alert.getMail_body(),alert.getMail_subject(),sender.getCommercialManagementId(), (int) ClassifierEnum.REFERENCE_TABLE_COMMERCIALMANAGEMENT.getReferenceCode());
         boolean canSend = senderService.sendMessage(messageDTO);
         if (canSend) {
             commercialManagement = this.commercialManagementService.findById(sender.getCommercialManagementId());
             commercialManagement.setManagementStatusIdc(changeStatus);
             commercialManagement.setManagementSubStatusIdc(changeSubStatus);
+            commercialManagement.setMessageSentDate(new Date());
         }
         return commercialManagement;
     }

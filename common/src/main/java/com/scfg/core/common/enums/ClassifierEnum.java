@@ -160,6 +160,7 @@ public enum ClassifierEnum {
     REFERENCE_TABLE_MESSAGERESPONSE(2,68), // Tabla de referencia respuesta propuesta - MessageResponse
     REFERENCE_TABLE_REQUESTANNEXE(3,68), // Tabla de referencia - RequestAnnexe
     REFERENCE_TABLE_TRANSACTION(4,68), // Tabla de referencia - Transaction
+    REFERENCE_TABLE_COMMERCIALMANAGEMENT(5,68), // Tabla de referencia - CommercialManagement
 
     //Commercial Management - Status
     CM_S_NO_MANAGEMENT(1,84), //ESTADO - SIN GESTIÓN

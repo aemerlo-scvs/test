@@ -24,9 +24,9 @@ public class WhatsAppSenderService implements SenderUseCase {
     private final TwilioConfig twilioConfig;
     private final Environment environment;
 
-    private final String[] urls = new String[]{"http://svrsepelioprod:8080",
-            "http://10.170.222.75:8080",
-            "http://10.170.221.74:8080"};
+    private final String[] urls = new String[]{"https://www.santacruzvidaysalud.com.bo/download/?enviroment={env}&id={ids}",
+            "https://www.santacruzvidaysalud.com.bo/download/?enviroment={env}&id={ids}",
+            "https://www.santacruzvidaysalud.com.bo/download/?enviroment={env}&id={ids}"};
 
     @Override
     public boolean sendMessage(MessageDTO messageDTO) {
@@ -75,11 +75,12 @@ public class WhatsAppSenderService implements SenderUseCase {
             }
 
             Twilio.init(twilioConfig.getAccountSID(), twilioConfig.getAuthToken());
-            String methodName = "/scvs/virh/download-doc?id=";
             List<URI> uriList = new ArrayList();
             if(!attachmentList.isEmpty()) {
                 for (AttachmentDTO attachment: attachmentList) {
-                    uriList.add(URI.create(urlBase+methodName+attachment.getFileName()));
+                    urlBase = urlBase.replace("{env}","1");
+                    urlBase = urlBase.replace("{ids}",attachment.getFileName());
+                    uriList.add(URI.create(urlBase));
                 }
                 Message message = Message.creator(
                                 new com.twilio.type.PhoneNumber("whatsapp:+591" + messageDTO.getTo()),
