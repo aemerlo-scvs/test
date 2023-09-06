@@ -9,8 +9,8 @@ import java.io.IOException;
 public interface VIRHUseCase {
     String getDataInformationPolicy(String param);
     FileDocument getDocument(Long id);
-    Boolean sendWhatsApp(String number, String message, Long requestId);
-    Boolean sendWhatsAppWithAttachment(String number, String message, Long requestId, Long docId);
+    Boolean sendWhatsApp(String number, String message, Long requestId, Integer referecenteTableIdc);
+    Boolean sendWhatsAppWithAttachment(String number, String message, Long requestId, Long docId, Integer referecenteTableIdc);
     FileDocumentDTO generate() throws IOException;
     String saveInformationPolicy(String data);
 

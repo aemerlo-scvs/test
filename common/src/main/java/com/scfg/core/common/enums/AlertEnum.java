@@ -40,7 +40,8 @@ public enum AlertEnum {
     VIRH_SCH_2(36), //Segundo envio de recordatorio - VIRH
     VIRH_SCH_3(37), //Tercer envio de recordatorio - VIRH
     VIRH_SCH_4(38), //Recordatorio rev. pol vencida - VIRH
-    VIRH_WELCOME(39); //Mensaje bienvenida - VIRH
+    VIRH_SCH_5(39), //Recordatorio rev. pol vencida - VIRH + 10 DIAS
+    VIRH_WELCOME(40); //Mensaje bienvenida - VIRH
 
     private int value;
 
