@@ -139,7 +139,7 @@ public class VIRHProcessService implements VIRHUseCase {
                         sw.setContent(Base64.getEncoder().encodeToString(pdc));
                         break;
                     }
-                    case 4: {
+                    case 5: {
                         String json = getConditionParticular(numberPolicy); //faltaria construir las consultas para generar los pdf dinamicos
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
                         String mainReport = "CONDICIONES_PARTICULARES";//(String) map.get("mainReport");
@@ -231,7 +231,7 @@ public class VIRHProcessService implements VIRHUseCase {
         return result;
     }
     private  String getConditionParticular(String numberPolicy){
-        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_vrih_report_data_condition_particular");
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_virh_report_data_condition_particular");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
         query.setParameter("param", numberPolicy);
