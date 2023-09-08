@@ -67,5 +67,5 @@ public class CommercialManagementViewWppSenderJpaEntity {
     private String numberPolicy;
 
     @Column(name = "uniqueCode")
-    private UUID uniqueCode;
+    private String uniqueCode;
 }

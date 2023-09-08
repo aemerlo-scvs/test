@@ -43,5 +43,5 @@ public class CommercialManagementViewWppSenderDTO {
 
     private String numberPolicy;
 
-    private UUID uniqueCode;
+    private String uniqueCode;
 }

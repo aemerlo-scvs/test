@@ -422,7 +422,7 @@ public class VIRHProcessService implements VIRHUseCase {
         } else {
             urlBase = urls[2];
         }
-        urlBase = urlBase + "/virh/scfg/" + sender.getUniqueCode();
+        urlBase = urlBase + "/virh/scfg/subscription/" + UUID.fromString(sender.getUniqueCode().toString());
         Alert alert = new Alert();
         List<String> valuesToReplace = new ArrayList<>();
         String productName = sender.getNumberPolicy().contains("SMVS") ? "Sepelio" : "Vida + Cáncer";
