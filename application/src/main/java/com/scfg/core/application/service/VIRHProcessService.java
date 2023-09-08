@@ -112,7 +112,7 @@ public class VIRHProcessService implements VIRHUseCase {
 
     public String updateDebtRegisterQuery(DebtRegisterUpdateDTO data) {
         return "UPDATE DebtRegistry SET " +
-                "collectionCode_lib='"+data.getId()+ "' , " +
+                "collectionCode_lib='"+data.getCodigo_recaudacion()+ "' , " +
                 "transactionId_lib='"+data.getId_transaccion()+"' , " +
                 "qrUrl_lib='"+data.getQr_simple_url()+"' , " +
                 "url_lib='"+data.getUrl_pasarela_pagos()+ "' "+
