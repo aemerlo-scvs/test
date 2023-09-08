@@ -9,6 +9,8 @@ import com.scfg.core.application.port.out.DocumentTemplatePort;
 import com.scfg.core.application.port.out.FileDocumentPort;
 import com.scfg.core.application.port.out.PolicyFileDocumentPort;
 import com.scfg.core.common.enums.*;
+import com.scfg.core.common.exception.NotDataFoundException;
+import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.common.util.HelpersConstants;
 import com.scfg.core.common.util.HelpersMethods;
 import com.scfg.core.common.util.PDFMerger;
@@ -23,6 +25,7 @@ import com.scfg.core.application.service.sender.WhatsAppSenderService;
 import com.scfg.core.domain.dto.AttachmentDTO;
 import com.scfg.core.domain.dto.MessageDTO;
 import com.scfg.core.domain.dto.virh.CommercialManagementViewWppSenderDTO;
+import com.scfg.core.domain.dto.virh.DebtRegisterUpdateDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRException;
@@ -32,11 +35,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Base64;
-import javax.persistence.EntityManager;
-import javax.persistence.ParameterMode;
-import javax.persistence.PersistenceContext;
-import javax.persistence.StoredProcedureQuery;
+import javax.persistence.*;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -107,7 +110,27 @@ public class VIRHProcessService implements VIRHUseCase {
 
     }
 
-  //  public FileDocumentDTO generateAndSavePolicyPdf(String numberPolicy, Long productId, List<String> exclusionPdf) throws IOException, JRException {
+    public String updateDebtRegisterQuery(DebtRegisterUpdateDTO data) {
+        return "UPDATE DebtRegistry SET " +
+                "collectionCode_lib='"+data.getId()+ "' , " +
+                "transactionId_lib='"+data.getId_transaccion()+"' , " +
+                "qrUrl_lib='"+data.getQr_simple_url()+"' , " +
+                "url_lib='"+data.getUrl_pasarela_pagos()+ "' "+
+                "WHERE id='"+data.getId()+"'";
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = {OperationException.class, NotDataFoundException.class, Exception.class})
+    public void updateDebtRegister(DebtRegisterUpdateDTO data) {
+        try {
+            Query query = this.entityManager.createNativeQuery(updateDebtRegisterQuery(data));
+            query.executeUpdate();
+        } catch (Exception e) {
+            System.out.printf(e.getMessage());
+        }
+    }
+
+    //  public FileDocumentDTO generateAndSavePolicyPdf(String numberPolicy, Long productId, List<String> exclusionPdf) throws IOException, JRException {
     public FileDocumentDTO generateAndSavePolicyPdf(String numberPolicy, Long productId, List<String> exclusionPdf) {
         Long policyItem=0L;
 

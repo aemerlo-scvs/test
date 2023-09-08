@@ -11,6 +11,8 @@ import com.scfg.core.common.exception.ResponseMessage;
 import com.scfg.core.domain.Alert;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.dto.FileDocumentDTO;
+import com.scfg.core.domain.dto.virh.DebtRegisterUpdateDTO;
+import com.sun.org.apache.xpath.internal.objects.XNumber;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -201,5 +203,20 @@ public class VIRHController {
         message.setResponseMessage(map.get("transaction_id"));
         message.setSuccess(true);
         return ok( message);
+    }
+
+    @PostMapping(value = "/updateDebtRegistry")
+    @ApiOperation(value = "Servicio  que guarda el registro de deuda")
+    ResponseEntity updateDebtRegistry(@RequestBody DebtRegisterUpdateDTO data ) {
+        try {
+            this.service.updateDebtRegister(data);
+            return ok("actualizado con exito");
+        } catch (OperationException e) {
+            log.error("Ocurrió un error al guardar la información: [{}]", e.toString());
+            return CustomErrorType.badRequest("Bad Request", e.getMessage());
+        } catch (Exception e) {
+            log.error("Ocurrió un error al guardar la información: [{}]", e.toString());
+            return CustomErrorType.serverError("Server Error", "No se pudo realizar la operación, " + e.getMessage());
+        }
     }
 }
