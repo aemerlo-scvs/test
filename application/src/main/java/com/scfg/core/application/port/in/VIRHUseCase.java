@@ -3,6 +3,7 @@ package com.scfg.core.application.port.in;
 import com.scfg.core.domain.FileDocument;
 
 import com.scfg.core.domain.dto.FileDocumentDTO;
+import com.scfg.core.domain.dto.virh.DebtRegisterUpdateDTO;
 
 import java.io.IOException;
 
@@ -17,4 +18,5 @@ public interface VIRHUseCase {
     String getWelcomeMessageText(String insuredName, String oldProduct);
 
     String savePayment(String transactionId, String paymentMethod);
+    void updateDebtRegister(DebtRegisterUpdateDTO data);
 }

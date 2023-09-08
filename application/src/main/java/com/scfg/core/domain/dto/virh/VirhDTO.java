@@ -28,6 +28,8 @@ public class VirhDTO {
     private String uniqueCode;
     @ApiModelProperty(notes = "Cumulo total", example = "5000")
     private Double cumulus;
+    @ApiModelProperty(notes = "Prima del plan", example = "5000")
+    private Double planPremium;
     @ApiModelProperty(notes = "Capital asegurado del cliente acorde al monto seleccionado", example = "5000")
     private Double insuredAmount;
     private NewPerson person;
