@@ -180,7 +180,7 @@ public class VIRHController {
                 }
 
                 // generar pdf
-                FileDocumentDTO fd=   service.generateAndSavePolicyPdf(ObjMap.get("PolicyNumber").toString(),Long.parseLong( ObjMap.get("ProductID").toString()),new ArrayList<>());
+                FileDocumentDTO fd=   service.generateAndSavePolicyPdf(ObjMap.get("PolicyNumber").toString(),Long.parseLong( ObjMap.get("ProductID").toString()),new ArrayList<>(),Long.parseLong( ObjMap.get("PolicyItemId").toString()));
                 // enviar whatsapp
                // service.sendWhatsAppWithAttachment(ObjMap.get("phoneNumber").toString(),"Hello!!",Long.parseLong(ObjMap.get("GeneralRequest").toString()), Long.parseLong("1"));
 
@@ -189,7 +189,7 @@ public class VIRHController {
                 String welcomemessage=service.getWelcomeMessageText(ObjMap.get("InsuredName").toString(),Product);
 
            //     service.sendWhatsAppWithAttachment("77286265",welcomemessage,Long.parseLong(ObjMap.get("GeneralRequest").toString()), fd.getId() ,1);
-                service.sendWhatsApp("77286265",welcomemessage,Long.parseLong(ObjMap.get("GeneralRequest").toString()) ,1);
+                service.sendWhatsApp(ObjMap.get("phoneNumber").toString(),welcomemessage,Long.parseLong(ObjMap.get("GeneralRequest").toString()) ,1);
 
             }
         }

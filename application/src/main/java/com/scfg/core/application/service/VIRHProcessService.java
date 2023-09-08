@@ -91,7 +91,7 @@ public class VIRHProcessService implements VIRHUseCase {
 
 
         FileDocumentDTO file= null;
-        file = generateAndSavePolicyPdf(numberPolicy,productId,listTo);
+        file = generateAndSavePolicyPdf(numberPolicy,productId,listTo,1L);
         return  file;
     }
 
@@ -108,7 +108,7 @@ public class VIRHProcessService implements VIRHUseCase {
     }
 
   //  public FileDocumentDTO generateAndSavePolicyPdf(String numberPolicy, Long productId, List<String> exclusionPdf) throws IOException, JRException {
-    public FileDocumentDTO generateAndSavePolicyPdf(String numberPolicy, Long productId, List<String> exclusionPdf) {
+    public FileDocumentDTO generateAndSavePolicyPdf(String numberPolicy, Long productId, List<String> exclusionPdf, Long policyItemId) {
         Long policyItem=0L;
 
         byte[] pdf;
@@ -127,7 +127,7 @@ public class VIRHProcessService implements VIRHUseCase {
                         String json = getDjs(numberPolicy);//faltaria construir las consultas para generar los pdf dinamicos
 
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
-                        String mainReport = "DJS";
+                        String mainReport = "CONDICIONES_PARTICULARES";
 //                        Map<String, String> subreports = (Map) map.get("subreports");
 //                        List<Object> beans = new ArrayList<>(map.entrySet());
 //                        Map reportParameters = (Map) map.get("reportParameters");
@@ -145,7 +145,7 @@ public class VIRHProcessService implements VIRHUseCase {
                     case 5: {
                         String json = getConditionParticular(numberPolicy); //faltaria construir las consultas para generar los pdf dinamicos
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
-                        String mainReport = "CONDICIONES_PARTICULARES";//(String) map.get("mainReport");
+                        String mainReport = "DJS";//(String) map.get("mainReport");
 //                        Map<String, String> subreports = (Map) map.get("subreports");
 //                        List<Object> beans = (List) map.get("reportBeansParams");
 //                        Map reportParameters = (Map) map.get("reportParameters");
@@ -187,7 +187,7 @@ public class VIRHProcessService implements VIRHUseCase {
         fd.setName(filename);
         FileDocument fileDocument= saveFileDocument(numberPolicy,pdf);
         fd.setId(fileDocument.getId());
-     //   PolicyFileDocument policyFileDocument= savePolicyDocument(fileDocument.getId(),policyItem);
+        PolicyFileDocument policyFileDocument= savePolicyDocument(fileDocument.getId(),policyItemId);
         return fd;
     }
 
