@@ -3,6 +3,7 @@ package com.scfg.core.application.port.in;
 import com.scfg.core.domain.FileDocument;
 
 import com.scfg.core.domain.dto.FileDocumentDTO;
+import com.scfg.core.domain.dto.virh.DebtRegisterUpdateDTO;
 
 import java.io.IOException;
 
@@ -13,5 +14,5 @@ public interface VIRHUseCase {
     Boolean sendWhatsAppWithAttachment(String number, String message, Long requestId, Long docId, Integer referecenteTableIdc);
     FileDocumentDTO generate() throws IOException;
     String saveInformationPolicy(String data);
-
+    void updateDebtRegister(DebtRegisterUpdateDTO data);
 }
