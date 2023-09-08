@@ -399,7 +399,7 @@ public class VIRHProcessService implements VIRHUseCase {
         } else {
             urlBase = urls[2];
         }
-        urlBase = urlBase + "/virh/" + sender.getUniqueCode();
+        urlBase = urlBase + "/virh/scfg/" + sender.getUniqueCode();
         Alert alert = new Alert();
         List<String> valuesToReplace = new ArrayList<>();
         String productName = sender.getNumberPolicy().contains("SMVS") ? "Sepelio" : "Vida + Cáncer";
@@ -460,7 +460,8 @@ public class VIRHProcessService implements VIRHUseCase {
             changeSubStatus = (int) ClassifierEnum.CM_EGM_PENDING.getReferenceCode();
         }
         senderService.setStrategy(whatsAppSenderService);
-        MessageDTO messageDTO = getMessageDTO("79855300",alert.getMail_body(),alert.getMail_subject(),sender.getCommercialManagementId(), (int) ClassifierEnum.REFERENCE_TABLE_COMMERCIALMANAGEMENT.getReferenceCode());
+        MessageDTO messageDTO = getMessageDTO(sender.getNumber(),alert.getMail_body(),alert.getMail_subject(),sender.getCommercialManagementId(), (int) ClassifierEnum.REFERENCE_TABLE_COMMERCIALMANAGEMENT.getReferenceCode());
+//        MessageDTO messageDTO = getMessageDTO("79855300",alert.getMail_body(),alert.getMail_subject(),sender.getCommercialManagementId(), (int) ClassifierEnum.REFERENCE_TABLE_COMMERCIALMANAGEMENT.getReferenceCode());
         boolean canSend = senderService.sendMessage(messageDTO);
         if (canSend) {
             commercialManagement = this.commercialManagementService.findById(sender.getCommercialManagementId());

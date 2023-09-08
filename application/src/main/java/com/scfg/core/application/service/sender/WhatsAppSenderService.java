@@ -24,9 +24,9 @@ public class WhatsAppSenderService implements SenderUseCase {
     private final TwilioConfig twilioConfig;
     private final Environment environment;
 
-    private final String[] urls = new String[]{"https://www.santacruzvidaysalud.com.bo/download/?enviroment={env}&id={ids}",
-            "https://www.santacruzvidaysalud.com.bo/download/?enviroment={env}&id={ids}",
-            "https://www.santacruzvidaysalud.com.bo/download/?enviroment={env}&id={ids}"};
+    private final String[] urls = new String[]{"https://www.santacruzvidaysalud.com.bo/apiScvs/virh/download-doc?enviroment={env}&id={ids}",
+            "https://www.santacruzvidaysalud.com.bo/apiScvsPre/virh/download-doc?enviroment={env}&id={ids}",
+            "https://www.santacruzvidaysalud.com.bo/apiScvsDev/virh/download-doc?enviroment={env}&id={ids}"};
 
     @Override
     public boolean sendMessage(MessageDTO messageDTO) {
