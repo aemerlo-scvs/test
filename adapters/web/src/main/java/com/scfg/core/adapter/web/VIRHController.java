@@ -1,11 +1,14 @@
 package com.scfg.core.adapter.web;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scfg.core.adapter.web.util.CustomErrorType;
 import com.scfg.core.application.port.in.CommercialManagementUseCase;
 import com.scfg.core.application.port.in.PlanUseCase;
 import com.scfg.core.application.service.VIRHProcessService;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.common.exception.ResponseMessage;
+import com.scfg.core.domain.Alert;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.dto.FileDocumentDTO;
 import io.swagger.annotations.Api;
@@ -21,9 +24,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import java.util.*;
 
 
 import static org.springframework.http.ResponseEntity.ok;
@@ -140,5 +144,62 @@ public class VIRHController {
             message.setResponseMessage("Fallo en el proceso");
         }
         return ok(message);
+    }
+
+   // @GetMapping(value = "/pago-exitoso")
+    @RequestMapping(value = "/pago-exitoso", method = RequestMethod.GET)
+    @ApiOperation(value="Confirma el Pago desde Libelula")
+    ResponseEntity ConfirmacionPago(String query) {
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        if (query.contains("&")) {
+            for (String keyValue : query.split(" *& *")) {
+                String[] pairs = keyValue.split(" *= *", 2);
+                map.put(pairs[0], pairs.length == 1 ? "" : pairs[1]);
+            }
+            String transaction_id = map.get("transaction_id");
+            String error = map.get("error");
+            String message = map.get("message");
+            String cancel_order = map.get("cancel_order");
+            String payment_method = map.get("payment_method");
+            String payment_method_id = map.get("payment_method_id");
+            String idqr = map.get("idqr");
+
+            if(Objects.equals(error, "0"))
+            {
+                // enviar parametros al procedimiento almacenado
+                String data= this.service.savePayment(transaction_id,payment_method);
+                String data_modified=data.substring(1, data.length() - 1);
+
+
+                ObjectMapper mapper = new ObjectMapper();
+                Map<String,Object> ObjMap = null;
+                try {
+                    ObjMap = mapper.readValue(data_modified, Map.class);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // generar pdf
+                FileDocumentDTO fd=   service.generateAndSavePolicyPdf(ObjMap.get("PolicyNumber").toString(),Long.parseLong( ObjMap.get("ProductID").toString()),new ArrayList<>());
+                // enviar whatsapp
+               // service.sendWhatsAppWithAttachment(ObjMap.get("phoneNumber").toString(),"Hello!!",Long.parseLong(ObjMap.get("GeneralRequest").toString()), Long.parseLong("1"));
+
+                String Product=ObjMap.get("OldProductInitials").toString().contains("SMVS")?"SEPELIO":"VIDA MÁS CÁNCER";
+
+                String welcomemessage=service.getWelcomeMessageText(ObjMap.get("InsuredName").toString(),Product);
+
+           //     service.sendWhatsAppWithAttachment("77286265",welcomemessage,Long.parseLong(ObjMap.get("GeneralRequest").toString()), fd.getId() ,1);
+                service.sendWhatsApp("77286265",welcomemessage,Long.parseLong(ObjMap.get("GeneralRequest").toString()) ,1);
+
+            }
+        }
+
+        System.out.println(map.get("transaction_id").toString());
+        System.out.println(map.values().toString());
+
+        ResponseMessage message = new ResponseMessage();
+        message.setResponseMessage(map.get("transaction_id"));
+        message.setSuccess(true);
+        return ok( message);
     }
 }

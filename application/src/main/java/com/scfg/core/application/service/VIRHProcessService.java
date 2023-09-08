@@ -16,7 +16,6 @@ import com.scfg.core.domain.Alert;
 import com.scfg.core.domain.CommercialManagement;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.PolicyFileDocument;
-import com.scfg.core.domain.common.Classifier;
 import com.scfg.core.domain.common.DocumentTemplate;
 import com.scfg.core.domain.dto.FileDocumentDTO;
 import com.scfg.core.application.service.sender.SenderService;
@@ -31,6 +30,8 @@ import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperReport;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+
+import java.text.MessageFormat;
 import java.util.Base64;
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
@@ -90,11 +91,7 @@ public class VIRHProcessService implements VIRHUseCase {
 
 
         FileDocumentDTO file= null;
-        try {
-            file = generateAndSavePolicyPdf(numberPolicy,productId,listTo);
-        } catch (JRException e) {
-            throw new RuntimeException(e);
-        }
+        file = generateAndSavePolicyPdf(numberPolicy,productId,listTo);
         return  file;
     }
 
@@ -110,7 +107,8 @@ public class VIRHProcessService implements VIRHUseCase {
 
     }
 
-    private FileDocumentDTO generateAndSavePolicyPdf(String numberPolicy, Long productId, List<String> exclusionPdf) throws IOException, JRException {
+  //  public FileDocumentDTO generateAndSavePolicyPdf(String numberPolicy, Long productId, List<String> exclusionPdf) throws IOException, JRException {
+    public FileDocumentDTO generateAndSavePolicyPdf(String numberPolicy, Long productId, List<String> exclusionPdf) {
         Long policyItem=0L;
 
         byte[] pdf;
@@ -125,7 +123,7 @@ public class VIRHProcessService implements VIRHUseCase {
         if (listDocumentDynamics.size() > 0) {
             for (DocumentTemplate sw : listDocumentDynamics) {
                 switch (sw.getDocumentTypeIdc()) {
-                    case 2: {
+                    case 1: {
                         String json = getDjs(numberPolicy);//faltaria construir las consultas para generar los pdf dinamicos
 
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
@@ -134,7 +132,12 @@ public class VIRHProcessService implements VIRHUseCase {
 //                        List<Object> beans = new ArrayList<>(map.entrySet());
 //                        Map reportParameters = (Map) map.get("reportParameters");
                         List<DocumentTemplate> templateList = listReportAndSubReport(sw.getId(), list);
-                        Map<String, JasperReport> jasperReportMap = loadReports(templateList);
+                        Map<String, JasperReport> jasperReportMap = null;
+                        try {
+                            jasperReportMap = loadReports(templateList);
+                        } catch (JRException e) {
+                            throw new RuntimeException(e);
+                        }
                         byte[] pdc =  useGeneric.generatePdfByte(mainReport, false, null, map, jasperReportMap);
                         sw.setContent(Base64.getEncoder().encodeToString(pdc));
                         break;
@@ -147,7 +150,12 @@ public class VIRHProcessService implements VIRHUseCase {
 //                        List<Object> beans = (List) map.get("reportBeansParams");
 //                        Map reportParameters = (Map) map.get("reportParameters");
                         List<DocumentTemplate> templateList = listReportAndSubReport(sw.getId(), list);
-                        Map<String, JasperReport> jasperReportMap = loadReports(templateList);
+                        Map<String, JasperReport> jasperReportMap = null;
+                        try {
+                            jasperReportMap = loadReports(templateList);
+                        } catch (JRException e) {
+                            throw new RuntimeException(e);
+                        }
                         byte[] pdc = useGeneric.generatePdfByte(mainReport, false, null, map, jasperReportMap);
                         sw.setContent(Base64.getEncoder().encodeToString(pdc));
                         break;
@@ -177,8 +185,9 @@ public class VIRHProcessService implements VIRHUseCase {
         fd.setContent(Base64.getEncoder().encodeToString(pdf));
         fd.setMime(HelpersConstants.PDF);
         fd.setName(filename);
-        //FileDocument fileDocument= saveFileDocument(numberPolicy,pdf);
-        //PolicyFileDocument policyFileDocument= savePolicyDocument(fileDocument.getId(),policyItem);
+        FileDocument fileDocument= saveFileDocument(numberPolicy,pdf);
+        fd.setId(fileDocument.getId());
+     //   PolicyFileDocument policyFileDocument= savePolicyDocument(fileDocument.getId(),policyItem);
         return fd;
     }
 
@@ -262,6 +271,7 @@ public class VIRHProcessService implements VIRHUseCase {
     @Override
     public Boolean sendWhatsAppWithAttachment(String number, String message, Long requestId, Long docId, Integer referenceTableIdc) {
         this.senderService.setStrategy(this.whatsAppSenderService);
+
         MessageDTO messageDTO = getMessageDTO(number, message, "Envío notificación por WhatsApp con adjunto", requestId, referenceTableIdc);
 
         AttachmentDTO attachmentDTO = new AttachmentDTO();
@@ -271,6 +281,18 @@ public class VIRHProcessService implements VIRHUseCase {
         list.add(attachmentDTO);
 
         return this.senderService.sendMessageWithAttachment(messageDTO, list);
+    }
+
+    @Override
+    public String getWelcomeMessageText(String insuredName, String oldProduct)
+    {
+        List<String> arr = new ArrayList<>();
+        arr.add(insuredName);
+        arr.add(oldProduct);
+        arr.add("62177077");
+        Alert alert = alertService.getAlertByEnumReplacingContent(
+                AlertEnum.VIRH_WELCOME,arr);
+        return alert.getMail_body();
     }
 
     private static MessageDTO getMessageDTO(String number, String message, String subject, Long requestId, Integer referenceTableIdc) {
@@ -447,5 +469,20 @@ public class VIRHProcessService implements VIRHUseCase {
             commercialManagement.setMessageSentDate(new Date());
         }
         return commercialManagement;
+    }
+
+    @Override
+    public String savePayment(String transactionId, String paymentMethod) {
+
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_virh_save_payment");
+        query.registerStoredProcedureParameter("transactionId", String.class, ParameterMode.IN);
+        query.registerStoredProcedureParameter("paymentMethod", String.class, ParameterMode.IN);
+        query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
+        query.setParameter("transactionId", transactionId);
+        query.setParameter("paymentMethod", paymentMethod);
+        query.execute();
+        String result = (String) query.getOutputParameterValue("result");
+
+        return result;
     }
 }
