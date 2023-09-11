@@ -2,7 +2,6 @@ package com.scfg.core.adapter.persistence.CommercialManagementView;
 
 import com.scfg.core.adapter.persistence.commecialManagement.CommercialManagementJpaEntity;
 import com.scfg.core.domain.dto.CommercialManagementDTO;
-import com.scfg.core.domain.smvs.ContactCenterRequestDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

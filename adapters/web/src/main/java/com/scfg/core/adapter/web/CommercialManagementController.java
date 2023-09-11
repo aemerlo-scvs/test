@@ -91,6 +91,19 @@ public class CommercialManagementController {
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
-
+    @PostMapping(value = "/search-json")
+    @ApiOperation(value = "Retorna una lista de polizas a renovar por filtros dinamicos")
+    ResponseEntity getAllByFiltersJSON(@RequestBody @Nullable CommercialManagementSearchFiltersDTO commercialManagementSearchFiltersDto) {
+        try {
+            String list = commercialManagementUseCase.searchJSON(commercialManagementSearchFiltersDto);
+            return ok(list);
+        } catch (OperationException e) {
+            log.error("Ocurrio un error al obtener la lista: [{}]", e.toString());
+            return CustomErrorType.badRequest("Bad Request", e.getMessage());
+        } catch (Exception e) {
+            log.error("Ocurrio un error al obtener la lista: [{}]", e.toString());
+            return CustomErrorType.serverError("Server Error", e.getMessage());
+        }
+    }
 
 }

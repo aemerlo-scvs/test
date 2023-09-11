@@ -84,6 +84,11 @@ public class CommercialManagementService implements CommercialManagementUseCase 
     }
 
     @Override
+    public String searchJSON(CommercialManagementSearchFiltersDTO commercialManagementSearchFiltersDto) {
+        return portView.searchJSON(commercialManagementSearchFiltersDto);
+    }
+
+    @Override
     public CommercialManagement findById(Long id) {
         return port.findById(id);
     }
