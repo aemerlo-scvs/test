@@ -16,6 +16,6 @@ import java.util.Date;
 public class CommercialManagementSearchFiltersDTO {
     private Date fromDate;
     private Date toDate;
-    private String status;
-    private String subStatus;
+    private Integer status;
+    private Integer subStatus;
 }

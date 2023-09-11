@@ -50,32 +50,32 @@ public class CommercialManagementService implements CommercialManagementUseCase 
     @Override
     public List<CommercialManagementDTO> search(CommercialManagementSearchFiltersDTO filtersDTO) {
 
-        if (!filtersDTO.getStatus().isEmpty()
-                && !filtersDTO.getSubStatus().isEmpty()
+        if (filtersDTO.getStatus() != null
+                && filtersDTO.getSubStatus() != null
                 && (filtersDTO.getFromDate() != null && filtersDTO.getToDate() != null)
         ) {
             return portView.search(filtersDTO.getStatus(), filtersDTO.getSubStatus(), filtersDTO.getFromDate(), filtersDTO.getToDate());
 
         }
-        if (!filtersDTO.getStatus().isEmpty()
+        if (filtersDTO.getStatus() != null
                 && (filtersDTO.getFromDate() != null && filtersDTO.getToDate() != null)
         ) {
             return portView.search(filtersDTO.getStatus(), filtersDTO.getFromDate(), filtersDTO.getToDate());
         }
-        if (filtersDTO.getStatus().isEmpty()
-                && filtersDTO.getSubStatus().isEmpty()
+        if (filtersDTO.getStatus() == null
+                && filtersDTO.getSubStatus() == null
                 && (filtersDTO.getFromDate() != null && filtersDTO.getToDate() != null)
         ) {
             return portView.search(filtersDTO.getFromDate(), filtersDTO.getToDate());
         }
-        if (!filtersDTO.getStatus().isEmpty()
-                && !filtersDTO.getSubStatus().isEmpty()
+        if (filtersDTO.getStatus() != null
+                && filtersDTO.getSubStatus() != null
                 && (filtersDTO.getFromDate() == null || filtersDTO.getToDate() == null)
         ) {
             return portView.search(filtersDTO.getStatus(), filtersDTO.getSubStatus());
         }
-        if (!filtersDTO.getStatus().isEmpty()
-                && filtersDTO.getSubStatus().isEmpty()
+        if (filtersDTO.getStatus() != null
+                && filtersDTO.getSubStatus() == null
                 && filtersDTO.getFromDate() == null
         ) {
             return portView.search(filtersDTO.getStatus());

@@ -6,11 +6,11 @@ import java.util.Date;
 import java.util.List;
 
 public interface CommercialManagementViewPort {
-    List<CommercialManagementDTO> search(String status);
-    List<CommercialManagementDTO> search(String status, String subStatus);
+    List<CommercialManagementDTO> search(Integer status);
+    List<CommercialManagementDTO> search(Integer status, Integer subStatus);
     List<CommercialManagementDTO> search(Date fromDate, Date toDate);
 
-    List<CommercialManagementDTO> search(String status, Date fromDate, Date toDate);
-    List<CommercialManagementDTO> search(String status, String subStatus, Date fromDate, Date toDate);
+    List<CommercialManagementDTO> search(Integer status, Date fromDate, Date toDate);
+    List<CommercialManagementDTO> search(Integer status, Integer subStatus, Date fromDate, Date toDate);
 
 }

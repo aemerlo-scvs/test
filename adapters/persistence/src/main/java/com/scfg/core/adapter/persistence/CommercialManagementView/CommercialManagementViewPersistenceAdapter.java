@@ -18,13 +18,13 @@ public class CommercialManagementViewPersistenceAdapter implements CommercialMan
 
 
     @Override
-    public List<CommercialManagementDTO> search(String status) {
+    public List<CommercialManagementDTO> search(Integer status) {
         List<CommercialManagementDTO> cmvList = repository.getAllByStatus(status);
         return cmvList.size() > 0 ? cmvList : new ArrayList<>();
     }
 
     @Override
-    public List<CommercialManagementDTO> search(String status, String subStatus) {
+    public List<CommercialManagementDTO> search(Integer status, Integer subStatus) {
         List<CommercialManagementDTO> cmvList = repository.getAllByStatusAndSubStatus(status, subStatus);
         return cmvList.size() > 0 ? cmvList : new ArrayList<>();
     }
@@ -36,13 +36,13 @@ public class CommercialManagementViewPersistenceAdapter implements CommercialMan
     }
 
     @Override
-    public List<CommercialManagementDTO> search(String status, Date fromDate, Date toDate) {
+    public List<CommercialManagementDTO> search(Integer status, Date fromDate, Date toDate) {
         List<CommercialManagementDTO> cmvList = repository.getAllByStateAndDates(status, fromDate, toDate);
         return cmvList.size() > 0 ? cmvList : new ArrayList<>();
     }
 
     @Override
-    public List<CommercialManagementDTO> search(String status, String subStatus, Date fromDate, Date toDate) {
+    public List<CommercialManagementDTO> search(Integer status, Integer subStatus, Date fromDate, Date toDate) {
         List<CommercialManagementDTO> cmvList = repository.getAllByAllFilters(status, subStatus, fromDate, toDate);
         return cmvList.size() > 0 ? cmvList : new ArrayList<>();
     }

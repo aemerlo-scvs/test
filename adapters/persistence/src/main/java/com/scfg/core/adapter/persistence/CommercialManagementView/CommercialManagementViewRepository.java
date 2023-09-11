@@ -16,10 +16,10 @@ public interface CommercialManagementViewRepository extends JpaRepository<Commer
             "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
             "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)" +
             "FROM CommercialManagementViewJpaEntity c "+
-            "WHERE c.managementStatus LIKE :status " +
-            "AND c.managementSubStatus LIKE :subStatus " +
+            "WHERE c.managementStatusIdc = :status " +
+            "AND c.managementSubStatusIdc = :subStatus " +
             "ORDER BY c.endOfCoverage")
-    List<CommercialManagementDTO> getAllByStatusAndSubStatus(@Param("status") String status, @Param("subStatus") String subStatus);
+    List<CommercialManagementDTO> getAllByStatusAndSubStatus(@Param("status") Integer status, @Param("subStatus") Integer subStatus);
 
     @Query("SELECT DISTINCT new com.scfg.core.domain.dto.CommercialManagementDTO(c.policyId, c.numberPolicy, c.productName, " +
             "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
@@ -33,11 +33,11 @@ public interface CommercialManagementViewRepository extends JpaRepository<Commer
             "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
             "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)" +
             "FROM CommercialManagementViewJpaEntity c "+
-            "WHERE c.managementStatus LIKE :status " +
+            "WHERE c.managementStatusIdc = :status " +
             "AND c.endOfCoverage BETWEEN  :fromDate AND :toDate " +
             "ORDER BY c.endOfCoverage")
     List<CommercialManagementDTO> getAllByStateAndDates(
-            @Param("status") String status,
+            @Param("status") Integer status,
             @Param("fromDate") Date fromDate,
             @Param("toDate") Date toDate
     );
@@ -48,13 +48,13 @@ public interface CommercialManagementViewRepository extends JpaRepository<Commer
             "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
             "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)" +
             "FROM CommercialManagementViewJpaEntity c "+
-            "WHERE c.managementStatus LIKE :status " +
-            "AND c.managementSubStatus LIKE :subStatus " +
+            "WHERE c.managementStatusIdc = :status " +
+            "AND c.managementSubStatusIdc = :subStatus " +
             "AND c.endOfCoverage BETWEEN  :fromDate AND :toDate " +
             "ORDER BY c.endOfCoverage")
     List<CommercialManagementDTO> getAllByAllFilters(
-            @Param("status") String status,
-            @Param("subStatus") String subStatus,
+            @Param("status") Integer status,
+            @Param("subStatus") Integer subStatus,
             @Param("fromDate") Date fromDate,
             @Param("toDate") Date toDate
     );
@@ -63,9 +63,9 @@ public interface CommercialManagementViewRepository extends JpaRepository<Commer
             "c.insured, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
             "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)" +
             "FROM CommercialManagementViewJpaEntity c "+
-            "WHERE c.managementStatus LIKE :status " +
+            "WHERE c.managementStatusIdc = :status " +
             "ORDER BY c.endOfCoverage")
-            List<CommercialManagementDTO> getAllByStatus(@Param("status") String status);
+            List<CommercialManagementDTO> getAllByStatus(@Param("status") Integer status);
 
 
 
