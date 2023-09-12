@@ -120,7 +120,7 @@ public class PlanPersistenceAdapter implements PlanPort {
     @Override
     public Object getPlanVirh(String apsCode) {
        String query ="select pl.id, pl.name, pl.description, pr.name as productName, " +
-                "pl.totalPremium as price, " +
+                "pl.totalPremium as price, pl.bfsAgreementCode as orderParticularCondition, " +
                 "(select * from (select cv.commercialName as name, cv.[order], cvp.insuredCapital as amount, cv.coverageTypeIdc from [Plan] pla" +
                 " join Product pr on pr.id = pla.productId " +
                 "join CoveragePlan cvp on cvp.planId = pla.id " +
