@@ -146,11 +146,11 @@ public class VIRHProcessService implements VIRHUseCase {
         if (listDocumentDynamics.size() > 0) {
             for (DocumentTemplate sw : listDocumentDynamics) {
                 switch (sw.getDocumentTypeIdc()) {
-                    case 1: {
-                        String json = getDjs(numberPolicy);//faltaria construir las consultas para generar los pdf dinamicos
+                    case 1: {//condiciones particulares
+                        String json = getConditionParticular(numberPolicy);//faltaria construir las consultas para generar los pdf dinamicos
 
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
-                        String mainReport = "CONDICIONES_PARTICULARES";
+                        String mainReport = sw.getDescription();
 //                        Map<String, String> subreports = (Map) map.get("subreports");
 //                        List<Object> beans = new ArrayList<>(map.entrySet());
 //                        Map reportParameters = (Map) map.get("reportParameters");
@@ -165,10 +165,10 @@ public class VIRHProcessService implements VIRHUseCase {
                         sw.setContent(Base64.getEncoder().encodeToString(pdc));
                         break;
                     }
-                    case 5: {
-                        String json = getConditionParticular(numberPolicy); //faltaria construir las consultas para generar los pdf dinamicos
+                    case 5: {//information DJS
+                        String json = getDjs(numberPolicy); //faltaria construir las consultas para generar los pdf dinamicos
                         Map<String, Object> map = (Map) (new Gson()).fromJson(json, HashMap.class);
-                        String mainReport = "DJS";//(String) map.get("mainReport");
+                        String mainReport = sw.getDescription();//(String) map.get("mainReport");
 //                        Map<String, String> subreports = (Map) map.get("subreports");
 //                        List<Object> beans = (List) map.get("reportBeansParams");
 //                        Map reportParameters = (Map) map.get("reportParameters");
@@ -253,7 +253,7 @@ public class VIRHProcessService implements VIRHUseCase {
         return reportsCompiled;
     }
     private  String getDjs(String numberPolicy){
-        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_vrih_report_data_djs");
+        StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_virh_report_data_djs");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
         query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
         query.setParameter("param", numberPolicy);
