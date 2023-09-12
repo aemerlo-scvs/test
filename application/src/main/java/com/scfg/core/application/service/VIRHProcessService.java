@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperReport;
+import org.hibernate.type.NTextType;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -78,7 +79,7 @@ public class VIRHProcessService implements VIRHUseCase {
 
         StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_view_virh_report_policy");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
+        query.registerStoredProcedureParameter("result", NTextType.class, ParameterMode.OUT);
         query.setParameter("param", param);
         query.execute();
         String result = (String) query.getOutputParameterValue("result");
