@@ -68,4 +68,6 @@ public interface CommercialManagementViewRepository extends JpaRepository<Commer
 
 
 
+
+
 }

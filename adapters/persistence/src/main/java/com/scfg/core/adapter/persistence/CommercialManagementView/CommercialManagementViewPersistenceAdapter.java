@@ -24,7 +24,8 @@ public class CommercialManagementViewPersistenceAdapter implements CommercialMan
 
 
     @Override
-    public String searchJSON(CommercialManagementSearchFiltersDTO filtersDTO) {
+    public String searchJSON(Integer status, Integer subStatus, Date fromDate, Date toDate) {
+        long startTime = System.nanoTime();
         StoredProcedureQuery query = em.createStoredProcedureQuery("proc_filter_commercial_management_view")
                 .registerStoredProcedureParameter(
                         "managementStatusIdc",
@@ -53,21 +54,26 @@ public class CommercialManagementViewPersistenceAdapter implements CommercialMan
                         NTextType.class,
                         ParameterMode.OUT
                 )
-                .setParameter("managementStatusIdc", filtersDTO.getStatus())
-                .setParameter("managementSubStatusIdc", filtersDTO.getSubStatus())
-                .setParameter("fromDate", filtersDTO.getFromDate())
-                .setParameter("toDate", filtersDTO.getToDate());
+                .setParameter("managementStatusIdc", status)
+                .setParameter("managementSubStatusIdc", subStatus)
+                .setParameter("fromDate", fromDate)
+                .setParameter("toDate", toDate);
         query.execute();
 
         String list = (String) query.getOutputParameterValue("result");
         em.close();
+        long endTime = System.nanoTime();
+        System.out.println("Duración Procedure: " + (endTime-startTime)/1e6 + " ms");
         return list;
     }
 
 
     @Override
     public List<CommercialManagementDTO> search(Integer status) {
+        long startTime = System.nanoTime();
         List<CommercialManagementDTO> cmvList = repository.getAllByStatus(status);
+        long endTime = System.nanoTime();
+        System.out.println("Duración select simple: " + (endTime-startTime)/1e6 + " ms");
         return cmvList.size() > 0 ? cmvList : new ArrayList<>();
     }
 
@@ -94,4 +100,6 @@ public class CommercialManagementViewPersistenceAdapter implements CommercialMan
         List<CommercialManagementDTO> cmvList = repository.getAllByAllFilters(status, subStatus, fromDate, toDate);
         return cmvList.size() > 0 ? cmvList : new ArrayList<>();
     }
+
+
 }

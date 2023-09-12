@@ -7,12 +7,14 @@ import java.util.Date;
 import java.util.List;
 
 public interface CommercialManagementViewPort {
-    String searchJSON(CommercialManagementSearchFiltersDTO filters);
+    String searchJSON(Integer status, Integer subStatus, Date fromDate, Date toDate);
     List<CommercialManagementDTO> search(Integer status);
     List<CommercialManagementDTO> search(Integer status, Integer subStatus);
     List<CommercialManagementDTO> search(Date fromDate, Date toDate);
 
     List<CommercialManagementDTO> search(Integer status, Date fromDate, Date toDate);
     List<CommercialManagementDTO> search(Integer status, Integer subStatus, Date fromDate, Date toDate);
+
+
 
 }

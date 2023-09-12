@@ -10,11 +10,13 @@ import com.scfg.core.domain.dto.CommercialManagementDTO;
 import com.scfg.core.domain.dto.CommercialManagementSearchFiltersDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.persistence.EntityManager;
 import javax.persistence.ParameterMode;
 import javax.persistence.StoredProcedureQuery;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,6 +38,7 @@ public class CommercialManagementService implements CommercialManagementUseCase 
         PersistenceResponse response = port.update(obj);
         return response;
     }
+
     @Override
     public PersistenceResponse updateSomeFields(CommercialManagement obj) {
         CommercialManagement cm = port.findById(obj.getId());
@@ -84,8 +87,8 @@ public class CommercialManagementService implements CommercialManagementUseCase 
     }
 
     @Override
-    public String searchJSON(CommercialManagementSearchFiltersDTO commercialManagementSearchFiltersDto) {
-        return portView.searchJSON(commercialManagementSearchFiltersDto);
+    public String searchJSON(Integer status, Integer subStatus, Date fromDate, Date toDate) {
+        return portView.searchJSON(status, subStatus, fromDate, toDate);
     }
 
     @Override
@@ -100,10 +103,10 @@ public class CommercialManagementService implements CommercialManagementUseCase 
 
     @Override
     public Boolean existsComercialManagementId(String comercialManagementId) {
-        if (!comercialManagementId.isEmpty() && comercialManagementId.length()==36){
+        if (!comercialManagementId.isEmpty() && comercialManagementId.length() == 36) {
 
-        return port.existsComercialManagementId(comercialManagementId);}
-        else return false;
+            return port.existsComercialManagementId(comercialManagementId);
+        } else return false;
     }
 
 

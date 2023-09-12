@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.springframework.http.ResponseEntity.ok;
@@ -26,7 +27,6 @@ import static org.springframework.http.ResponseEntity.ok;
 @Api(tags = "API REST de la Gestion Comercial de renovacion de polizas")
 public class CommercialManagementController {
     private final CommercialManagementUseCase commercialManagementUseCase;
-
 
 
     @PostMapping(value = "/save")
@@ -91,11 +91,16 @@ public class CommercialManagementController {
             return CustomErrorType.serverError("Server Error", e.getMessage());
         }
     }
-    @PostMapping(value = "/search-json")
+
+    @GetMapping(value = "/search-json")
     @ApiOperation(value = "Retorna una lista de polizas a renovar por filtros dinamicos")
-    ResponseEntity getAllByFiltersJSON(@RequestBody @Nullable CommercialManagementSearchFiltersDTO commercialManagementSearchFiltersDto) {
+    ResponseEntity getAllByFiltersJSON(
+            @RequestParam(required = false) Integer status,
+            @RequestParam(required = false) Integer subStatus,
+            @RequestParam(required = false) Date fromDate,
+            @RequestParam(required = false) Date toDate) {
         try {
-            String list = commercialManagementUseCase.searchJSON(commercialManagementSearchFiltersDto);
+            String list = commercialManagementUseCase.searchJSON(status,subStatus,fromDate,toDate);
             return ok(list);
         } catch (OperationException e) {
             log.error("Ocurrio un error al obtener la lista: [{}]", e.toString());
