@@ -86,10 +86,6 @@ public class CommercialManagementService implements CommercialManagementUseCase 
         return new ArrayList<>();
     }
 
-    @Override
-    public String searchJSON(Integer status, Integer subStatus, Date fromDate, Date toDate) {
-        return portView.searchJSON(status, subStatus, fromDate, toDate);
-    }
 
     @Override
     public CommercialManagement findById(Long id) {

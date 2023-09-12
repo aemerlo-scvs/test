@@ -92,23 +92,4 @@ public class CommercialManagementController {
         }
     }
 
-    @GetMapping(value = "/search-json")
-    @ApiOperation(value = "Retorna una lista de polizas a renovar por filtros dinamicos")
-    ResponseEntity getAllByFiltersJSON(
-            @RequestParam(required = false) Integer status,
-            @RequestParam(required = false) Integer subStatus,
-            @RequestParam(required = false) Date fromDate,
-            @RequestParam(required = false) Date toDate) {
-        try {
-            String list = commercialManagementUseCase.searchJSON(status,subStatus,fromDate,toDate);
-            return ok(list);
-        } catch (OperationException e) {
-            log.error("Ocurrio un error al obtener la lista: [{}]", e.toString());
-            return CustomErrorType.badRequest("Bad Request", e.getMessage());
-        } catch (Exception e) {
-            log.error("Ocurrio un error al obtener la lista: [{}]", e.toString());
-            return CustomErrorType.serverError("Server Error", e.getMessage());
-        }
-    }
-
 }
