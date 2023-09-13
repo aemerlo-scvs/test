@@ -426,7 +426,14 @@ public class VIRHProcessService implements VIRHUseCase {
         urlBase = urlBase + "/virh/scfg/subscription/" + UUID.fromString(sender.getUniqueCode().toString());
         Alert alert = new Alert();
         List<String> valuesToReplace = new ArrayList<>();
-        String productName = sender.getNumberPolicy().contains("SMVS") ? "Sepelio" : "Vida + Cáncer";
+        String productName = "";
+        if (sender.getNumberPolicy().toUpperCase().contains("SMVS")) {
+            productName = "Sepelio";
+        } else if (sender.getNumberPolicy().toUpperCase().contains("VIRH")) {
+            productName = "Vinda Individual Renta Hospitalaria";
+        } else {
+            productName = "Vida + Cáncer";
+        }
         if (sender.getPrioritySender() == PrioritySenderEnum.FIRST.getValue()) {
 
             valuesToReplace.add(sender.getInsured());
