@@ -256,7 +256,7 @@ public class VIRHProcessService implements VIRHUseCase {
     private  String getDjs(String numberPolicy){
         StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_virh_report_data_djs");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
+        query.registerStoredProcedureParameter("result", NTextType.class, ParameterMode.OUT);
         query.setParameter("param", numberPolicy);
         query.execute();
         String result = (String) query.getOutputParameterValue("result");
@@ -266,7 +266,7 @@ public class VIRHProcessService implements VIRHUseCase {
     private  String getConditionParticular(String numberPolicy){
         StoredProcedureQuery query = entityManager.createStoredProcedureQuery("sp_virh_report_data_condition_particular");
         query.registerStoredProcedureParameter("param", String.class, ParameterMode.IN);
-        query.registerStoredProcedureParameter("result", String.class, ParameterMode.OUT);
+        query.registerStoredProcedureParameter("result", NTextType.class, ParameterMode.OUT);
         query.setParameter("param", numberPolicy);
         query.execute();
         String result = (String) query.getOutputParameterValue("result");
