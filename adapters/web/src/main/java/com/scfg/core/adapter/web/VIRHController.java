@@ -163,9 +163,9 @@ public class VIRHController {
     }
 
    // @GetMapping(value = "/pago-exitoso")
-    @RequestMapping(value = "/pago-exitoso", method = RequestMethod.GET)
+    @RequestMapping(value = "/pago-exitoso2", method = RequestMethod.GET)
     @ApiOperation(value="Confirma el Pago desde Libelula")
-    ResponseEntity ConfirmacionPago(String query) {
+    ResponseEntity ConfirmacionPago2(String query) {
         Map<String, String> map = new LinkedHashMap<String, String>();
         if (query.contains("&")) {
             for (String keyValue : query.split(" *& *")) {
@@ -205,7 +205,7 @@ public class VIRHController {
                 String welcomemessage=service.getWelcomeMessageText(ObjMap.get("InsuredName").toString(),Product);
 
            //     service.sendWhatsAppWithAttachment("77286265",welcomemessage,Long.parseLong(ObjMap.get("GeneralRequest").toString()), fd.getId() ,1);
-                service.sendWhatsApp(ObjMap.get("phoneNumber").toString(),welcomemessage,Long.parseLong(ObjMap.get("GeneralRequest").toString()) ,1);
+                service.sendWhatsApp("77286265",welcomemessage,Long.parseLong(ObjMap.get("GeneralRequest").toString()) ,1);
 
             }
         }
@@ -213,9 +213,64 @@ public class VIRHController {
         System.out.println(map.get("transaction_id").toString());
         System.out.println(map.values().toString());
 
-        ResponseMessage message = new ResponseMessage();
-        message.setResponseMessage(map.get("transaction_id"));
-        message.setSuccess(true);
-        return ok( message);
+        ResponseMessage message2 = new ResponseMessage();
+        message2.setResponseMessage(map.get("transaction_id"));
+        message2.setSuccess(true);
+        return ok( message2);
+    }
+
+    @RequestMapping(value = "/pago", method = RequestMethod.GET)
+    @ApiOperation(value="Confirma el Pago desde Libelula")
+    ResponseEntity ConfirmacionPago(@RequestParam Map<String, String> pago) {
+        //   Map<String, String> map = new LinkedHashMap<String, String>();
+        //   if (query.contains("&")) {
+        //       for (String keyValue : query.split(" *& *")) {
+        //           String[] pairs = keyValue.split(" *= *", 2);
+        //           map.put(pairs[0], pairs.length == 1 ? "" : pairs[1]);
+        //       }
+        String transaction_id = pago.get("transaction_id");
+        String error = pago.get("error");
+        String message = pago.get("message");
+        String cancel_order = pago.get("cancel_order");
+        String payment_method = pago.get("payment_method");
+        String payment_method_id = pago.get("payment_method_id");
+        String idqr = pago.get("idqr");
+
+        if (Objects.equals(error, "0")) {
+            // enviar parametros al procedimiento almacenado
+            String data = this.service.savePayment(transaction_id, payment_method);
+            String data_modified = data.substring(1, data.length() - 1);
+
+
+            ObjectMapper mapper = new ObjectMapper();
+            Map<String, Object> ObjMap = null;
+            try {
+                ObjMap = mapper.readValue(data_modified, Map.class);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+
+            // generar pdf
+            FileDocumentDTO fd = service.generateAndSavePolicyPdf(ObjMap.get("PolicyNumber").toString(), Long.parseLong(ObjMap.get("ProductID").toString()), new ArrayList<>(), Long.parseLong(ObjMap.get("PolicyItemId").toString()));
+            // enviar whatsapp
+            // service.sendWhatsAppWithAttachment(ObjMap.get("phoneNumber").toString(),"Hello!!",Long.parseLong(ObjMap.get("GeneralRequest").toString()), Long.parseLong("1"));
+
+            String Product = ObjMap.get("OldProductInitials").toString().contains("SMVS") ? "SEPELIO" : "VIDA MÁS CÁNCER";
+
+            String welcomemessage = service.getWelcomeMessageText(ObjMap.get("InsuredName").toString(), Product);
+
+            //     service.sendWhatsAppWithAttachment("77286265",welcomemessage,Long.parseLong(ObjMap.get("GeneralRequest").toString()), fd.getId() ,1);
+            service.sendWhatsApp("77286265", welcomemessage, Long.parseLong(ObjMap.get("GeneralRequest").toString()), 1);
+
+        }
+
+
+        System.out.println(pago.get("transaction_id").toString());
+        System.out.println(pago.values().toString());
+
+        ResponseMessage message3 = new ResponseMessage();
+        message3.setResponseMessage(pago.get("transaction_id"));
+        message3.setSuccess(true);
+        return ok(message3);
     }
 }
