@@ -122,14 +122,14 @@ public class PlanPersistenceAdapter implements PlanPort {
        String query ="select pl.id, pl.name, pl.description, pr.name as productName, " +
                 "pl.totalPremium as price, pl.bfsAgreementCode as orderParticularCondition, " +
                 "(select * from (select cv.commercialName as name, cv.[order], cvp.insuredCapital as amount, cv.coverageTypeIdc from [Plan] pla" +
-                " join Product pr on pr.id = pla.productId " +
-                "join CoveragePlan cvp on cvp.planId = pla.id " +
-                "join Coverage cv on cv.id = cvp.coverageId " +
-                "where pr.apsCode = '"+ apsCode + "' and cvp.planId = pl.id) as x" +
+                " join Product pr on pr.id = pla.productId and pr.status = 1 " +
+                "join CoveragePlan cvp on cvp.planId = pla.id and cvp.status = 1 " +
+                "join Coverage cv on cv.id = cvp.coverageId and cv.status = 1 " +
+                "where pr.apsCode = '"+ apsCode + "' and cvp.planId = pl.id and pla.status = 1) as x" +
                 " for JSON PATH) as 'coverageList' " +
                 "from [Plan] pl " +
-                "join Product pr on pr.id = pl.productId " +
-                "where pr.apsCode = '" + apsCode +
+                "join Product pr on pr.id = pl.productId and pr.status = 1" +
+                "where pl.status = 1  and pr.apsCode = '" + apsCode +
                 "' for JSON PATH";
        List<Object> obj = em.createNativeQuery(query).getResultList();
         em.close();
