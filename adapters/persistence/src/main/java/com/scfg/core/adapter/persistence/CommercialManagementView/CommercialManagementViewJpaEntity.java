@@ -34,9 +34,14 @@ public class CommercialManagementViewJpaEntity {
     @Column(name = "productName")
     private String productName;
 
+    @Column(name = "productInitials")
+    private String productInitials;
+
     @Column(name = "insured")
     private String insured;
 
+    @Column(name = "identificationNumber")
+    private String identificationNumber;
 
     @Column(name = "policyStatus")
     private String policyStatus;

@@ -20,7 +20,9 @@ public class CommercialManagementDTO {
     private Long policyId;
     private String numberPolicy;
     private String productName;
+    private String productInitials;
     private String insured;
+    private String identificationNumber;
     private String policyStatus;
     private String managementStatus;
     private String managementSubStatus;
