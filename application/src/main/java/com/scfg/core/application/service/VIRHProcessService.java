@@ -428,7 +428,7 @@ public class VIRHProcessService implements VIRHUseCase {
         List<String> valuesToReplace = new ArrayList<>();
         String productName = "";
         if (sender.getNumberPolicy().toUpperCase().contains("SMVS")) {
-            productName = "Sepelio";
+            productName = "Sepelio Vida Segura";
         } else if (sender.getNumberPolicy().toUpperCase().contains("VIRH")) {
             productName = "Vinda Individual Renta Hospitalaria";
         } else {
@@ -437,10 +437,9 @@ public class VIRHProcessService implements VIRHUseCase {
         if (sender.getPrioritySender() == PrioritySenderEnum.FIRST.getValue()) {
 
             valuesToReplace.add(sender.getInsured());
-            valuesToReplace.add(HelpersMethods.formatStringOnlyDate(sender.getStartOfCoverage()));
             valuesToReplace.add(productName);
             valuesToReplace.add(sender.getNumberPolicy());
-            valuesToReplace.add(bank);
+            valuesToReplace.add(HelpersMethods.formatStringOnlyDate(sender.getStartOfCoverage()));
             valuesToReplace.add(differenceDay);
             valuesToReplace.add(urlBase);
 
@@ -450,9 +449,11 @@ public class VIRHProcessService implements VIRHUseCase {
             changeStatus = (int) ClassifierEnum.CM_S_AUTOMATIC_CAMPAIGN.getReferenceCode();
             changeSubStatus = (int) ClassifierEnum.CM_AUTO_CAMPAIGN_C1_M2_1.getReferenceCode();
         } else if (sender.getPrioritySender() == PrioritySenderEnum.SECOND.getValue()) {
+
             valuesToReplace.add(sender.getInsured());
             valuesToReplace.add(productName);
             valuesToReplace.add(sender.getNumberPolicy());
+            valuesToReplace.add(HelpersMethods.formatStringOnlyDate(sender.getStartOfCoverage()));
             valuesToReplace.add(urlBase);
 
             alert = this.alertService.getAlertByEnumReplacingContent(
@@ -461,7 +462,11 @@ public class VIRHProcessService implements VIRHUseCase {
             changeStatus = (int) ClassifierEnum.CM_S_AUTOMATIC_CAMPAIGN.getReferenceCode();
             changeSubStatus = (int) ClassifierEnum.CM_AUTO_CAMPAIGN_C1_M3_10.getReferenceCode();
         } else if (sender.getPrioritySender() == PrioritySenderEnum.THIRD.getValue()) {
+
+            valuesToReplace.add(sender.getInsured());
             valuesToReplace.add(productName);
+            valuesToReplace.add(sender.getNumberPolicy());
+            valuesToReplace.add(HelpersMethods.formatStringOnlyDate(sender.getStartOfCoverage()));
             valuesToReplace.add(urlBase);
 
             alert = this.alertService.getAlertByEnumReplacingContent(

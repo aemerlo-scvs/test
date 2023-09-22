@@ -109,23 +109,26 @@ public class AlertService {
                 contentReplaced = contentReplaced.replace("{policyNumber}", valuesToReplace.get(0));
                 break;
             case VIRH_SCH_1:
-                contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); //Insured name
-                contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Coverage Start date
-                contentReplaced = contentReplaced.replace("{{3}}",valuesToReplace.get(2)); // Product
-                contentReplaced = contentReplaced.replace("{{4}}",valuesToReplace.get(3)); // Policy number
-                contentReplaced = contentReplaced.replace("{{5}}",valuesToReplace.get(4)); // Bank (Banco Fassil)
-                contentReplaced = contentReplaced.replace("{{6}}",valuesToReplace.get(5)); // Days to remove policy
-                contentReplaced = contentReplaced.replace("{{7}}",valuesToReplace.get(6)); // Link
-                break;
-            case VIRH_SCH_2:
-                contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); //Insured name
+                contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); // Insured name
                 contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Product
                 contentReplaced = contentReplaced.replace("{{3}}",valuesToReplace.get(2)); // Policy number
-                contentReplaced = contentReplaced.replace("{{4}}",valuesToReplace.get(3)); // Link
+                contentReplaced = contentReplaced.replace("{{4}}",valuesToReplace.get(3)); // Coverage Start date
+                contentReplaced = contentReplaced.replace("{{5}}",valuesToReplace.get(4)); // Days to remove policy
+                contentReplaced = contentReplaced.replace("{{6}}",valuesToReplace.get(5)); // Link
+                break;
+            case VIRH_SCH_2:
+                contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); // Insured name
+                contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Product
+                contentReplaced = contentReplaced.replace("{{3}}",valuesToReplace.get(2)); // Policy number
+                contentReplaced = contentReplaced.replace("{{4}}",valuesToReplace.get(3)); // Coverage Start date
+                contentReplaced = contentReplaced.replace("{{5}}",valuesToReplace.get(4)); // Link
                 break;
             case VIRH_SCH_3:
-                contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); // Product
-                contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Link
+                contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); // Insured name
+                contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Product
+                contentReplaced = contentReplaced.replace("{{3}}",valuesToReplace.get(2)); // Policy number
+                contentReplaced = contentReplaced.replace("{{4}}",valuesToReplace.get(3)); // Coverage Start date
+                contentReplaced = contentReplaced.replace("{{5}}",valuesToReplace.get(4)); // Link
                 break;
             case VIRH_SCH_4:
                 contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); // Insured name
