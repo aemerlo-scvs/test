@@ -391,11 +391,12 @@ public class VIRHProcessService implements VIRHUseCase {
 //        }
 //        this.commercialManagementService.saveAll(commercialManagementList);
         List<String> arr = new ArrayList<>();
-        arr.add("JUAN PABLO SUAREZ");
+        arr.add("ISABEL PRISCILA GONZALES PEREZ");
         arr.add("SEPELIO");
         arr.add("62177077");
+        arr.add("https://www.santacruzvidaysalud.com.bo/virh/scfg/subscription/0D4263FA-0DEB-43A7-B0A6-B68B01F058B9");
         Alert alert = alertService.getAlertByEnumReplacingContent(
-                AlertEnum.VIRH_WELCOME,arr);
+                AlertEnum.VIRH_WELCOME_2,arr);
         senderService.setStrategy(whatsAppSenderService);
         MessageDTO messageDTO = new MessageDTO();
         messageDTO.setMessage(alert.getMail_body());
@@ -405,7 +406,7 @@ public class VIRHProcessService implements VIRHUseCase {
         attachmentDTO.setFileName(docId+"");
         List<AttachmentDTO> attachmentDTOList = new ArrayList<>();
         attachmentDTOList.add(attachmentDTO);
-        senderService.sendMessageWithAttachment(messageDTO, attachmentDTOList);
+        senderService.sendMessage(messageDTO);
     }
 
     private CommercialManagement sendNotification(CommercialManagementViewWppSenderDTO sender) {

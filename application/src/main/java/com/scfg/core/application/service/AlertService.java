@@ -147,6 +147,12 @@ public class AlertService {
                 contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Product
                 contentReplaced = contentReplaced.replace("{{3}}",valuesToReplace.get(2)); // Numbar to contact company
                 break;
+            case VIRH_WELCOME_2:
+                contentReplaced = contentReplaced.replace("{{1}}",valuesToReplace.get(0)); // Insured name
+                contentReplaced = contentReplaced.replace("{{2}}",valuesToReplace.get(1)); // Product
+                contentReplaced = contentReplaced.replace("{{3}}",valuesToReplace.get(2)); // Numbar to contact company
+                contentReplaced = contentReplaced.replace("{{4}}",valuesToReplace.get(3)); // URL to download certificate
+                break;
         }
         return contentReplaced;
     }
