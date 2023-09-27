@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface CommercialManagementViewPort {
     List<CommercialManagementDTO> search(Integer status);
+    List<CommercialManagementDTO> search(Integer status, String identificationNumber);
     List<CommercialManagementDTO> search(Integer status, Integer subStatus);
     List<CommercialManagementDTO> search(Date fromDate, Date toDate);
 

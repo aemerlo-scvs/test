@@ -20,7 +20,11 @@ public class CommercialManagementViewPersistenceAdapter implements CommercialMan
         List<CommercialManagementDTO> cmvList = repository.getAllByStatus(status);
         return cmvList.size() > 0 ? cmvList : new ArrayList<>();
     }
-
+    @Override
+    public List<CommercialManagementDTO> search(Integer status, String identificationNumber) {
+        List<CommercialManagementDTO> cmvList = repository.getAllByStatusAndIdentificationNumber(status, identificationNumber);
+        return cmvList.size() > 0 ? cmvList : new ArrayList<>();
+    }
     @Override
     public List<CommercialManagementDTO> search(Integer status, Integer subStatus) {
         List<CommercialManagementDTO> cmvList = repository.getAllByStatusAndSubStatus(status, subStatus);

@@ -64,6 +64,13 @@ public interface CommercialManagementViewRepository extends JpaRepository<Commer
             "WHERE c.managementStatusIdc = :status " +
             "ORDER BY c.endOfCoverage")
             List<CommercialManagementDTO> getAllByStatus(@Param("status") Integer status);
+    @Query("SELECT DISTINCT new com.scfg.core.domain.dto.CommercialManagementDTO(c.policyId, c.numberPolicy, c.productName, c.productInitials, " +
+            "c.insured, c.identificationNumber, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
+            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)" +
+            "FROM CommercialManagementViewJpaEntity c "+
+            "WHERE c.managementStatusIdc = :status AND c.identificationNumber = :identificationNumber " +
+            "ORDER BY c.endOfCoverage")
+            List<CommercialManagementDTO> getAllByStatusAndIdentificationNumber(@Param("status") Integer status, @Param("identificationNumber") String identificationNumber);
 
 
 

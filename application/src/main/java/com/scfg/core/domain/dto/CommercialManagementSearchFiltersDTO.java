@@ -18,4 +18,5 @@ public class CommercialManagementSearchFiltersDTO {
     private Date toDate;
     private Integer status;
     private Integer subStatus;
+    private String identificationNumber;
 }
