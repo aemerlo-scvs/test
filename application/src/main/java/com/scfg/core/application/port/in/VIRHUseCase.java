@@ -15,7 +15,7 @@ public interface VIRHUseCase {
     FileDocumentDTO generate() throws IOException;
     String saveInformationPolicy(String data);
 
-    String getWelcomeMessageText(String insuredName, String oldProduct);
+    String getWelcomeMessageText(String insuredName, String oldProduct, String link);
 
     String savePayment(String transactionId, String paymentMethod);
     void updateDebtRegister(DebtRegisterUpdateDTO data);

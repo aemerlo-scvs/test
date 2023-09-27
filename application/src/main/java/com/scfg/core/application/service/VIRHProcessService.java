@@ -35,7 +35,6 @@ import org.hibernate.type.NTextType;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.text.MessageFormat;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -308,14 +307,15 @@ public class VIRHProcessService implements VIRHUseCase {
     }
 
     @Override
-    public String getWelcomeMessageText(String insuredName, String oldProduct)
+    public String getWelcomeMessageText(String insuredName, String oldProduct, String link)
     {
         List<String> arr = new ArrayList<>();
         arr.add(insuredName);
         arr.add(oldProduct);
         arr.add("62177077");
+        arr.add(link);
         Alert alert = alertService.getAlertByEnumReplacingContent(
-                AlertEnum.VIRH_WELCOME,arr);
+                AlertEnum.VIRH_WELCOME_2,arr);
         return alert.getMail_body();
     }
 
