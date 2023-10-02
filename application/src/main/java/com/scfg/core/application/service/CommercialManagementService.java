@@ -49,6 +49,15 @@ public class CommercialManagementService implements CommercialManagementUseCase 
         return response;
     }
 
+    @Override
+    public PersistenceResponse updateStatusAndSubstatus(CommercialManagement obj) {
+        CommercialManagement cm = port.findById(obj.getId());
+        cm.setManagementStatusIdc(obj.getManagementStatusIdc());
+        cm.setManagementSubStatusIdc(obj.getManagementSubStatusIdc());
+        PersistenceResponse response = port.update(cm);
+        return response;
+    }
+
 
     @Override
     public List<CommercialManagementDTO> search(CommercialManagementSearchFiltersDTO filtersDTO) {

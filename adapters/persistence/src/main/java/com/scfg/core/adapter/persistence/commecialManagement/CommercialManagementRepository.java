@@ -14,5 +14,8 @@ public interface CommercialManagementRepository extends JpaRepository<Commercial
     @Query(value = " select case when count(c.id)> 0 then 1 else 0 end from CommercialManagement c where c.comercialManagementId= :comercialManagementId",nativeQuery = true )
     Integer existsByComercialManagementId(@Param("comercialManagementId") String comercialManagementId);
 
+    @Query(value = "SELECT a.* FROM CommercialManagement a " +
+            "WHERE a.comercialManagementId = :id AND a.status = :status", nativeQuery = true)
+    CommercialManagementJpaEntity findByCommercialManagementId(@Param("id") UUID id, @Param("status") Integer status);
 
 }

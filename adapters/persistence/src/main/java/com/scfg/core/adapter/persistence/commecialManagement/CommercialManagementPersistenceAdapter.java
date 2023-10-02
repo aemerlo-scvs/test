@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @PersistenceAdapter
@@ -47,6 +48,12 @@ public class CommercialManagementPersistenceAdapter implements CommercialManagem
     @Override
     public CommercialManagement findById(Long id) {
         CommercialManagementJpaEntity cms = this.repository.findById(id, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        return mapToDomain(cms);
+    }
+
+    @Override
+    public CommercialManagement findByCommercialManagementId(UUID id) {
+        CommercialManagementJpaEntity cms = this.repository.findByCommercialManagementId(id, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
         return mapToDomain(cms);
     }
 

@@ -6,9 +6,12 @@ import com.scfg.core.adapter.web.util.CustomErrorType;
 import com.scfg.core.application.port.in.CommercialManagementUseCase;
 import com.scfg.core.application.port.in.PlanUseCase;
 import com.scfg.core.application.service.VIRHProcessService;
+import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.exception.OperationException;
 import com.scfg.core.common.exception.ResponseMessage;
+import com.scfg.core.common.util.PersistenceResponse;
 import com.scfg.core.domain.Alert;
+import com.scfg.core.domain.CommercialManagement;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.dto.FileDocumentDTO;
 import com.scfg.core.domain.dto.virh.DebtRegisterUpdateDTO;
@@ -212,5 +215,18 @@ public class VIRHController {
         message3.setResponseMessage(pago.get("transaction_id"));
         message3.setSuccess(true);
         return ok(message3);
+    }
+
+    @PostMapping(value ="/updateStatusAndSubstatus")
+    @ApiOperation(value = "Actualiza el estado y subestado")
+    public ResponseEntity<PersistenceResponse> updateSomeFields(@RequestBody CommercialManagement obj) {
+        try {
+            PersistenceResponse response = commercialManagementUseCase.updateStatusAndSubstatus(obj);
+            return ok(response);
+        } catch (NotDataFoundException | OperationException e) {
+            return CustomErrorType.badRequest("CommercialManagement", e.getMessage());
+        } catch (Exception ex) {
+            return CustomErrorType.serverError("Server Error", ex.getMessage());
+        }
     }
 }
