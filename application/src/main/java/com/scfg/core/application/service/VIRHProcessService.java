@@ -422,7 +422,7 @@ public class VIRHProcessService implements VIRHUseCase {
     }
 
     private CommercialManagement sendNotification(CommercialManagementViewWppSenderDTO sender) {
-        String bank = "Banco Fassil";
+        String bank = "Banco Fassil"; //Todo Se debe modificar con el nuevo mensaje que se deba enviar
         CommercialManagement commercialManagement = null;
         String urlBase = "";
         String differenceDay = sender.getDateDifference() > 0 ? sender.getDateDifference() + "" : (sender.getDateDifference() * -1) + "";
