@@ -137,6 +137,14 @@ public class VIRHController {
         return ok("HOla mundo");
     }
 
+    @GetMapping(value = "/aqwe-tjf-qad")
+    @ApiOperation(value = "Da biara anohyeto samufo")
+    ResponseEntity ChangeLimitMessageDiary(@RequestParam Integer newLimit) {
+
+        boolean res = service.changeLimitToSendMessageDiary(newLimit);
+        return ok(res);
+    }
+
     @GetMapping(value = "/send-whatsapp-manual")
     @ApiOperation(value = "WhatsApp envios manuales")
     ResponseEntity WppSenderManually(@RequestParam Integer priority, @RequestParam Integer limitMessage) {

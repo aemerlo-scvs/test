@@ -32,7 +32,9 @@ import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperReport;
 import org.hibernate.type.NTextType;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Propagation;
@@ -71,7 +73,15 @@ public class VIRHProcessService implements VIRHUseCase {
             "http://10.170.222.75:8081",
             "https://www.santacruzvidaysalud.com.bo"};
 
-    private final Integer limitSenderPerDay = 10; // Limite diario de envios por WhatsApp - Default: 5000
+    private Integer limitSenderPerDay = 10; // Limite diario de envios por WhatsApp - Default: 5000
+
+    public boolean changeLimitToSendMessageDiary(Integer newLimit) {
+        int actualLimit = limitSenderPerDay;
+
+        limitSenderPerDay = newLimit;
+
+        return limitSenderPerDay != actualLimit;
+    }
 
     @Override
     public String getDataInformationPolicy(String param) {
@@ -332,6 +342,8 @@ public class VIRHProcessService implements VIRHUseCase {
         return messageDTO;
     }
 
+    @Profile(value="prod")
+    @Scheduled(cron = "0 00 06 * * *", zone = "America/La_Paz")
     public void automaticSenderNotificationToRenew() {
         List<CommercialManagementViewWppSenderDTO> senders = this.cmWppPort.findAll();
         List<CommercialManagement> commercialManagementList = new ArrayList<>();
