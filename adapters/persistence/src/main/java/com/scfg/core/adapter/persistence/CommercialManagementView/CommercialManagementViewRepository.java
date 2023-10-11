@@ -72,6 +72,27 @@ public interface CommercialManagementViewRepository extends JpaRepository<Commer
             "ORDER BY c.endOfCoverage")
             List<CommercialManagementDTO> getAllByStatusAndIdentificationNumber(@Param("status") Integer status, @Param("identificationNumber") String identificationNumber);
 
+    @Query(value = "SELECT TOP 1 PERCENT c.*" +
+            "FROM vv_virh_commercialManagementView c "+
+            "WHERE c.number like :number " +
+            "ORDER BY c.endOfCoverage", nativeQuery = true)
+    List<CommercialManagementViewJpaEntity> getByPhoneNumber(@Param("number") String number);
+    @Query(value = "SELECT DISTINCT new com.scfg.core.domain.dto.CommercialManagementDTO(c.policyId, c.numberPolicy, c.productName, c.productInitials, " +
+            "c.insured, c.identificationNumber, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
+            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)"+
+            "FROM CommercialManagementViewJpaEntity c "+
+            "WHERE c.identificationNumber like :identificationNumber " +
+            "ORDER BY c.endOfCoverage")
+    List<CommercialManagementDTO> getByIdentificationNumber(@Param("identificationNumber") String identificationNumber);
+
+    @Query(value = "SELECT DISTINCT new com.scfg.core.domain.dto.CommercialManagementDTO(c.policyId, c.numberPolicy, c.productName, c.productInitials, " +
+            "c.insured, c.identificationNumber, c.policyStatus, c.managementStatus, c.managementSubStatus, c.managementStatusIdc, c.managementSubStatusIdc , c.userName, c.userId, c.coverages, " +
+            "c.number, c.email, c.planId, c.planName, c.dateDifference , c.endOfCoverage, c.issuanceDate, c.fromDate, c.code, c.URL, c.commercialManagementId)"+
+            "FROM CommercialManagementViewJpaEntity c "+
+            "WHERE c.number like :number and c.identificationNumber like :identificationNumber " +
+            "ORDER BY c.endOfCoverage")
+    List<CommercialManagementDTO> getByPhoneNumberAndIdentificationNumber(@Param("number") String number, @Param("identificationNumber") String identificationNumber);
+
 
 
 

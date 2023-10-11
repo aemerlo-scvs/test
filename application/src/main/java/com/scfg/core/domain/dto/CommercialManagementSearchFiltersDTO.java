@@ -19,4 +19,5 @@ public class CommercialManagementSearchFiltersDTO {
     private Integer status;
     private Integer subStatus;
     private String identificationNumber;
+    private String number;
 }

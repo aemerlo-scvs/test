@@ -52,13 +52,22 @@ public class CommercialManagementService implements CommercialManagementUseCase 
 
     @Override
     public List<CommercialManagementDTO> search(CommercialManagementSearchFiltersDTO filtersDTO) {
-
+        // Busqueda directa
+        if( filtersDTO.getNumber()!=null && filtersDTO.getIdentificationNumber()!=null ){
+            return portView.search(filtersDTO.getNumber(), filtersDTO.getIdentificationNumber());
+        }
+        if( filtersDTO.getNumber()!=null && filtersDTO.getIdentificationNumber()==null){
+            return portView.search(filtersDTO.getNumber());
+        }
+        if( filtersDTO.getNumber()==null && filtersDTO.getIdentificationNumber()!=null ){
+            return portView.search(filtersDTO.getIdentificationNumber(),true);
+        }
+        // Filtros de datos
         if (filtersDTO.getStatus() != null
                 && filtersDTO.getSubStatus() != null
                 && (filtersDTO.getFromDate() != null && filtersDTO.getToDate() != null)
         ) {
             return portView.search(filtersDTO.getStatus(), filtersDTO.getSubStatus(), filtersDTO.getFromDate(), filtersDTO.getToDate());
-
         }
         if (filtersDTO.getStatus() != null
                 && (filtersDTO.getFromDate() != null && filtersDTO.getToDate() != null)

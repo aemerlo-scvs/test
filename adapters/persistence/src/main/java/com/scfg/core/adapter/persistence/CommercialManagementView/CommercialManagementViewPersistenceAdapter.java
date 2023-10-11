@@ -2,6 +2,7 @@ package com.scfg.core.adapter.persistence.CommercialManagementView;
 
 import com.scfg.core.application.port.out.CommercialManagementViewPort;
 import com.scfg.core.common.PersistenceAdapter;
+import com.scfg.core.common.util.ObjectMapperUtils;
 import com.scfg.core.domain.dto.CommercialManagementDTO;
 import lombok.RequiredArgsConstructor;
 
@@ -14,6 +15,23 @@ import java.util.List;
 public class CommercialManagementViewPersistenceAdapter implements CommercialManagementViewPort {
 
     private final CommercialManagementViewRepository repository;
+    @Override
+    public List<CommercialManagementDTO> search(String phoneNumber) {
+        List<CommercialManagementViewJpaEntity> cmvList = repository.getByPhoneNumber(phoneNumber);
+        return cmvList.size() > 0 ?  ObjectMapperUtils.mapAll(cmvList, CommercialManagementDTO.class) : new ArrayList<>();
+    }
+    @Override
+    public List<CommercialManagementDTO> search(String identificationNumber, boolean isIdentificationNumber) {
+        List<CommercialManagementDTO> cmvList = repository.getByIdentificationNumber(identificationNumber);
+        return cmvList.size() > 0 ?  cmvList : new ArrayList<>();
+    }
+
+    @Override
+    public List<CommercialManagementDTO> search(String phoneNumber, String identificationNumber) {
+        List<CommercialManagementDTO> cmvList = repository.getByPhoneNumberAndIdentificationNumber(phoneNumber,identificationNumber);
+        return cmvList.size() > 0 ?  cmvList : new ArrayList<>();
+    }
+
 
     @Override
     public List<CommercialManagementDTO> search(Integer status) {
