@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.scfg.core.adapter.web.util.CustomErrorType;
 import com.scfg.core.application.port.in.CommercialManagementUseCase;
+import com.scfg.core.application.port.in.PepUseCase;
 import com.scfg.core.application.port.in.PlanUseCase;
 import com.scfg.core.application.service.VIRHProcessService;
 import com.scfg.core.common.exception.NotDataFoundException;
@@ -14,6 +15,7 @@ import com.scfg.core.domain.Alert;
 import com.scfg.core.domain.CommercialManagement;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.dto.FileDocumentDTO;
+import com.scfg.core.domain.dto.SearchPepDTO;
 import com.scfg.core.domain.dto.virh.DebtRegisterUpdateDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,6 +46,7 @@ import static org.springframework.http.ResponseEntity.ok;
 public class VIRHController {
     private final VIRHProcessService service;
     private final PlanUseCase planUseCase;
+    private final PepUseCase pepUseCase;
     private final CommercialManagementUseCase commercialManagementUseCase;
 
     @GetMapping(value = "/policyInformation/{unique}")
@@ -236,5 +239,12 @@ public class VIRHController {
         } catch (Exception ex) {
             return CustomErrorType.serverError("Server Error", ex.getMessage());
         }
+    }
+
+    @PostMapping(value = "/pepExist")
+    @ApiOperation(value = "Retorna un Boolean si existe el cliente PEP por número de identificación o nombre completo")
+    ResponseEntity existsByIdentificationNumberOrName(@RequestBody SearchPepDTO pepDTO) {
+        boolean exists = pepUseCase.existsByIdentificationNumberOrName(pepDTO);
+        return ok(exists);
     }
 }
