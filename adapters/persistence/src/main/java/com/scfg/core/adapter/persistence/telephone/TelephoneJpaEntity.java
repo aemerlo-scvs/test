@@ -24,10 +24,18 @@ import javax.persistence.Table;
 public class TelephoneJpaEntity extends BaseJpaEntity {
     @Column(name = "personId")
     private Long personId;
+    @Column(name = "newPersonId")
+    private Long newPersonId;
+
+    @Column(name = "telephoneTypeIdc")
+    private Integer telephoneTypeIdc;
+
+    @Column(name = "DeviceTypeIdc")
+    private Integer DeviceTypeIdc;
+
+    @Column(name = "internalNumber")
+    private String internalNumber;
 
     @Column(name = "number")
     private String number;
-
-    @Column(name = "numberTypeIdc")
-    private Integer numberTypeIdc;
 }

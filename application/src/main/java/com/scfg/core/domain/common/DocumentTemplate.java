@@ -20,4 +20,8 @@ public class DocumentTemplate extends BaseDomain{
     private String documentUrl;
     @Null
     private long idDocumentTemplate;
+    private Long productId;
+    private Integer typeDocumentPdfIdc;
+    private String content;
+    private Boolean isDynamic;
 }

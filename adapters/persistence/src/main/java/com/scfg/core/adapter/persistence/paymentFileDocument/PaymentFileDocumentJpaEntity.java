@@ -27,7 +27,7 @@ public class PaymentFileDocumentJpaEntity extends BaseJpaEntity {
     private String description;
     @Column(name = "documentTypeIdc")
     private Integer documentTypeIdc;
-    @Column(name = "documentNumber", length = 500)
+    @Column(name = "documentNumber")
     private String documentNumber;
     @Column(name = "content", length = 900)
     private String content;

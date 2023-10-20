@@ -1,15 +1,20 @@
 package com.scfg.core.adapter.persistence.fileDocument;
 
+import com.scfg.core.adapter.persistence.requirementControl.RequirementControlJpaEntity;
+import com.scfg.core.adapter.persistence.beneficiary.BeneficiaryJpaEntity;
+import com.scfg.core.adapter.persistence.policy.PolicyJpaEntity;
 import com.scfg.core.application.port.out.FileDocumentPort;
 import com.scfg.core.common.PersistenceAdapter;
 import com.scfg.core.common.enums.PolicyStatusEnum;
 import com.scfg.core.common.enums.TypesAttachmentsEnum;
+import com.scfg.core.common.enums.TypesDocumentPersonEnum;
+import com.scfg.core.domain.Beneficiary;
 import com.scfg.core.common.enums.PersistenceStatusEnum;
-import com.scfg.core.common.util.ModelMapperConfig;
 import com.scfg.core.domain.FileDocument;
 import com.scfg.core.domain.dto.FileDocumentDTO;
 import com.scfg.core.domain.dto.credicasas.FileDocumentByRequestDTO;
 import com.scfg.core.domain.GeneralRequest;
+import config.ModelMapperConfig;
 import org.modelmapper.ModelMapper;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;

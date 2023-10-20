@@ -56,6 +56,11 @@ public class RoleService implements RoleUseCase {
         return rolePort.delete(roleAux);
     }
 
+    @Override
+    public Boolean existName(String name) {
+        return rolePort.existName(name);
+    }
+
     String validateRole(Role role){
         String field = null;
         if(role.getName() == null || role.getName().isEmpty() ) {

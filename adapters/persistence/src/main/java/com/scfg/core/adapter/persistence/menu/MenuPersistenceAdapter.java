@@ -63,7 +63,7 @@ public class MenuPersistenceAdapter implements MenuPort {
 
         MenuJpaEntity menuJpaEntity = mapToJpaEntityAll(menu);
 
-        if (menu.getParentId() != null) {
+        if (menu.getParentId() != null && menu.getParentId()!=0) {
             MenuJpaEntity parentMenu = menuRepository.findById(menu.getParentId()).orElseThrow(() -> new NotDataFoundException("Menu: " + menu.getParentId() + " No encontrado"));
             menuJpaEntity.setParentId(parentMenu);
         }
@@ -93,6 +93,11 @@ public class MenuPersistenceAdapter implements MenuPort {
     public Boolean delete(Menu menu) {
         menuRepository.deleteAllByIdOrParentId(PersistenceStatusEnum.DELETED.getValue(), menu.getId());
         return true;
+    }
+
+    @Override
+    public Boolean existNameFather(String name) {
+        return menuRepository.exitNameFather(name);
     }
 
     //#region Mappers

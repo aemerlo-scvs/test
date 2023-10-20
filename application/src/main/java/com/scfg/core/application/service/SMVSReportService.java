@@ -7,7 +7,6 @@ import com.scfg.core.common.util.MyProperties;
 import com.scfg.core.common.util.PersistenceResponse;
 import com.scfg.core.domain.dto.*;
 import com.scfg.core.domain.smvs.ParametersFromDTO;
-import com.scfg.core.domain.smvs.SMVSReportDTO;
 import com.scfg.core.domain.smvs.TempCajerosDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

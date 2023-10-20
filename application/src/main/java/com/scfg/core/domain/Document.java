@@ -20,5 +20,4 @@ public class Document extends BaseDomain {
     private String mimeType;
     private Integer documentTypeIdc;
     private String documentUrl;
-    private Long documentNumber;
 }

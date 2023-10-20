@@ -10,4 +10,5 @@ public interface TelephonePort {
     boolean saveOrUpdateAll(List<Telephone> telephoneList);
 
     List<Telephone> getAllByPersonId(Long personId);
+    List<Telephone> getAllByNewPersonId(Long personId);
 }

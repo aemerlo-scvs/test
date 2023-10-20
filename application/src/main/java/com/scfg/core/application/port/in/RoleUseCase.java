@@ -6,7 +6,6 @@ import com.scfg.core.domain.common.RoleMenuDTO;
 import java.util.List;
 
 public interface RoleUseCase {
-
     Role getById(long id);
 
     List<Role> get();
@@ -17,4 +16,5 @@ public interface RoleUseCase {
 
     Role delete(long roleId);
 
+     Boolean existName(String name);
 }

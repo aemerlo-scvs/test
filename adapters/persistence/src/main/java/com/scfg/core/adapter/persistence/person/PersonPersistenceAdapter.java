@@ -11,7 +11,10 @@ import com.scfg.core.domain.person.NaturalPerson;
 import com.scfg.core.domain.person.Person;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-
+import javax.persistence.Query;
+import org.hibernate.type.NTextType;
+import javax.persistence.ParameterMode;
+import javax.persistence.StoredProcedureQuery;
 import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,8 @@ public class PersonPersistenceAdapter implements PersonPort {
     private final PersonRepository personRepository;
 
     private final EntityManager em;
+
+    private static String GET_REQUEST_ALL_BY_FILTER = "exec proc_search_persons :documentTypeIdc,:identificationNumber,:name";
 
     @Override
     public List<Person> findAll() {
@@ -62,7 +67,7 @@ public class PersonPersistenceAdapter implements PersonPort {
         PersonJpaEntity personJpaEntity = personRepository.findByNaturalPersonIdentificationNumber(identificationNumber);
         return personJpaEntity != null;
     }
-    
+
     @Override
     public long saveOrUpdate(Person person) {
         PersonJpaEntity personJpaEntity = mapToJpaEntity(person);
@@ -72,7 +77,7 @@ public class PersonPersistenceAdapter implements PersonPort {
 
     @Override
     public List<Person> findAllByAssignedGroup(Integer assignedGroup) {
-        List<PersonJpaEntity> personGroups = personRepository.findAllByAssignedGroupIdc(PersistenceStatusEnum.CREATED_OR_UPDATED.getValue(),assignedGroup);
+        List<PersonJpaEntity> personGroups = personRepository.findAllByAssignedGroupIdc(PersistenceStatusEnum.CREATED_OR_UPDATED.getValue(), assignedGroup);
         List<Person> listAux = new ArrayList<>();
         personGroups.forEach(item -> {
             listAux.add(mapToDomain(item));
@@ -82,13 +87,13 @@ public class PersonPersistenceAdapter implements PersonPort {
 
     @Override
     public List<Person> findAllByListOfPersonId(List<Long> personIdList) {
-        List<PersonJpaEntity> personJpaEntityList = personRepository.findAllByListId(personIdList,PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        List<PersonJpaEntity> personJpaEntityList = personRepository.findAllByListId(personIdList, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
         return personJpaEntityList.stream().map(o -> new ModelMapper().map(o, Person.class)).collect(Collectors.toList());
     }
 
     @Override
     public Person findByNitNumber(Long nitNumber) {
-        PersonJpaEntity person = personRepository.findByNitNumber(nitNumber,PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
+        PersonJpaEntity person = personRepository.findByNitNumber(nitNumber, PersistenceStatusEnum.CREATED_OR_UPDATED.getValue());
         return new ModelMapper().map(person, Person.class);
     }
 
@@ -273,5 +278,4 @@ public class PersonPersistenceAdapter implements PersonPort {
     }
 
     //#endregion
-
 }

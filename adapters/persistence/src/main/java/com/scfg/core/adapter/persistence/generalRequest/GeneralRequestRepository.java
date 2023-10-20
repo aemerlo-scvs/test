@@ -57,7 +57,7 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
                                   @Param("activeRequestStatus") Integer activeRequestStatus,
                                   @Param("pendingRequestStatus") Integer pendingRequestStatus);
 
-    @Query("SELECT DISTINCT new com.scfg.core.domain.smvs.ContactCenterRequestDTO(np.name, np.lastName, np.motherLastName, np.marriedLastName, gr.activationCode, d.cellPhone, p.telephone, p.email, gr.createdAt, r.salePlace, r.agencyName, r.voucherNumber, gr.requestStatusIdc)" +
+    @Query("SELECT DISTINCT new com.scfg.core.domain.smvs.ContactCenterRequestDTO(np.name, np.lastName, np.motherLastName, np.marriedLastName, gr.activationCode, p.telephone, p.email, gr.createdAt, r.salePlace, r.agencyName, r.voucherNumber, gr.requestStatusIdc)" +
             "FROM GeneralRequestJpaEntity gr " +
             "INNER JOIN PlanJpaEntity pl ON pl.id = gr.planId " +
             "INNER JOIN CoverageProductPlanJpaEntity cpp ON cpp.planId = pl.id " +
@@ -226,7 +226,7 @@ public interface GeneralRequestRepository extends JpaRepository<GeneralRequestJp
             "INNER JOIN PlanJpaEntity pl ON pl.id = g.planId \n" +
             "INNER JOIN ProductJpaEntity p ON p.id = pl.productId \n" +
             "WHERE g.creditNumber = :operationNumber " +
-            "AND pl.agreementCode = :planAgreementCode " +
+            "AND pl.bfsAgreementCode = :planAgreementCode " +
             "AND p.agreementCode = :productAgreementCode " +
             "AND g.status = :status " +
             "AND pl.status = :status " +

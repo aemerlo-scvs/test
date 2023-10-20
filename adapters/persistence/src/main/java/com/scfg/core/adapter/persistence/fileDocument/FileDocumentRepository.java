@@ -27,6 +27,7 @@ public interface FileDocumentRepository extends JpaRepository<FileDocumentJpaEnt
             "where gr.id = :requestId and pfd.isSigned = 1 ")
     List<FileDocumentByRequestDTO> findAllSignedDocumentsByRequestId(@Param("requestId") Long requestId);
 
+    //TODO verificar la firma del documento
     @Query("SELECT new com.scfg.core.domain.dto.credicasas.FileDocumentByRequestDTO(fd.id," +
             "fd.typeDocument, fd.description, fd.content, fd.mimeType, pd.isSigned ) " +
             "FROM PolicyItemJpaEntity pit " +
@@ -41,7 +42,6 @@ public interface FileDocumentRepository extends JpaRepository<FileDocumentJpaEnt
             @Param("policyItemId") Long policyItemId,
             @Param("typeDocument") Integer  typeDocument,
             @Param("policyStatusIdc") Integer  policyStatusIdc);
-
 
     @Query("SELECT fd " +
             "FROM PolicyItemJpaEntity pit " +

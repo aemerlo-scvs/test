@@ -108,10 +108,8 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
 
             //#region Validación de calidad de información
 
-            Person personAux = personPort.findByIdentificationNumberAndType(processRequest.getPerson().getNaturalPerson()
-                                                                            .getIdentificationNumber(),
-                                                                            processRequest.getPerson().getNaturalPerson()
-                                                                            .getDocumentType());
+            Person personAux = personPort.findByIdentificationNumberAndType(processRequest.getPerson().getNaturalPerson().getIdentificationNumber(),
+                                                                            processRequest.getPerson().getNaturalPerson().getDocumentType());
 
             //#endregion
 
@@ -208,7 +206,7 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
                 PolicyItemEconomicReinsurance policyItemEconomicReinsurance = new PolicyItemEconomicReinsurance(
                         policyItemEconomic.getId(), coverage.getCoverageId());
                 productCalculationsService.calcPolicyItemEconomicReinsuranceVIN(policyItemEconomicReinsurance, null,
-                        policyItemEconomic.getMovementTypeIdc(), coverage, policyItemEconomic.getIndividualNetPremium(),
+                        policyItemEconomic.getMovementTypeIdc(), coverage, totalPremiumCeded, policyItemEconomic.getIndividualNetPremium(),
                         processRequest.getTermInYears(), policy.getFromDate(), policy.getToDate(), policy.getFromDate());
                 policyItemEconomicReinsuranceList.add(policyItemEconomicReinsurance);
             }
@@ -514,7 +512,8 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
         PolicyItemEconomic tempAnulmmentPolicyItemEconomic = policyItemEconomicPort.saveOrUpdate(anulmmentPolicyItemEconomic);
         anulmmentPolicyItemEconomicReinsuranceList.forEach(o -> {
             o.setId(0L);
-            o.setPremiumCeded(o.getPremiumCeded() * factor);
+            o.setPremiumCeded((o.getPremiumCeded() > 0) ? o.getPremiumCeded() * factor : o.getPremiumCeded());
+            o.setPremiumRetained((o.getPremiumRetained() > 0) ? o.getPremiumRetained() * factor : o.getPremiumRetained());
             o.setPolicyItemEconomicId(tempAnulmmentPolicyItemEconomic.getId());
         });
 
@@ -808,9 +807,7 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
             headers.add("Tipo de Movimiento");
             headers.add("SubTipo de Movimiento");
             headers.add("Moneda");
-            headers.add("Regional SCVS");
-            headers.add("Sucursal BFS");
-            headers.add("Agencia BFS");
+            headers.add("Regional");
             headers.add("Ramo");
             headers.add("Producto");
             headers.add("Plan");
@@ -863,6 +860,7 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
             headers.add("Capital Cedido Total");
             headers.add("Prima Cedida Total");
             headers.add("IRE Total");
+            headers.add("Prima Neta Retenida");
             headers.add("Edad Actuarial a la fecha de corte");
             headers.add("Edad actuarial Mancomunada a la fecha de corte");
             headers.add("Fumador");
@@ -876,8 +874,6 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
             headers.add("% De ahorro (si corresponde)");
             headers.add("Tasa de Interés Financiera (%)");
             headers.add("Reserva Matemática y Financiera Total");
-            headers.add("Fecha de Pago");
-            headers.add("No. de Comprobante");
         }
         if (option == 2) {
             headers.add("No. Propuesta");
@@ -1194,6 +1190,7 @@ public class VinService implements ProcessRequestWithoutSubscriptionUseCase, Vin
         policyItemEconomicReinsuranceList.forEach(o -> {
             o.setId(0L);
             o.setPremiumCeded(o.getPremiumCeded() * factor);
+            o.setPremiumRetained(o.getPremiumRetained() * factor);
             o.setPolicyItemEconomicId(tempPolicyItemEconomic.getId());
         });
         policyItemEconomicReinsurancePort.saveOrUpdateAll(policyItemEconomicReinsuranceList);

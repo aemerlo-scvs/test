@@ -1,6 +1,5 @@
 package com.scfg.core.application.service;
 
-import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
@@ -48,28 +47,150 @@ public class JksCertificateService implements JksCertificateUseCase {
         return jksCertificatePort.saveOrUpdate(jksCertificate) > 0;
     }
 
-    @Override
-    public String signDocumentWithP12Cert(String document, List<String> ownerSigns, LocalDateTime signatureDate) {
-        String signedDocument = "";
-        String signedDocumentAux = "";
+//    @Override
+//    public String signDocumentWithP12Cert(String document, List<String> ownerSigns) {
+//        String signedDocument = "";
+//        String signedDocumentAux = "";
+//
+//        if (document.isEmpty()) {
+//            throw new OperationException("El documento a firmar esta vacio");
+//        }
+//
+//        List<JksCertificateDTO> jksCertificateDTOList = getJksCertificateDTOList(ownerSigns);
+//
+//
+//        for (int i = 0; i < jksCertificateDTOList.size(); i++) {
+//            if (i == 0) {
+//                signedDocumentAux = document;
+//            }
+//
+//            signedDocumentAux = signInBase64(signedDocumentAux, jksCertificateDTOList.get(i));
+//
+//            signedDocument = signedDocumentAux;
+//        }
+//
+//        return signedDocument;
+//    }
+//
+//    @Override
+//    public String signDocumentWithP12Cert(String document, List<String> ownerSigns, LocalDateTime signatureDate) {
+//        String signedDocument = "";
+//        String signedDocumentAux = "";
+//
+//        if (document.isEmpty()) {
+//            throw new OperationException("El documento a firmar esta vacio");
+//        }
+//
+//        List<JksCertificateDTO> jksCertificateDTOList = getJksCertificateDTOList(ownerSigns);
+//
+//
+//        for (int i = 0; i < jksCertificateDTOList.size(); i++) {
+//            if (i == 0) {
+//                signedDocumentAux = document;
+//            }
+//
+//            signedDocumentAux = signInBase64(signedDocumentAux, jksCertificateDTOList.get(i),signatureDate);
+//
+//            signedDocument = signedDocumentAux;
+//        }
+//
+//        return signedDocument;
+//    }
+@Override
+public String signDocumentWithP12Cert(String document, List<String> ownerSigns, LocalDateTime signatureDate) {
+    String signedDocument = "";
+    String signedDocumentAux = "";
 
-        if (document.isEmpty()) {
-            throw new OperationException("El documento a firmar esta vacio");
+    if (document.isEmpty()) {
+        throw new OperationException("El documento a firmar esta vacio");
+    }
+
+    List<JksCertificateDTO> jksCertificateDTOList = getJksCertificateDTOList(ownerSigns);
+
+
+    for (int i = 0; i < jksCertificateDTOList.size(); i++) {
+        if (i == 0) {
+            signedDocumentAux = document;
         }
 
-        List<JksCertificateDTO> jksCertificateDTOList = getJksCertificateDTOList(ownerSigns);
+        signedDocumentAux = signInBase64(signedDocumentAux, jksCertificateDTOList.get(i),signatureDate);
 
+        signedDocument = signedDocumentAux;
+    }
 
-        for (int i = 0; i < jksCertificateDTOList.size(); i++) {
-            if (i == 0) {
-                signedDocumentAux = document;
-            }
+    return signedDocument;
+}
 
-            signedDocumentAux = signInBase64(signedDocumentAux, jksCertificateDTOList.get(i),signatureDate);
+//    @Override
+//    public byte[] signDocumentWithP12Cert(byte[] document, List<String> ownerSigns) {
+//        byte[] signedDocument = null;
+//        byte[] signedDocumentAux = null;
+//
+//        if (document != null) {
+//            throw new OperationException("El documento a firmar esta vacio");
+//        }
+//
+//        List<JksCertificateDTO> jksCertificateDTOList = getJksCertificateDTOList(ownerSigns);
+//
+//        for (int i = 0; i < jksCertificateDTOList.size(); i++) {
+//            if (i == 0) {
+//                signedDocumentAux = document;
+//            }
+//
+//            signedDocumentAux = signInByte(signedDocumentAux, jksCertificateDTOList.get(i), LocalDateTime.now());
+//
+//            signedDocument = signedDocumentAux;
+//        }
+//
+//        return signedDocument;
+//    }
+    private String signInBase64(String documentToSign, JksCertificateDTO cert, LocalDateTime signatureDate) {
 
-            signedDocument = signedDocumentAux;
+        byte[] documentToSignAux = Base64.getDecoder().decode(documentToSign);
+        byte[] signedDocument = signInByte(documentToSignAux, cert, signatureDate);
+
+        return Base64.getEncoder().encodeToString(signedDocument);
+    }
+
+    private byte[] signInByte(byte[] documentToSign, JksCertificateDTO cert, LocalDateTime signatureDate) {
+
+        byte[] signedDocument = null;
+        try {
+            KeyStore ks = KeyStore.getInstance("pkcs12");
+            byte[] certDocumentDecoded = Base64.getDecoder().decode(cert.getContent());
+            char[] certPasswordCharArray = cert.getPassword().toCharArray();
+
+            InputStream is = new ByteArrayInputStream(certDocumentDecoded);
+
+            ks.load(is, certPasswordCharArray);
+            String alias = (String) ks.aliases().nextElement();
+            PrivateKey key = (PrivateKey) ks.getKey(alias, certPasswordCharArray);
+            Certificate[] chain = ks.getCertificateChain(alias);
+
+            // Recibimos como parámetro de entrada el nombre del archivo PDF a firmar
+            PdfReader reader = new PdfReader(documentToSign);
+
+            ByteArrayOutputStream bout = new ByteArrayOutputStream(8192);
+
+            // Añadimos firma al documento PDF
+            PdfStamper stp = PdfStamper.createSignature(reader, bout, '\0');
+
+            PdfSignatureAppearance sap = stp.getSignatureAppearance();
+            sap.setCrypto(key, chain, null, PdfSignatureAppearance.SELF_SIGNED);
+            sap.setReason("Firma PKCS12");
+            sap.setLocation("Santa Cruz");
+            sap.setSignDate(DateUtils.asCalendarLocalDateTime(signatureDate));
+//            // Añade la firma visible. Podemos comentarla para que no sea visible.
+//            sap.setVisibleSignature(new Rectangle(50, 50, 250, 80), 1, "sig");
+//            sap.setAcro6Layers(true);
+
+            stp.close();
+
+            signedDocument = bout.toByteArray();
+
+        } catch (Exception ex) {
+            throw new OperationException("Error" + ex.getMessage());
         }
-
         return signedDocument;
     }
 
@@ -128,55 +249,55 @@ public class JksCertificateService implements JksCertificateUseCase {
         return jksCertificateDTOList;
     }
 
-    private String signInBase64(String documentToSign, JksCertificateDTO cert, LocalDateTime signatureDate) {
+//    private String signInBase64(String documentToSign, JksCertificateDTO cert) {
+//
+//        byte[] documentToSignAux = Base64.getDecoder().decode(documentToSign);
+//        byte[] signedDocument = signInByte(documentToSignAux, cert);
+//
+//        return Base64.getEncoder().encodeToString(signedDocument);
+//    }
 
-        byte[] documentToSignAux = Base64.getDecoder().decode(documentToSign);
-        byte[] signedDocument = signInByte(documentToSignAux, cert, signatureDate);
-
-        return Base64.getEncoder().encodeToString(signedDocument);
-    }
-
-    private byte[] signInByte(byte[] documentToSign, JksCertificateDTO cert, LocalDateTime signatureDate) {
-
-        byte[] signedDocument = null;
-        try {
-            KeyStore ks = KeyStore.getInstance("pkcs12");
-            byte[] certDocumentDecoded = Base64.getDecoder().decode(cert.getContent());
-            char[] certPasswordCharArray = cert.getPassword().toCharArray();
-
-            InputStream is = new ByteArrayInputStream(certDocumentDecoded);
-
-            ks.load(is, certPasswordCharArray);
-            String alias = (String) ks.aliases().nextElement();
-            PrivateKey key = (PrivateKey) ks.getKey(alias, certPasswordCharArray);
-            Certificate[] chain = ks.getCertificateChain(alias);
-
-            // Recibimos como parámetro de entrada el nombre del archivo PDF a firmar
-            PdfReader reader = new PdfReader(documentToSign);
-
-            ByteArrayOutputStream bout = new ByteArrayOutputStream(8192);
-
-            // Añadimos firma al documento PDF
-            PdfStamper stp = PdfStamper.createSignature(reader, bout, '\0');
-
-            PdfSignatureAppearance sap = stp.getSignatureAppearance();
-            sap.setCrypto(key, chain, null, PdfSignatureAppearance.SELF_SIGNED);
-            sap.setReason("Firma PKCS12");
-            sap.setLocation("Santa Cruz");
-            sap.setSignDate(DateUtils.asCalendarLocalDateTime(signatureDate));
-//            // Añade la firma visible. Podemos comentarla para que no sea visible.
-//            sap.setVisibleSignature(new Rectangle(50, 50, 250, 80), 1, "sig");
-//            sap.setAcro6Layers(true);
-
-            stp.close();
-
-            signedDocument = bout.toByteArray();
-
-        } catch (Exception ex) {
-            throw new OperationException("Error" + ex.getMessage());
-        }
-        return signedDocument;
-    }
+//    private byte[] signInByte(byte[] documentToSign, JksCertificateDTO cert) {
+//
+//        byte[] signedDocument = null;
+//        try {
+//            KeyStore ks = KeyStore.getInstance("pkcs12");
+//            byte[] certDocumentDecoded = Base64.getDecoder().decode(cert.getContent());
+//            char[] certPasswordCharArray = cert.getPassword().toCharArray();
+//
+//            InputStream is = new ByteArrayInputStream(certDocumentDecoded);
+//
+//            ks.load(is, certPasswordCharArray);
+//            String alias = (String) ks.aliases().nextElement();
+//            PrivateKey key = (PrivateKey) ks.getKey(alias, certPasswordCharArray);
+//            Certificate[] chain = ks.getCertificateChain(alias);
+//
+//            // Recibimos como parámetro de entrada el nombre del archivo PDF a firmar
+//            PdfReader reader = new PdfReader(documentToSign);
+//
+//            ByteArrayOutputStream bout = new ByteArrayOutputStream(8192);
+//
+//            // Añadimos firma al documento PDF
+//            PdfStamper stp = PdfStamper.createSignature(reader, bout, '\0');
+//
+//            PdfSignatureAppearance sap = stp.getSignatureAppearance();
+//            sap.setCrypto(key, chain, null, PdfSignatureAppearance.SELF_SIGNED);
+//            sap.setReason("Firma PKCS12");
+//            sap.setLocation("Santa Cruz");
+////
+////            // Añade la firma visible. Podemos comentarla para que no sea visible.
+////            sap.setVisibleSignature(new Rectangle(50, 50, 250, 80), 1, "sig");
+////            sap.setAcro6Layers(true);
+//
+//            stp.close();
+//
+//            signedDocument = bout.toByteArray();
+//
+//        } catch (Exception ex) {
+//            throw new OperationException("Error" + ex.getMessage());
+//        }
+//        return signedDocument;
+//    }
 
     //#endregion
 

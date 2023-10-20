@@ -10,8 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 @AllArgsConstructor
@@ -108,40 +107,12 @@ public class GeneralRequest extends BaseDomain {
     //VIN
     public GeneralRequest(VinProcessRequestDTO processRequest, int status, long personId, long planId) {
         String requestDescription = "Propuesta del cliente: " + processRequest.getPerson().getNaturalPerson().getCompleteName();
-
-        LocalDateTime requestDate;
-        if(processRequest.getRequestDate()!=null)
-            requestDate=processRequest.getRequestDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        else
-            requestDate=new Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-
-        int daysInYear = 0;
+        int daysInYear = 365;
         if (processRequest.getTermInYears() == 1) {
             daysInYear = 370;
         }
-        else
-        {
-            int actualYear=requestDate.toInstant(ZoneOffset.UTC).atZone(ZoneId.systemDefault()).getYear();
-            for (int i=0;i<processRequest.getTermInYears();i++){
-                if(LocalDate.of(actualYear+i, Month.JANUARY,1).lengthOfYear()==365)
-                {
-                    daysInYear+=365;
-                }
-                else
-                {
-                    if(requestDate.getMonthValue()>2)
-                    {
-                        daysInYear+=365;
-                    }
-                    else
-                    {
-                        daysInYear+=366;
-                    }
-                }
-            }
-        }
         this.setId(0L);
-        this.setRequestDate(requestDate);
+        this.setRequestDate(LocalDateTime.now());
         this.setDescription(requestDescription);
         this.setWeight(null);
         this.setHeight(null);
@@ -150,7 +121,7 @@ public class GeneralRequest extends BaseDomain {
         this.setCurrentAmount(null);
         this.setAccumulatedAmount(null);
         this.setCreditTerm(processRequest.getCreditTerm());
-        this.setCreditTermInDays(daysInYear);
+        this.setCreditTermInDays(daysInYear * processRequest.getTermInYears());
         this.setCreditTermInYears(processRequest.getTermInYears());
         this.setRejectedReasonIdc(null);
         this.setAcceptanceReasonIdc(null);

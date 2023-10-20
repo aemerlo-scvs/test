@@ -1935,13 +1935,13 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             insuredData.addCell(getCell(insuredCelf, 8, Element.ALIGN_JUSTIFIED));
 
             insuredData.addCell(getCell("Telf. Domicilio:", 7, Element.ALIGN_LEFT, true));
-            String insuredTelf = (djsDirectionInsuredPersonal.getCellPhone() == null || djsDirectionInsuredPersonal.getCellPhone() == "") ? "S/N" : djsDirectionInsuredPersonal.getCellPhone();
-            insuredData.addCell(getCell(insuredTelf, 7, Element.ALIGN_JUSTIFIED));
+//            String insuredTelf = (djsDirectionInsuredPersonal.getCellPhone() == null || djsDirectionInsuredPersonal.getCellPhone() == "") ? "S/N" : djsDirectionInsuredPersonal.getCellPhone();
+//            insuredData.addCell(getCell(insuredTelf, 7, Element.ALIGN_JUSTIFIED));
 
 
             insuredData.addCell(getCell("Telf. Oficina:", 6, Element.ALIGN_LEFT, true));
-            String insuredOffTelf = (djsDirectionInsuredWork.getCellPhone() == null || djsDirectionInsuredWork.getCellPhone() == "") ? "S/N" : djsDirectionInsuredWork.getCellPhone();
-            insuredData.addCell(getCell(insuredOffTelf, 13, Element.ALIGN_JUSTIFIED));
+//            String insuredOffTelf = (djsDirectionInsuredWork.getCellPhone() == null || djsDirectionInsuredWork.getCellPhone() == "") ? "S/N" : djsDirectionInsuredWork.getCellPhone();
+//            insuredData.addCell(getCell(insuredOffTelf, 13, Element.ALIGN_JUSTIFIED));
 
 
             insuredData.addCell(getCell("Estado Civil:", 9, Element.ALIGN_LEFT, true));
@@ -2649,15 +2649,15 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             certInsurerTable.addCell(getCellVinSize8("", 10, Element.ALIGN_LEFT, true, false));//11
             certInsurerTable.addCell(getCellVinSize8("Línea Gratuita:", 6, Element.ALIGN_LEFT, true, false));//6
             certInsurerTable.addCell(getCellVinSize8(generateCertificateVin.getInsurerCompany().getTelephones()
-                    .stream().filter(x -> x.getNumberTypeIdc() == (int) ClassifierEnum.NUMBER_TYPE_FREE.getReferenceCode())
+                    .stream().filter(x -> x.getTelephoneTypeIdc() == (int) ClassifierEnum.NUMBER_TYPE_FREE.getReferenceCode())
                     .findFirst().get().getNumber(), 6, Element.ALIGN_LEFT, false, false));//6
             certInsurerTable.addCell(getCellVinSize8("Whatsapp:", 4, Element.ALIGN_LEFT, true, false));//4
             certInsurerTable.addCell(getCellVinSize8(generateCertificateVin.getInsurerCompany().getTelephones()
-                    .stream().filter(x -> x.getNumberTypeIdc() == (int) ClassifierEnum.NUMBER_TYPE_WHATSAPP.getReferenceCode())
+                    .stream().filter(x -> x.getTelephoneTypeIdc() == (int) ClassifierEnum.NUMBER_TYPE_WHATSAPP.getReferenceCode())
                     .findFirst().get().getNumber(), 7, Element.ALIGN_LEFT, false, false));//7
             certInsurerTable.addCell(getCellVinSize8("Teléfono:", 4, Element.ALIGN_LEFT, true, false));//4
             certInsurerTable.addCell(getCellVinSize8(generateCertificateVin.getInsurerCompany().getTelephones()
-                    .stream().filter(x -> x.getNumberTypeIdc() == (int) ClassifierEnum.NUMBER_TYPE_FIJO.getReferenceCode())
+                    .stream().filter(x -> x.getTelephoneTypeIdc() == (int) ClassifierEnum.NUMBER_TYPE_FIJO.getReferenceCode())
                     .findFirst().get().getNumber(), 11, Element.ALIGN_LEFT, false, false));//10
 
             certInsurerTable.addCell(getCellVinSize8("", 10, Element.ALIGN_LEFT, true, false));//11
@@ -3738,7 +3738,7 @@ public class GeneratePdfService implements GeneratePdfUseCase {
             String yearlyPremium = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(obj.getPremiumPaidAnnual(), "Bs");
             String years = obj.getYearsPassed().toString();
             String days = obj.getDaysPassed().toString();
-            String rescueValue = HelpersMethods.convertNumberToCompanyFormatNumber(obj.getRescueValue());
+            String rescueValue = HelpersMethods.formatStringOnlyDate(obj.getRequestDate());
             String expenseManagement = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(
                     obj.getAdminExpenses(), "");
             String rescueDiscount = HelpersMethods.convertNumberToCompanyFormatNumberAndCurrency(

@@ -28,6 +28,12 @@ public class AlertPersistenceAdapter  implements AlertPort {
         return list.stream().map(o -> new ModelMapper().map(o, Alert.class)).collect(Collectors.toList());
     }
 
+    @Override
+    public List<Alert> findByIdList(List<Integer> idList) {
+        List<AlertJpaEntity> list = repository.findAllById(idList);
+        return list.stream().map(o -> new ModelMapper().map(o, Alert.class)).collect(Collectors.toList());
+    }
+
     private Alert ConvetJpaToDomian(AlertJpaEntity alertJpaEntity) {
         Alert alert=Alert.builder()
                 .alert_id(alertJpaEntity.getAlert_id())

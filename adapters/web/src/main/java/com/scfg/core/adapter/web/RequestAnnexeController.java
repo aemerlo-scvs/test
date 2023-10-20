@@ -4,13 +4,17 @@ import com.scfg.core.adapter.web.util.CustomErrorType;
 import com.scfg.core.application.port.in.RequestAnnexeUseCase;
 import com.scfg.core.common.exception.NotDataFoundException;
 import com.scfg.core.common.exception.OperationException;
+import com.scfg.core.domain.common.RequestAnnexe;
 import com.scfg.core.domain.dto.PageableDTO;
 import com.scfg.core.domain.dto.RequestAnnexeCancelaltionDto;
 import com.scfg.core.domain.dto.RequestAnnexeSearchFiltersDto;
 
 import com.scfg.core.domain.dto.RequestSaveVoucherPaymentDto;
-import com.scfg.core.domain.dto.vin.*;
+import com.scfg.core.domain.dto.vin.AnnexeRequirementDto;
+import com.scfg.core.domain.dto.vin.RequestAnnexeDTO;
 import com.scfg.core.domain.common.AnnexeRequirementControl;
+import com.scfg.core.domain.dto.vin.RequestAnnexeFileDocumentDTO;
+import com.scfg.core.domain.dto.vin.UpdateRequestAnnexeDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -31,23 +35,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequestMapping(path = "requestAnnexe")
 @Api(tags = "API REST Solicitud de anexo")
 public class RequestAnnexeController {
-
     private final RequestAnnexeUseCase requestAnnexeUseCase;
-
-    @GetMapping(value = "/detail/{annexeTypeId}/{policyId}")
-    @ApiOperation(value = "Retorna una solictud existente por el Id del tipo de anexo")
-    ResponseEntity getRequestAnnexeDetail(@PathVariable long annexeTypeId, @PathVariable long policyId) {
-        try {
-            RequestAnnexeDetailDTO response = requestAnnexeUseCase.getRequestAnnexeDetail(policyId, annexeTypeId);
-            return ok(response);
-        } catch (OperationException e) {
-            log.error("Ocurrió un error al querer procesar la solicitud: [{}]", e.getMessage());
-            return CustomErrorType.badRequest("Process Error", e.getMessage());
-        } catch (Exception e) {
-            log.error("Ocurrió un error al querer procesar la solicitud: [{}]", e.getMessage());
-            return CustomErrorType.serverError("Server Error", e.getMessage());
-        }
-    }
 
     @PostMapping(value = "/processRequest")
     @ApiOperation(value = "Se valida todo el proceso y se genera los documentos según sean necesarios")
@@ -152,7 +140,7 @@ public class RequestAnnexeController {
     @ApiOperation(value = "valida si se podra guardar el voucher de pago")
     ResponseEntity validateVoucherPayment(@PathVariable Long requestAnnexeId){
         try {
-            return ok(this.requestAnnexeUseCase.validateVoucherPayment(requestAnnexeId));
+            return ok(this.requestAnnexeUseCase.validateVousherPayment(requestAnnexeId));
         } catch (OperationException | NotDataFoundException e) {
             log.error("Ocurrio un error al validar el guardado del voucher de pago [{}] : [{}]", requestAnnexeId, e.toString());
             return CustomErrorType.badRequest("Bad Request", e.getMessage());

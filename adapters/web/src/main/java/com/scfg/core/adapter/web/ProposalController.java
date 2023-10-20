@@ -24,7 +24,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping(path = "/proposal")
-@Api(tags = "API REST Planes")
+@Api(tags = "API REST Propuesta")
 public class ProposalController implements PlanEndPoint{
     private final ProposalUseCase proposalUseCase;
 

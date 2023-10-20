@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
 import java.util.List;
 
 @AllArgsConstructor
@@ -67,6 +66,4 @@ public class VinProcessRequestDTO {
     private Person holderCompany;
     @ApiModelProperty(notes = "Tipo de moneda", example = "", value = "", required = true)
     private Integer currencyTypeIdc;
-    @ApiModelProperty(notes = "Fecha de Solicitud de Seguro", example = "", value = "", required = false)
-    private Date requestDate;
 }

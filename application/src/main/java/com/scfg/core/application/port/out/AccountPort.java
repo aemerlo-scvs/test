@@ -7,9 +7,11 @@ import java.util.List;
 public interface AccountPort {
 
     List<Account> findAllByPersonId(Long personId);
+    List<Account> findAllByNewPersonId(Long personId);
     Account findLastByPersonId(Long personId);
     Account findByPolicyId(Long policyId);
     Account findLastByPersonIdAndPolicyId(Long personId, Long policyId);
     Account saveOrUpdate(Account account);
 
+    boolean saveOrUpdateAll(List<Account> accountList);
 }

@@ -11,6 +11,7 @@ public class TwilioConfig {
     private String authToken;
     private String cellphoneNumber;
     private String whatsAppNumber;
+    private String whatsAppNumber_sandBox;
 
     public TwilioConfig() {
     }
@@ -45,5 +46,13 @@ public class TwilioConfig {
 
     public void setWhatsAppNumber(String whatsAppNumber) {
         this.whatsAppNumber = whatsAppNumber;
+    }
+
+    public String getWhatsAppNumber_sandBox() {
+        return whatsAppNumber_sandBox;
+    }
+
+    public void setWhatsAppNumber_sandBox(String whatsAppNumber_sandBox) {
+        this.whatsAppNumber_sandBox = whatsAppNumber_sandBox;
     }
 }

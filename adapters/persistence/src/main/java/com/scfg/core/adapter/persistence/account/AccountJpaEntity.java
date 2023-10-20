@@ -33,4 +33,12 @@ public class AccountJpaEntity extends BaseJpaEntity {
 
     @Column(name = "personId")
     private Long personId;
+    @Column(name = "financialEntityIdc")
+    private Integer financialEntityIdc;
+    @Column(name = "accountPersonName")
+    private String accountPersonName;
+    @Column(name = "accountIdentificationNumber")
+    private Long accountIdentificationNumber;
+    @Column(name = "newPersonId")
+    private Long newPersonId;
 }

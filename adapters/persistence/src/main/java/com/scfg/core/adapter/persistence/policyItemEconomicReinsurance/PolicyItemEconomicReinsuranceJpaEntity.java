@@ -23,6 +23,8 @@ public class PolicyItemEconomicReinsuranceJpaEntity extends BaseJpaEntity {
     private Long policyItemEconomicId;
     @Column(name = "premiumCeded", nullable = false)
     private Double premiumCeded;
+    @Column(name = "premiumRetained", nullable = false)
+    private Double premiumRetained;
     @Column(name = "coverageId", nullable = false)
     private Long coverageId;
     @Column(name = "reinsurerId", nullable = false)

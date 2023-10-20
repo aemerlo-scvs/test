@@ -14,10 +14,10 @@ import java.util.Date;
 @SuperBuilder
 public class ContactCenterRequestDTO {
 
-    public ContactCenterRequestDTO(String name, String lastName, String motherLastName, String marriedLastName, String activationCode, String cellphone, String telephone, String email, Date requestDate, String salePlace, String agencyName, String voucherNumber, Integer requestStatusIdc) {
+    public ContactCenterRequestDTO(String name, String lastName, String motherLastName, String marriedLastName, String activationCode, String telephone, String email, Date requestDate, String salePlace, String agencyName, String voucherNumber, Integer requestStatusIdc) {
         this.completeName = this.getCompleteNameAux(name, lastName, motherLastName, marriedLastName);
         this.activationCode = activationCode;
-        this.cellphone = cellphone;
+//        this.cellphone = cellphone;
         this.telephone = parseToInt(telephone);
         this.email = email;
         this.requestDate = requestDate.toInstant().atZone(ZoneId.of("America/La_Paz")).toLocalDateTime();
