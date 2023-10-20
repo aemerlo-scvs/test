@@ -68,7 +68,7 @@ public class CommercialManagementService implements CommercialManagementUseCase 
         if( filtersDTO.getNumber()!=null && filtersDTO.getIdentificationNumber()==null){
             return portView.search(filtersDTO.getNumber());
         }
-        if( filtersDTO.getNumber()==null && filtersDTO.getIdentificationNumber()!=null ){
+        if( filtersDTO.getStatus() == null && filtersDTO.getNumber()==null && filtersDTO.getIdentificationNumber()!=null ){
             return portView.search(filtersDTO.getIdentificationNumber(),true);
         }
         // Filtros de datos
